@@ -1,7 +1,6 @@
 #pragma once
 #include "KamataEngine.h"
-
-class GameScene {
+class TitleScene {
 public:
 
 	//初期化
@@ -13,6 +12,7 @@ public:
 	//描画
 	void Draw();
 
+
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
@@ -20,4 +20,7 @@ private:
 
 	//終了フラグ
 	bool isFinish = false;
+
+
+
 };

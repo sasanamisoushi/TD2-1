@@ -1,23 +1,21 @@
 #pragma once
 #include "KamataEngine.h"
 
-class GameScene {
+class GameClearScene {
 public:
-
-	//初期化
+	// 初期化
 	void Initialize();
 
-	//更新
+	// 更新
 	void Update();
 
-	//描画
+	// 描画
 	void Draw();
 
-	//デスフラグのgetter
+	// デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
 private:
-
-	//終了フラグ
+	// 終了フラグ
 	bool isFinish = false;
 };
