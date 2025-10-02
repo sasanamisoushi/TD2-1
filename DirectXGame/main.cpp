@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "KamataEngine.h"
 #include "TitleScene.h"
+#include "GameClearScene.h"
 #include <Windows.h>
 
 using namespace KamataEngine;
@@ -23,14 +24,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	DirectXCommon* dxCommmon = DirectXCommon::GetInstance();
 	ImGuiManager* imguiManager = ImGuiManager::GetInstance();
 
-	// ゲームシーンの初期化
-	GameScene* gameScene = new GameScene();
+	
 
 	// シーンオブジェクトへのポインタ
 	GameScene* gameScene = nullptr;
 	TitleScene* titleScene = nullptr;
-	GameCleasrScene* gameClearScene = nullptr;
-
+	GameClearScene* gameClearScene = nullptr;
+	
 
 	// 現在と次のシーンの状態変数
 	Scene currentSceneEnum = Scene::kTitle;
@@ -40,8 +40,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	titleScene = new TitleScene();
 	titleScene->Initialize();
 
-	// ゲームシーンの初期化
-	gameScene->Initialize();
+	
 
 	// メインループ
 	while (true) {
@@ -98,7 +97,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		case Scene::kTitle:
 			if (titleScene != nullptr) {
 				titleScene->Update();
-				if (titleScene->isfinished()) {
+				if (titleScene->IsFinished()) {
 					nextSceneEnum = Scene::kGame;
 				}
 			}
@@ -106,8 +105,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		case Scene::kGame:
 			if (gameScene != nullptr) {
 				gameScene->Update();
-				if (gameScene->isfinished()) {
-					// NOTE: 勝利条件か敗北条件かを判断するようにゲームシーンのロジックを修正する必要がある
+				if (gameScene->IsFinished()) {
 					nextSceneEnum = Scene::kGameClear;
 				}
 			}
@@ -115,7 +113,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		case Scene::kGameClear:
 			if (gameClearScene != nullptr) {
 				gameClearScene->Update();
-				if (gameClearScene->isfinished()) {
+				if (gameClearScene->IsFinished()) {
 					nextSceneEnum = Scene::kTitle;
 				}
 			}
@@ -148,24 +146,21 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// 描画終了
 		dxCommmon->PostDraw();
 
-		// 最終的なクリーンアップ
-		switch (currentSceneEnum) {
-		case Scene::kTitle:
-			delete titleScene;
-			break;
-		case Scene::kGame:
-			delete gameScene;
-			break;
-		case Scene::kGameClear:
-			delete gameClearScene;
-			break;
-		}
+		
 	}
 
-	// ゲームシーンの解放
-	delete gameScene;
-	// nullptrの代入
-	gameScene = nullptr;
+	// 最終的なクリーンアップ
+	switch (currentSceneEnum) {
+	case Scene::kTitle:
+		delete titleScene;
+		break;
+	case Scene::kGame:
+		delete gameScene;
+		break;
+	case Scene::kGameClear:
+		delete gameClearScene;
+		break;
+	}
 
 	// エンジンの終了処理
 	KamataEngine::Finalize();

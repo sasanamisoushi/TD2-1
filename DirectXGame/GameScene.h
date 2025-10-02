@@ -14,10 +14,10 @@ public:
 	void Draw();
 
 	//デスフラグのgetter
-	bool IsFinished() const { return finished_; }
+	bool IsFinished() const { return isFinish; }
 
 private:
 
 	//終了フラグ
-	bool finished_ = false;
+	bool isFinish = false;
 };
