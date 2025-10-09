@@ -1,8 +1,5 @@
 #include "Fish.h"
 #include "math.h"
-#include <DirectXMath.h>
-using namespace DirectX;
-
 #include <cstdlib>
 #include <cassert>
 #include <numbers>

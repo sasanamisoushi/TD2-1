@@ -3,6 +3,7 @@
 #include "Player.h"
 #include <vector>
 #include "Fish.h"
+#include "BigFish.h"
 
 class GameScene 
 {
@@ -31,10 +32,22 @@ private:
 	Model* playerModel_ = nullptr;
 	Camera camera_;
 
+	//========================================
+	//魚
+	//========================================
 	// 魚モデル
 	Model* fishModel_ = nullptr;
 
 	std::list<Fish*> fishes_;
+
+
+	//大きい魚のモデル
+	Model* bigFishModel_ = nullptr;
+	std::vector<BigFish*> BigFishes_;
+
+	// 現在数をカウント
+	int smallCount = 0;
+	int bigCount = 0;
 
 	//終了フラグ
 	bool isFinish = false;
