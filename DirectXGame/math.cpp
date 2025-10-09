@@ -171,3 +171,7 @@ Vector3 Normalize(const Vector3& v) {
 	}
 	return {v.x / len, v.y / len, v.z / len};
 }
+
+//Matrix4x4 MakeViewportMatrix(float width, float height) { return Matrix4x4(); }
+
+//Matrix4x4 Inverse(const Matrix4x4& m) { return Matrix4x4(); }

@@ -75,3 +75,9 @@ inline float ToDegrees(float radians) { return radians * (180.0f / 3.1415f); }
 float Length(const Vector3& v);
 
 Vector3 Normalize(const Vector3& v);
+
+
+// 正規化デバイス座標
+Matrix4x4 MakeViewportMatrix(float width, float height);
+
+Matrix4x4 Inverse(const Matrix4x4& m);
