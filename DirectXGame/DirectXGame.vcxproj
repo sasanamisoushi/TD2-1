@@ -112,6 +112,7 @@
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math.cpp" />
+    <ClCompile Include="orthographicCamera.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
@@ -196,6 +197,7 @@
     <ClInclude Include="GameClearScene.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="math.h" />
+    <ClInclude Include="orthographicCamera.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TitleScene.h" />
   </ItemGroup>
