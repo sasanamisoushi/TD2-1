@@ -21,6 +21,8 @@ void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* playerM
 
 	isLureThrow = false;
 	isKeyPush = false;
+	isLeft = false;
+
 }
 
 void Player::Update() {
@@ -31,23 +33,36 @@ void Player::Update() {
 void Player::InputMove() {
 
 	// ルアーの投げる場所決定の処理
-	if (!isLureThrow) {
-
+	if (!isLureThrow) 
+	{
 		KamataEngine::Vector3 acceleration = {};
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_RIGHT)) {
+		if (!isLeft)
+		{
 			acceleration.x += kLureMoveSpeedX;
-			velocity_.x += acceleration.x;
 		}
-
-		/*KamataEngine::Vector3 acceleration = {};
-		acceleration.x += kLureMoveSpeedX;
-		if (worldTransform_.translation_.x > 1260 || worldTransform_.translation_.x < 0) {
-		     kLureMoveSpeedX *= -1;
+		else
+		{
+			acceleration.x -= kLureMoveSpeedX;
 		}
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_P)) {
+		if (worldTransform_.translation_.x > 10.0f && !isLeft)
+		{
+			velocity_.x = 0;
+			acceleration.x = 0;
+			isLeft = true;
+		}
+		if (worldTransform_.translation_.x < -10.0f && isLeft)
+		{
+			velocity_.x = 0;
+			acceleration.x = 0;
+			isLeft = false;
+		}
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_P)) 
+		{
+			velocity_.x = 0;
+			acceleration.x = 0;
 		    isLureThrow = true;
 		}
-		velocity_.x += acceleration.x;*/
+		velocity_.x += acceleration.x;
 	}
 	// 魚を釣る
 	if (isLureThrow) {

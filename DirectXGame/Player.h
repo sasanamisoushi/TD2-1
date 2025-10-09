@@ -21,7 +21,8 @@ private:
 	
 	
 	// ルアーの移動
-	static inline const float kLureMoveSpeedX = 5;
+	static inline const float kLureMoveSpeedX = 0.001f;
+
 	static inline const float kLureMoveSpeedY = 5;
 	// プレイヤーの描画座標
 	float playerDrawPosX;
@@ -30,6 +31,8 @@ private:
 	// フラグ
 	int isLureThrow; // ルアーが投げてある
 	int isKeyPush; //スペースを押してる
+
+	int isLeft; // ルアーが右に行った時に使う
 
 public:
 
