@@ -1,5 +1,6 @@
 #pragma once
 #include "KamataEngine.h"
+#include "Fish.h"
 
 class GameScene {
 public:
@@ -16,7 +17,21 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
+	//解放
+	void Finalize();
+
 private:
+
+
+
+	// カメラ
+	Camera camera_;
+
+
+	// 魚モデル
+	Model* fishModel_ = nullptr;
+
+	std::vector<Fish*> fishes_;
 
 	//終了フラグ
 	bool isFinish = false;

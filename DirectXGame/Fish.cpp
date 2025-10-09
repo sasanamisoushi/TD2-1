@@ -1,29 +1,77 @@
 #include "Fish.h"
+#include "math.h"
+#include <DirectXMath.h>
+using namespace DirectX;
+
 #include <cstdlib>
+#include <cassert>
+#include <numbers>
 
-void Fish::Initialize(const Vector2& startPos, bool moveRight) {
-	pos_ = startPos;
-	moveRight_ = moveRight;
+void Fish::Initialize(Model* model, Camera* camera, const Vector3& position) {
+	// NULLポインタチェック
+	assert(model);
+	// モデル
+	model_ = model;
 
-	// 左右方向の速度を決定
-	velocity_ = {moveRight ? speed_ : -speed_, 0.0f};
+	// カメラ
+	camera_ = camera;
 
-	// 魚のテクスチャ読み込み（仮）
-	textureHandle_ = TextureManager::Load("fish.png");
+	// 自分の位置を中心に５ずつの範囲で泳ぐ
+	leftLimit_ = position.x - 5.0f;
+	rigdhtLimit_ = position.x + 5.0f;
+
+	// ワールドトランスフォームの初期化
+	worldTransform_.Initialize();
+	worldTransform_.translation_ = position;
+
+	
+	
+	//移動方向
+	//direction_ = moveRight ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(-1.0f, 0.0f, 0.0f);
+
+	// 速度ベクトルを方向に基づいて設定
+	velocity_ += {-speed_,0.0f,0.0f};
+
+	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
+
+	// 角度調整
+	//if (moveRight) {
+	//	//右
+	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	//} else {
+	//	//左
+	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
+	//}
 }
 
 void Fish::Update() {
-	pos_ += velocity_;
 
-	// 画面外に出たら反対側へ回り込む
-	const float screenWidth = 1280.0f; // 画面サイズに合わせて変更
-	if (pos_.x > screenWidth + radius_) {
-		pos_.x = -radius_;
-	} else if (pos_.x < -radius_) {
-		pos_.x = screenWidth + radius_;
-	}
+	// 移動
+	worldTransform_.translation_ +=  velocity_;
+
+	// 端で反転（ヒステリシスを持たせる）
+	//if (worldTransform_.translation_.x > rigdhtLimit_+0.1f) {
+	//	direction_.x = -1.0f;                   // 左へ
+	//	velocity_.x = direction_.x * speed_;
+	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f; // 左向きに回転
+	//	worldTransform_.translation_.x = rigdhtLimit_;
+	//} else if (worldTransform_.translation_.x < leftLimit_-0.1f) {
+	//	direction_.x = 1.0f;                     // 右へ
+	//	velocity_.x = direction_.x * speed_;
+	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // 右向きに回転
+	//	worldTransform_.translation_.x = leftLimit_;
+	//}
+
+	
+
+	// 行列更新
+	WorldTransformUpdate(worldTransform_);
 }
 
 void Fish::Draw() { 
-	Sprite::Draw(textureHandle_, pos_, {moveRight_ ? 1.0f : -1.0f, 1.0f}); 
+	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
+	// 3Dモデル描画前処理
+	Model::PreDraw(dxCommon->GetCommandList());
+	model_->Draw(worldTransform_, * camera_);
+	Model::PostDraw();
 }

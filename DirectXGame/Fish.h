@@ -6,7 +6,7 @@ using namespace KamataEngine;
 class Fish {
 public:
 	// 初期化（座標と速度方向を指定）
-	void Initialize(const Vector2& startPos, bool moveRight);
+	void Initialize(Model* model, Camera* camera, const Vector3& position);
 
 	// 更新
 	void Update();
@@ -14,18 +14,29 @@ public:
 	// 描画
 	void Draw();
 
-	// 位置取得
-	const Vector2& GetPosition() const { return pos_; }
-
-	// 当たり判定用
-	float GetRadius() const { return radius_; }
-
+	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
+	
 private:
-	Vector2 pos_;
-	Vector2 velocity_;
-	float speed_ = 2.0f;
-	float radius_ = 16.0f;
-	int textureHandle_ = -1;
+	// ワールド変換データ
+	KamataEngine::WorldTransform worldTransform_;
 
-	bool moveRight_ = true;
+	// モデル
+	Model* model_ = nullptr;
+
+	//カメラ
+	Camera* camera_ = nullptr;
+
+	// テクスチャハンドル
+	uint32_t textureHandle_ = 0u;
+
+	//Vector3 direction_;
+	
+	// 速度
+	Vector3 velocity_ = {};
+
+	static inline const float speed_ = 0.01f;
+	float radius_ = 1.0f;
+
+	float leftLimit_ = -100.0f;
+	float rigdhtLimit_ = 100.0f;
 };
