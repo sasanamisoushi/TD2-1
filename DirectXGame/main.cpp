@@ -71,81 +71,80 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			default:
 				break;
 			}
+
+			// 新しいシーンに更新
+			currentSceneEnum = nextSceneEnum;
+
+			// 新しいシーンの初期化
+			switch (currentSceneEnum) {
+			case Scene::kTitle:
+				titleScene = new TitleScene();
+				titleScene->Initialize();
+				break;
+			case Scene::kGame:
+				gameScene = new GameScene();
+				gameScene->Initialize();
+				break;
+			case Scene::kGameClear:
+				gameClearScene = new GameClearScene();
+				gameClearScene->Initialize();
+				break;
+			}
 		}
 
-		// 新しいシーンに更新
-		currentSceneEnum = nextSceneEnum;
-
-		// 新しいシーンの初期化
-		switch (currentSceneEnum) {
-		case Scene::kTitle:
-			titleScene = new TitleScene();
-			titleScene->Initialize();
-			break;
-		case Scene::kGame:
-			gameScene = new GameScene();
-			gameScene->Initialize();
-			break;
-		case Scene::kGameClear:
-			gameClearScene = new GameClearScene();
-			gameClearScene->Initialize();
-			break;
-		}
-
-		// 現在のシーンを更新
-		switch (currentSceneEnum) {
-		case Scene::kTitle:
-			if (titleScene != nullptr) {
-				titleScene->Update();
-				if (titleScene->IsFinished()) {
-					nextSceneEnum = Scene::kGame;
+			// 現在のシーンを更新
+			switch (currentSceneEnum) {
+			case Scene::kTitle:
+				if (titleScene != nullptr) {
+					titleScene->Update();
+					if (titleScene->IsFinished()) {
+						nextSceneEnum = Scene::kGame;
+					}
 				}
-			}
-			break;
-		case Scene::kGame:
-			if (gameScene != nullptr) {
-				gameScene->Update();
-				if (gameScene->IsFinished()) {
-					nextSceneEnum = Scene::kGameClear;
+				break;
+			case Scene::kGame:
+				if (gameScene != nullptr) {
+					gameScene->Update();
+					if (gameScene->IsFinished()) {
+						nextSceneEnum = Scene::kGameClear;
+					}
 				}
-			}
-			break;
-		case Scene::kGameClear:
-			if (gameClearScene != nullptr) {
-				gameClearScene->Update();
-				if (gameClearScene->IsFinished()) {
-					nextSceneEnum = Scene::kTitle;
+				break;
+			case Scene::kGameClear:
+				if (gameClearScene != nullptr) {
+					gameClearScene->Update();
+					if (gameClearScene->IsFinished()) {
+						nextSceneEnum = Scene::kTitle;
+					}
 				}
+				break;
 			}
-			break;
-		}
 
-		imguiManager->End();
+			imguiManager->End();
 
-		// 描画開始
-		dxCommmon->PreDraw();
-		// 現在のシーンを描画
-		switch (currentSceneEnum) {
-		case Scene::kTitle:
-			if (titleScene != nullptr) {
-				titleScene->Draw();
+			// 描画開始
+			dxCommmon->PreDraw();
+			// 現在のシーンを描画
+			switch (currentSceneEnum) {
+			case Scene::kTitle:
+				if (titleScene != nullptr) {
+					titleScene->Draw();
+				}
+				break;
+			case Scene::kGame:
+				if (gameScene != nullptr) {
+					gameScene->Draw();
+				}
+				break;
+			case Scene::kGameClear:
+				if (gameClearScene != nullptr) {
+					gameClearScene->Draw();
+				}
+				break;
 			}
-			break;
-		case Scene::kGame:
-			if (gameScene != nullptr) {
-				gameScene->Draw();
-			}
-			break;
-		case Scene::kGameClear:
-			if (gameClearScene != nullptr) {
-				gameClearScene->Draw();
-			}
-			break;
-		}
-		imguiManager->Draw();
-		// 描画終了
-		dxCommmon->PostDraw();
-
+			imguiManager->Draw();
+			// 描画終了
+			dxCommmon->PostDraw();
 		
 	}
 
