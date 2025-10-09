@@ -33,13 +33,13 @@ void GameScene::Initialize()
 		Fish* fish = new Fish();
 
 		// x座標をランダムに配置
-		Vector3 fishPos{3.0f, 3.0f, 0.0f};
+		Vector3 fishPos{0.0f, static_cast<float>(rand()%10+-3), 0.0f};
 
 		// 50%の確率で右か左向きになる
-		//bool moveRight = (rand() % 2 == 0);
+		bool moveRight = (rand() % 2 == 0);
 
 		// 魚の初期化
-		fish->Initialize(fishModel_, &camera_, fishPos);
+		fish->Initialize(fishModel_, &camera_, fishPos, moveRight);
 
 		// 配列に登録
 		fishes_.push_back(fish);
