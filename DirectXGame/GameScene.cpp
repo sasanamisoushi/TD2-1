@@ -114,10 +114,14 @@ GameScene::~GameScene() {
 	}
 	fishes_.clear();
 
+	delete fishModel_;
+
 	for (auto& Bigfish : BigFishes_) {
 		delete Bigfish;
 	}
 	BigFishes_.clear();
+
+	delete bigFishModel_;
 }
 
 void GameScene::Update() {
