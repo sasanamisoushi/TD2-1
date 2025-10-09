@@ -135,14 +135,23 @@ void GameScene::Update() {
 		bigFish->Update();
 	}
 
+	
+	
 	// 魚が取れた時
-	fishes_.remove_if([](Fish* fish) {
+	int caughtFishCount = 0;
+	fishes_.remove_if([&caughtFishCount](Fish* fish) {
 		if (fish->IsLureCheck()) {
 			delete fish;
+			caughtFishCount++;
 			return true;
 		}
 		return false;
 	});
+
+	//捕まえた数だけ再生成
+	for (int i = 0; i < caughtFishCount; i++) {
+		SpawnFish(false); // 小さい魚を追加
+	}
 
 	player_->Update();
 	if (Input::GetInstance()->TriggerKey(DIK_S)) {
@@ -221,5 +230,50 @@ void GameScene::CheckAllCollisions() {
 		else {
 			fish->OutCollision();
 		}
+	}
+}
+
+void GameScene::SpawnFish(bool isBigFish) {
+	bool moveRight = (rand() % 2 == 0);
+	Vector3 fishPos;
+	bool setPos = false;
+
+	for (int confirmation = 0; confirmation < 50 && !setPos; confirmation++) {
+		fishPos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
+		setPos = true;
+
+		// 小さい魚と距離確認
+		for (auto& fishS : fishes_) {
+			float distanceY = fabs(fishPos.y - fishS->GetWorldPosition().y);
+			if (distanceY < 1.5f) {
+				setPos = false;
+				break;
+			}
+		}
+
+		// 大きい魚と距離確認
+		for (auto& BigFish : BigFishes_) {
+			float distanceY = fabs(fishPos.y - BigFish->GetWorldPosition().y);
+			if (distanceY < 2.5f) {
+				setPos = false;
+				break;
+			}
+		}
+	}
+
+	if (!setPos) {
+		fishPos = {0.0f, static_cast<float>((rand() % 40) / 10.0f + 1.0f), 0.0f};
+	}
+
+	if (isBigFish) {
+		BigFish* bigFish = new BigFish();
+		bigFish->Initialize(bigFishModel_, &camera_, fishPos, moveRight);
+		BigFishes_.push_back(bigFish);
+		bigCount++;
+	} else {
+		Fish* fish = new Fish();
+		fish->Initialize(fishModel_, &camera_, fishPos, moveRight);
+		fishes_.push_back(fish);
+		smallCount++;
 	}
 }
