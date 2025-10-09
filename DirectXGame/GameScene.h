@@ -1,12 +1,21 @@
 #pragma once
 #include "KamataEngine.h"
+#include "Player.h"
+#include <vector>
 
-class GameScene {
+class GameScene 
+{
+
+	Player* player_ = nullptr;
+	KamataEngine::Model* model_ = nullptr;
+	KamataEngine::Model* playerModel_ = nullptr;
+	KamataEngine::Camera camera_;
+
 public:
 
 	//初期化
 	void Initialize();
-
+	~GameScene();
 	//更新
 	void Update();
 

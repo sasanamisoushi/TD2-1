@@ -1,7 +1,103 @@
 #include "Player.h"
+#include "cassert"
+#include <algorithm>
+#include <numbers>
 
-void Player::Initialize() {}
+using namespace KamataEngine;
+using namespace MathUtility;
 
-void Player::Update() {}
+void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* playerModel, KamataEngine::Camera* camera, KamataEngine::Vector3& position, KamataEngine::Vector3& playerPosition) {
+	assert(model);
+	assert(playerModel);
+	model_ = model;
+	playerModel_ = playerModel;
+	worldTransform_.Initialize();
+	worldTransform_.translation_ = position;
+	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	playerWorldTransform_.Initialize();
+	playerWorldTransform_.translation_ = playerPosition;
+	playerWorldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	camera_ = camera;
 
-void Player::Draw() {}
+	isLureThrow = false;
+	isKeyPush = false;
+}
+
+void Player::Update() {
+	InputMove();
+	WorldTransformUpdate();
+}
+
+void Player::InputMove() {
+
+	// ルアーの投げる場所決定の処理
+	if (!isLureThrow) {
+
+		KamataEngine::Vector3 acceleration = {};
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_RIGHT)) {
+			acceleration.x += kLureMoveSpeedX;
+			velocity_.x += acceleration.x;
+		}
+
+		/*KamataEngine::Vector3 acceleration = {};
+		acceleration.x += kLureMoveSpeedX;
+		if (worldTransform_.translation_.x > 1260 || worldTransform_.translation_.x < 0) {
+		     kLureMoveSpeedX *= -1;
+		}
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_P)) {
+		    isLureThrow = true;
+		}
+		velocity_.x += acceleration.x;*/
+	}
+	// 魚を釣る
+	if (isLureThrow) {
+
+		if (!isKeyPush) {
+			// acceleration.y += kLureMoveSpeedY;
+		}
+		if (isKeyPush) {
+			// acceleration.y -= kLureMoveSpeedY;
+		}
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) {
+			isKeyPush = true;
+		} else {
+			isKeyPush = false;
+		}
+	}
+}
+
+void Player::WorldTransformUpdate()
+{
+	worldTransform_.translation_.x += velocity_.x;
+	worldTransform_.translation_.y += velocity_.y;
+	worldTransform_.translation_.z += velocity_.z;
+	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	worldTransform_.TransferMatrix();
+}
+
+void Player::Draw() {
+	model_->Draw(worldTransform_, *camera_);
+	playerModel_->Draw(playerWorldTransform_, *camera_);
+}
+
+KamataEngine::Vector3 Player::GetWorldPosition() {
+	// ワールド座標を入れる変数
+	KamataEngine::Vector3 worldPos;
+	// ワールド行列の平行移動成分取得
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
+}
+
+AABB Player::GetAABB() {
+	KamataEngine::Vector3 worldPos = GetWorldPosition();
+
+	AABB aabb;
+
+	aabb.min = {(worldPos.x - 0.5f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
+	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
+
+	return aabb;
+}
