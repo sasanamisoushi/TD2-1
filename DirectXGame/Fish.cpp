@@ -31,7 +31,7 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, boo
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
-	worldTransform_.scale_ = {0.3f, 0.3f, 0.3f};
+	worldTransform_.scale_ = {0.2f, 0.2f, 0.2f};
 	worldTransform_.translation_.x = randomPos;
 
 	

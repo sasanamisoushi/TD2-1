@@ -28,7 +28,7 @@ void BigFish::Initialize(Model* model, Camera* camera, const Vector3& position, 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
-	worldTransform_.scale_ = {0.5f, 0.5f, 0.5f};
+	worldTransform_.scale_ = {0.35f, 0.35f, 0.35f};
 	worldTransform_.translation_.x = randomPos;
 
 	// 泳ぐ上限
