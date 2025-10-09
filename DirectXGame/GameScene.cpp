@@ -1,9 +1,6 @@
 #include "GameScene.h"
 #include "math.h"
 
-
-using namespace DirectX;
-
 using namespace KamataEngine;
 
 void GameScene::Initialize() 
@@ -15,17 +12,7 @@ void GameScene::Initialize()
 
 	Vector3 playerPosition = {5, 5, 0};
 	Vector3 lurePosition = {1, 5, 0};
-
-	camera_.Initialize();
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
-}
-
-GameScene::~GameScene() 
-{
-	delete model_;
-	delete playerModel_;
-	delete player_; 
-}
 
 	// カメラの初期化
 	camera_.Initialize();
@@ -59,19 +46,25 @@ GameScene::~GameScene()
 	}
 }
 
-void GameScene::Update() {
+GameScene::~GameScene() {
+	delete model_;
+	delete playerModel_;
+	delete player_;
+	for (auto& fish : fishes_) {
+		delete fish;
+	}
+	fishes_.clear();
+}
+
+void GameScene::Update()
+{
 
 	//魚の挙動
 	for (auto& fish : fishes_) {
 		fish->Update();
 	}
 
-	 
-
-	//キーを押したらクリア画面に
-	if (Input::GetInstance()->TriggerKey(DIK_1)) {
-void GameScene::Update() 
-{
+	
 	player_->Update();
 	if (Input::GetInstance()->TriggerKey(DIK_S)) {
 		isFinish = true;
@@ -107,21 +100,7 @@ void GameScene::Draw() {
 	for (auto& fish : fishes_) {
 		fish->Draw();
 	}
-	Model::PostDraw();
-}
-
-void GameScene::Finalize() {
-	for (auto& fish : fishes_) {
-		delete fish;
-	}
-	fishes_.clear();
-}
-void GameScene::Draw() 
-{ 
-	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
-	Model::PreDraw(dxCommon->GetCommandList());
 
 	player_->Draw();
-
 	Model::PostDraw();
 }

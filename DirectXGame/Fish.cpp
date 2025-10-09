@@ -8,70 +8,67 @@ using namespace DirectX;
 #include <numbers>
 
 void Fish::Initialize(Model* model, Camera* camera, const Vector3& position) {
-	// NULLƒ|ƒCƒ“ƒ^ƒ`ƒFƒbƒN
+	// NULLãƒã‚¤ãƒ³ã‚¿ãƒã‚§ãƒƒã‚¯
 	assert(model);
-	// ƒ‚ƒfƒ‹
+	// ãƒ¢ãƒ‡ãƒ«
 	model_ = model;
 
-	// ƒJƒƒ‰
+	// ã‚«ãƒ¡ãƒ©
 	camera_ = camera;
 
-	// ©•ª‚ÌˆÊ’u‚ğ’†S‚É‚T‚¸‚Â‚Ì”ÍˆÍ‚Å‰j‚®
+	// è‡ªåˆ†ã®ä½ç½®ã‚’ä¸­å¿ƒã«ï¼•ãšã¤ã®ç¯„å›²ã§æ³³ã
 	leftLimit_ = position.x - 5.0f;
 	rigdhtLimit_ = position.x + 5.0f;
 
-	// ƒ[ƒ‹ƒhƒgƒ‰ƒ“ƒXƒtƒH[ƒ€‚Ì‰Šú‰»
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ ã®åˆæœŸåŒ–
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 
 	
 	
-	//ˆÚ“®•ûŒü
+	//ç§»å‹•æ–¹å‘
 	//direction_ = moveRight ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(-1.0f, 0.0f, 0.0f);
 
-	// ‘¬“xƒxƒNƒgƒ‹‚ğ•ûŒü‚ÉŠî‚Ã‚¢‚Äİ’è
+	// é€Ÿåº¦ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ–¹å‘ã«åŸºã¥ã„ã¦è¨­å®š
 	velocity_ += {-speed_,0.0f,0.0f};
 
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 
-	// Šp“x’²®
+	// è§’åº¦èª¿æ•´
 	//if (moveRight) {
-	//	//‰E
+	//	//å³
 	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	//} else {
-	//	//¶
+	//	//å·¦
 	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 	//}
 }
 
 void Fish::Update() {
 
-	// ˆÚ“®
+	// ç§»å‹•
 	worldTransform_.translation_ +=  velocity_;
 
-	// ’[‚Å”½“]iƒqƒXƒeƒŠƒVƒX‚ğ‚½‚¹‚éj
+	// ç«¯ã§åè»¢ï¼ˆãƒ’ã‚¹ãƒ†ãƒªã‚·ã‚¹ã‚’æŒãŸã›ã‚‹ï¼‰
 	//if (worldTransform_.translation_.x > rigdhtLimit_+0.1f) {
-	//	direction_.x = -1.0f;                   // ¶‚Ö
+	//	direction_.x = -1.0f;                   // å·¦ã¸
 	//	velocity_.x = direction_.x * speed_;
-	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f; // ¶Œü‚«‚É‰ñ“]
+	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f; // å·¦å‘ãã«å›è»¢
 	//	worldTransform_.translation_.x = rigdhtLimit_;
 	//} else if (worldTransform_.translation_.x < leftLimit_-0.1f) {
-	//	direction_.x = 1.0f;                     // ‰E‚Ö
+	//	direction_.x = 1.0f;                     // å³ã¸
 	//	velocity_.x = direction_.x * speed_;
-	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // ‰EŒü‚«‚É‰ñ“]
+	//	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // å³å‘ãã«å›è»¢
 	//	worldTransform_.translation_.x = leftLimit_;
 	//}
 
 	
 
-	// s—ñXV
+	// è¡Œåˆ—æ›´æ–°
 	WorldTransformUpdate(worldTransform_);
 }
 
 void Fish::Draw() { 
-	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
-	// 3Dƒ‚ƒfƒ‹•`‰æ‘Oˆ—
-	Model::PreDraw(dxCommon->GetCommandList());
+	// 3Dãƒ¢ãƒ‡ãƒ«æç”»å‰å‡¦ç†
 	model_->Draw(worldTransform_, * camera_);
-	Model::PostDraw();
 }

@@ -6,12 +6,6 @@
 
 class GameScene 
 {
-
-	Player* player_ = nullptr;
-	KamataEngine::Model* model_ = nullptr;
-	KamataEngine::Model* playerModel_ = nullptr;
-	KamataEngine::Camera camera_;
-
 public:
 
 	//初期化
@@ -26,16 +20,13 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
-	//解放
-	void Finalize();
-
+	
 private:
 
-
-
-	// カメラ
+	Player* player_ = nullptr;
+	Model* model_ = nullptr;
+	Model* playerModel_ = nullptr;
 	Camera camera_;
-
 
 	// 魚モデル
 	Model* fishModel_ = nullptr;
