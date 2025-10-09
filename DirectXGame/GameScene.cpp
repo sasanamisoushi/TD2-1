@@ -133,15 +133,13 @@ void GameScene::Update()
 	}
 
 	// 魚が取れた時
-	fishes_.remove_if([](Fish* fish)
-	{
-		if (fish->IsLureCheck())
-		{
+	fishes_.remove_if([](Fish* fish) {
+		if (fish->IsLureCheck()) {
 			delete fish;
 			return true;
 		}
 		return false;
-	})
+	});
 	
 	player_->Update();
 	if (Input::GetInstance()->TriggerKey(DIK_S)) {
