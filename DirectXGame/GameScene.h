@@ -17,6 +17,9 @@ public:
 	//描画
 	void Draw();
 
+	// 全ての当たり判定
+	void CheckAllCollisions();
+
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
@@ -31,7 +34,7 @@ private:
 	// 魚モデル
 	Model* fishModel_ = nullptr;
 
-	std::vector<Fish*> fishes_;
+	std::list<Fish*> fishes_;
 
 	//終了フラグ
 	bool isFinish = false;
