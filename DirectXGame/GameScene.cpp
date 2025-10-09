@@ -1,12 +1,18 @@
 #include "GameScene.h"
-#include <DirectXMath.h>
-
-
-using namespace DirectX;
+#include "math.h"
 
 using namespace KamataEngine;
 
-void GameScene::Initialize() { 
+void GameScene::Initialize() 
+{
+	player_ = new Player();
+
+	model_ = Model::CreateFromOBJ("player", true);
+	playerModel_ = Model::CreateFromOBJ("enemy", true);
+
+	Vector3 playerPosition = {5, 5, 0};
+	Vector3 lurePosition = {1, 5, 0};
+	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
 
 	// カメラの初期化
 	camera_.Initialize();
@@ -40,17 +46,27 @@ void GameScene::Initialize() {
 	}
 }
 
-void GameScene::Update() {
+GameScene::~GameScene() {
+	delete model_;
+	delete playerModel_;
+	delete player_;
+	for (auto& fish : fishes_) {
+		delete fish;
+	}
+	fishes_.clear();
+}
+
+void GameScene::Update()
+{
 
 	//魚の挙動
 	for (auto& fish : fishes_) {
 		fish->Update();
 	}
 
-	 
-
-	//キーを押したらクリア画面に
-	if (Input::GetInstance()->TriggerKey(DIK_1)) {
+	
+	player_->Update();
+	if (Input::GetInstance()->TriggerKey(DIK_S)) {
 		isFinish = true;
 	}
 
@@ -68,6 +84,10 @@ void GameScene::Update() {
 	index++;
 	}
 
+
+	ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
+	ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
+
 	ImGui::End();
 #endif
 }
@@ -80,12 +100,7 @@ void GameScene::Draw() {
 	for (auto& fish : fishes_) {
 		fish->Draw();
 	}
-	Model::PostDraw();
-}
 
-void GameScene::Finalize() {
-	for (auto& fish : fishes_) {
-		delete fish;
-	}
-	fishes_.clear();
+	player_->Draw();
+	Model::PostDraw();
 }

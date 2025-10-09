@@ -1,13 +1,16 @@
 #pragma once
 #include "KamataEngine.h"
+#include "Player.h"
+#include <vector>
 #include "Fish.h"
 
-class GameScene {
+class GameScene 
+{
 public:
 
 	//初期化
 	void Initialize();
-
+	~GameScene();
 	//更新
 	void Update();
 
@@ -17,16 +20,13 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
-	//解放
-	void Finalize();
-
+	
 private:
 
-
-
-	// カメラ
+	Player* player_ = nullptr;
+	Model* model_ = nullptr;
+	Model* playerModel_ = nullptr;
 	Camera camera_;
-
 
 	// 魚モデル
 	Model* fishModel_ = nullptr;
