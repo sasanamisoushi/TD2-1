@@ -24,6 +24,8 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
+	void SpawnFish(bool isBigFish);
+
 	
 private:
 
