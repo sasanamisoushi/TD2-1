@@ -25,7 +25,8 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, boo
 	float maxPos = screenRight - swimRange;
 	float randomPos = minPos + static_cast<float>(rand()) / RAND_MAX * (maxPos - minPos);
 
-
+	// 魚がゲットできる時間
+	fishGetTimer_ = 90;
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -44,7 +45,8 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, boo
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 
 	// 角度調整
-	if (moveRight) {
+	if (moveRight)
+	{
 		//右
 		worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	} else {
@@ -71,13 +73,59 @@ void Fish::Update() {
 		worldTransform_.translation_.x = leftLimit_;
 	}
 
-	
-
 	// 行列更新
 	WorldTransformUpdate(worldTransform_);
+
+	
+
 }
 
 void Fish::Draw() { 
 	// 3Dモデル描画前処理
 	model_->Draw(worldTransform_, * camera_);
+}
+
+KamataEngine::Vector3 Fish::GetWorldPosition() 
+{
+	// ワールド座標を入れる変数
+	KamataEngine::Vector3 worldPos;
+	// ワールド行列の平行移動成分取得
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
+}
+
+AABB Fish::GetAABB() 
+{
+	KamataEngine::Vector3 worldPos = GetWorldPosition();
+
+	AABB aabb;
+
+	aabb.min = {(worldPos.x - 0.5f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
+	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
+
+	return aabb;
+}
+
+void Fish::OnCollision(const Player* player) 
+{
+	// ルアーと当たっているとき
+	(void)player; 
+	// ゲットタイマーを減らす
+	fishGetTimer_--;
+	// ゲットタイマーが0になったらゲット
+	if (fishGetTimer_ < 0) 
+	{
+		isLureCheck_ = true;
+	}
+	
+}
+
+void Fish::OutCollision()
+{ 
+	// ルアーと当たっていないとき
+	// ゲットタイマーをリセット
+	fishGetTimer_ = 90; 
 }

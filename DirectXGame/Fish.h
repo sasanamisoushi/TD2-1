@@ -1,7 +1,10 @@
 #pragma once
 #include "KamataEngine.h"
+#include "math.h"
 
 using namespace KamataEngine;
+
+class Player;
 
 class Fish {
 public:
@@ -15,6 +18,24 @@ public:
 	void Draw();
 
 	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
+
+	KamataEngine::Vector3 GetWorldPosition();
+
+	AABB GetAABB();
+
+	// ルアーと当たっている
+	void OnCollision(const Player* player);
+	// ルアーと当たってない
+	void OutCollision();
+
+	// フラグ
+	// 魚がルアーの範囲内にいるか
+	bool isLureCheck_ = false;
+	bool IsLureCheck() const { return isLureCheck_; }
+
+	// 魚がゲットできる時間
+	int fishGetTimer_;
+
 	
 private:
 	// ワールド変換データ
@@ -40,4 +61,7 @@ private:
 
 	float leftLimit_ = 0.0f;
 	float rigdhtLimit_ = 0.0f;
+
+	
+	
 };

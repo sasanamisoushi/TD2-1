@@ -4,6 +4,8 @@
 
 #include <vector>
 
+class Fish;
+
 class Player 
 {
 
@@ -23,7 +25,7 @@ private:
 	// ルアーの移動
 	static inline const float kLureMoveSpeedX = 0.001f;
 
-	static inline const float kLureMoveSpeedY = 5;
+	static inline const float kLureMoveSpeedY = 0.001f; 
 	// プレイヤーの描画座標
 	float playerDrawPosX;
 	float playerDrawPosY;
@@ -57,5 +59,7 @@ public:
 	KamataEngine::Vector3 GetWorldPosition();
 
 	AABB GetAABB();
+
+	void OnCollision(const Fish* fish);
 
 };
