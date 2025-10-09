@@ -10,8 +10,8 @@ void GameScene::Initialize()
 	model_ = Model::CreateFromOBJ("player", true);
 	playerModel_ = Model::CreateFromOBJ("enemy", true);
 
-	Vector3 playerPosition = {5, 5, 0};
-	Vector3 lurePosition = {1, 5, 0};
+	Vector3 playerPosition = {5, 10, 0};
+	Vector3 lurePosition = {0, 8, 0};
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
 
 	// カメラの初期化
@@ -64,11 +64,23 @@ void GameScene::Update()
 		fish->Update();
 	}
 
+	// 魚が取れた時
+	fishes_.remove_if([](Fish* fish)
+	{
+		if (fish->IsLureCheck())
+		{
+			delete fish;
+			return true;
+		}
+		return false;
+	});
 	
 	player_->Update();
 	if (Input::GetInstance()->TriggerKey(DIK_S)) {
 		isFinish = true;
 	}
+
+	CheckAllCollisions();
 
 #ifdef _DEBUG
 	ImGui::Begin("Game Scene");
@@ -81,12 +93,15 @@ void GameScene::Update()
 		ImGui::Text("Fish %d", index);
 		ImGui::SameLine();
 		ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+		ImGui::Text("GetTimer %d", fish->fishGetTimer_);
 	index++;
 	}
 
 
 	ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
 	ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
+
+	
 
 	ImGui::End();
 #endif
@@ -103,4 +118,32 @@ void GameScene::Draw() {
 
 	player_->Draw();
 	Model::PostDraw();
+}
+
+void GameScene::CheckAllCollisions() 
+{
+	// 判定対象1と2の座標
+	AABB aabb1, aabb2;
+
+	// 自キャラの座標
+	aabb1 = player_->GetAABB();
+
+	// 自キャラと魚全ての当たり判定
+	for (Fish* fish : fishes_)
+	{
+		aabb2 = fish->GetAABB();
+
+		// ルアーと魚が当たっているとき
+		if (IsCollision(aabb1,aabb2)) 
+		{
+ 			player_->OnCollision(fish);
+
+			fish->OnCollision(player_);
+		}
+		// ルアーと魚が当たってないとき
+		else
+		{
+			fish->OutCollision();
+		}
+	}
 }

@@ -65,19 +65,26 @@ void Player::InputMove() {
 		velocity_.x += acceleration.x;
 	}
 	// 魚を釣る
-	if (isLureThrow) {
+	if (isLureThrow)
+	{
 
+		KamataEngine::Vector3 acceleration = {};
 		if (!isKeyPush) {
-			// acceleration.y += kLureMoveSpeedY;
+			acceleration.y -= kLureMoveSpeedY;
+		} else {
+			acceleration.y += kLureMoveSpeedY;
 		}
-		if (isKeyPush) {
-			// acceleration.y -= kLureMoveSpeedY;
+		if (worldTransform_.translation_.y < -2.5f && !isKeyPush) {
+			// ルアーが下端に行ったときに
+			velocity_.y = 0;
+			acceleration.y = 0;
 		}
 		if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) {
 			isKeyPush = true;
 		} else {
 			isKeyPush = false;
 		}
+		velocity_.y += acceleration.y;
 	}
 }
 
@@ -115,4 +122,9 @@ AABB Player::GetAABB() {
 	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
 
 	return aabb;
+}
+
+void Player::OnCollision(const Fish* fish) 
+{
+	(void)fish; 
 }
