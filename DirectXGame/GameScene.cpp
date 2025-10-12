@@ -1,10 +1,10 @@
 #include "GameScene.h"
 #include "math.h"
+#include "Time.h"
 
 using namespace KamataEngine;
 
-void GameScene::Initialize() 
-{
+void GameScene::Initialize() {
 	player_ = new Player();
 
 	model_ = Model::CreateFromOBJ("player", true);
@@ -18,22 +18,21 @@ void GameScene::Initialize()
 	camera_.Initialize();
 
 	camera_.translation_ = {0.0f, 5.0f, -20.0f};
-	camera_.rotation_ = {0.0f,0.0f, 0.0f};
-	camera_.UpdateMatrix();  
+	camera_.rotation_ = {0.0f, 0.0f, 0.0f};
+	camera_.UpdateMatrix();
 
-	
-	//魚のモデル
-	fishModel_ = Model::CreateFromOBJ("fish"); 
+	// 魚のモデル
+	fishModel_ = Model::CreateFromOBJ("fish");
 
-	//複数の魚を出す
-	
+	// 複数の魚を出す
+
 	for (int i = 0; i < 5; i++) {
 
 		// 魚を生成
 		Fish* fish = new Fish();
 
 		// x座標をランダムに配置
-		Vector3 fishPos{0.0f, static_cast<float>(rand()%10+-3), 0.0f};
+		Vector3 fishPos{0.0f, static_cast<float>(rand() % 10 + -3), 0.0f};
 
 		// 50%の確率で右か左向きになる
 		bool moveRight = (rand() % 2 == 0);
@@ -44,6 +43,10 @@ void GameScene::Initialize()
 		// 配列に登録
 		fishes_.push_back(fish);
 	}
+
+	//タイマー
+	gameTimer_ = kGameTimer;
+	isGame_ = true;
 }
 
 GameScene::~GameScene() {
@@ -58,6 +61,17 @@ GameScene::~GameScene() {
 
 void GameScene::Update()
 {
+	// タイマー処理
+	if (isGame_) {
+		gameTimer_--;
+		if (gameTimer_ <= 0) {
+			gameTimer_ = 0;
+			isGame_ = false;
+
+			// ここでゲーム終了フラグを立てる！
+			isFinish = true;
+		}
+	}
 
 	//魚の挙動
 	for (auto& fish : fishes_) {
@@ -88,6 +102,10 @@ void GameScene::Update()
 	ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
 	ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
 
+	//タイム
+	int seconds = gameTimer_ / 60;
+	ImGui::Text("TIME: %d", seconds);
+	
 	ImGui::End();
 #endif
 }

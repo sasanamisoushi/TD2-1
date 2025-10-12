@@ -35,4 +35,9 @@ private:
 
 	//終了フラグ
 	bool isFinish = false;
+
+	//タイマー
+	static const int kGameTimer = 1800;
+	int gameTimer_ = 0;
+	bool isGame_ = false;
 };
