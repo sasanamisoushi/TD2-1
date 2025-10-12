@@ -37,20 +37,8 @@ private:
 	bool isFinish = false;
 
 	//タイマー
-	 Model* num0Model_=nullptr; 
-	 Model* num1Model_=nullptr; 
-	 Model* num2Model_=nullptr; 
-	 Model* num3Model_=nullptr; 
-	 Model* num4Model_=nullptr; 
-	 Model* num5Model_=nullptr; 
-	 Model* num6Model_=nullptr; 
-	 Model* num7Model_=nullptr; 
-	 Model* num8Model_=nullptr; 
-	 Model* num9Model_=nullptr;
-
-	static const int kGameTimer_ = 1800;
-	int gameTimer_ = 0;
-	WorldTransform numderTransform_;
-	int currentNumber_ = 0;
-	bool isGame_ = false;
+	uint32_t numTexHandles_[8];
+	Sprite* numSprite_ = nullptr;
+	int gameTimer_ = 1800;
+	bool isGame_ = true;
 };
