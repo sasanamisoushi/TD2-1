@@ -20,7 +20,7 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
-	
+
 private:
 
 	Player* player_ = nullptr;
