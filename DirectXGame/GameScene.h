@@ -37,7 +37,7 @@ private:
 	bool isFinish = false;
 
 	//タイマー
-	uint32_t numTexHandles_[8];
+	uint32_t numTexHandles_[10];
 	Sprite* numSprite_ = nullptr;
 	int gameTimer_ = 1800;
 	bool isGame_ = true;

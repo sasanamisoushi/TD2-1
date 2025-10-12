@@ -53,8 +53,10 @@ void GameScene::Initialize() {
 	numTexHandles_[5] = TextureManager::Load("num/5.png");
 	numTexHandles_[6] = TextureManager::Load("num/6.png");
 	numTexHandles_[7] = TextureManager::Load("num/7.png");
+	numTexHandles_[8] = TextureManager::Load("num/8.png");
+	numTexHandles_[9] = TextureManager::Load("num/9.png");
 
-	numSprite_ = Sprite::Create(numTexHandles_[7], {30, 30});
+	numSprite_ = Sprite::Create(numTexHandles_[9], {30, 30});
 }
 
 GameScene::~GameScene() {
