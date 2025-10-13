@@ -45,6 +45,7 @@ void GameScene::Initialize() {
 	}
 
 	// タイマー
+	//数字の描画
 	numTexHandles_[0] = TextureManager::Load("num/0.png");
 	numTexHandles_[1] = TextureManager::Load("num/1.png");
 	numTexHandles_[2] = TextureManager::Load("num/2.png");
@@ -56,7 +57,10 @@ void GameScene::Initialize() {
 	numTexHandles_[8] = TextureManager::Load("num/8.png");
 	numTexHandles_[9] = TextureManager::Load("num/9.png");
 
-	numSprite_ = Sprite::Create(numTexHandles_[9], {30, 30});
+	//数字の初期化
+	numSprite_[0] = Sprite::Create(numTexHandles_[0], {30, 30});
+	numSprite_[1] = Sprite::Create(numTexHandles_[0], {50, 30});
+	numSprite_[2] = Sprite::Create(numTexHandles_[0], {70, 30});
 }
 
 GameScene::~GameScene() {
@@ -75,8 +79,12 @@ void GameScene::Update()
 	if (isGame_) {
 		if (gameTimer_ > 0) {
 			gameTimer_--;
-		} else {
+		} 
+		if (gameTimer_<=0)
+		{
+			gameTimer_ = 0;
 			isGame_ = false;
+			isFinish = true;
 		}
 	}
 
@@ -131,7 +139,22 @@ void GameScene::Draw() {
 	Model::PostDraw();
 	
 	Sprite::PreDraw(dxCommon->GetCommandList());
+
 	// 数字の描画
-	numSprite_->Draw();
+	// 残り秒数
+	int seconds = gameTimer_ / 60; // 60FPS → 秒換算
+	int hundreds = (seconds / 100) % 10;
+ 	int tens = (seconds / 10)%10;
+	int ones = seconds % 10;
+
+	// スプライトに対応する数字をセット
+	numSprite_[0]->SetTextureHandle(numTexHandles_[hundreds]);//三桁
+	numSprite_[1]->SetTextureHandle(numTexHandles_[tens]);//二桁
+	numSprite_[2]->SetTextureHandle(numTexHandles_[ones]);//一桁
+	// 描画
+	numSprite_[0]->Draw();
+	numSprite_[1]->Draw();
+	numSprite_[2]->Draw();
+	
 	Sprite::PostDraw();
 }
