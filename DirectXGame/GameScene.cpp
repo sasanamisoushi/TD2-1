@@ -239,7 +239,7 @@ void GameScene::Draw() {
 	player_->Draw();
 	Model::PostDraw();
 
-
+	//2d描画
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
 	// 数字の描画
