@@ -1,7 +1,10 @@
 #pragma once
 #include "KamataEngine.h"
+#include "math.h"
 
 using namespace KamataEngine;
+
+class Player;
 
 class BigFish {
 public:
@@ -16,9 +19,24 @@ public:
 
 	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
 
+	AABB GetAABB();
+
+	// ルアーと当たっている
+	void OnCollision(const Player* player);
+
+	// ルアーと当たってない
+	void OutCollision();
+
+	// フラグ
+	bool isLureCheck_ = false;
+	bool IsLureCheck() const { return isLureCheck_; }
+
+	// 魚がゲットできる時間
+	int fishGetTimer_ = 30;
+
 private:
 	// ワールド変換データ
-	KamataEngine::WorldTransform worldTransform_;
+	WorldTransform worldTransform_;
 
 	// モデル
 	Model* model_ = nullptr;
@@ -33,12 +51,15 @@ private:
 	Vector3 direction_;
 
 	// 速度
-	Vector3 velocity_ = {};
+	Vector3 velocity_{};
 
+	// 定数速度
 	static inline const float speed_ = 0.05f;
+
+	// 半径
 	float radius_ = 1.0f;
 
+	// 泳ぐ範囲
 	float leftLimit_ = 0.0f;
 	float rigdhtLimit_ = 0.0f;
 };
-;

@@ -128,3 +128,10 @@ void Player::OnCollision(const Fish* fish)
 {
 	(void)fish; 
 }
+
+void Player::OnCollision(const BigFish* Bigfish) 
+{
+
+	(void)Bigfish;
+
+}

@@ -45,7 +45,7 @@ private:
 
 	//大きい魚のモデル
 	Model* bigFishModel_ = nullptr;
-	std::vector<BigFish*> BigFishes_;
+	std::list<BigFish*> BigFishes_;
 
 	// 現在数をカウント
 	int smallCount = 0;
@@ -57,6 +57,6 @@ private:
 	// タイマー
 	uint32_t numTexHandles_[10];
 	Sprite* numSprite_[3];
-	int gameTimer_ = 180;
+	int gameTimer_ = 18000;
 	bool isGame_ = true; // ゲーム中か
 };

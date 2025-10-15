@@ -6,10 +6,15 @@ using namespace KamataEngine;
 
 class Player;
 
+enum class FishState {
+	Appear, //登場中
+	Normal, //通常行動
+};
+
 class Fish {
 public:
 	// 初期化（座標と速度方向を指定）
-	void Initialize(Model* model, Camera* camera, const Vector3& position, bool moveRight);
+	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight);
 
 	// 更新
 	void Update();
@@ -62,6 +67,18 @@ private:
 	float leftLimit_ = 0.0f;
 	float rigdhtLimit_ = 0.0f;
 
-	
+	FishState state_ = FishState::Appear;
+
+	 // 目的位置
+	Vector3 targetPos_;
+
+	//登場演出タイマー
+	float appearTimer_ = 0.0f;
+
+	//約1秒で登場
+	float appearDuration_= 60.0f;
+
+	Vector3 finalScale_;
+
 	
 };

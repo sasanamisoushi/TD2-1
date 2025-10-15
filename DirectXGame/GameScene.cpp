@@ -166,6 +166,16 @@ void GameScene::Update() {
 		return false;
 	});
 
+	// 大きい魚が取れた時
+	BigFishes_.remove_if([&caughtFishCount](BigFish* bigfish) {
+		if (bigfish->IsLureCheck()) {
+			delete bigfish;
+			caughtFishCount++;
+			return true;
+		}
+		return false;
+	});
+
 	//捕まえた数だけ再生成
 	for (int i = 0; i < caughtFishCount; i++) {
 		SpawnFish(false); // 小さい魚を追加
@@ -211,6 +221,7 @@ void GameScene::Update() {
 		ImGui::Text("BigFish %d", index);
 		ImGui::SameLine();
 		ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+		ImGui::Text("GetTimer %d", BigFish->fishGetTimer_);
 		index++;
 	}
 
@@ -281,6 +292,22 @@ void GameScene::CheckAllCollisions() {
 		// ルアーと魚が当たってないとき
 		else {
 			fish->OutCollision();
+		}
+	}
+
+	// 自キャラと大きい魚全ての当たり判定
+	for (BigFish* Bigfish : BigFishes_) {
+		aabb2 = Bigfish->GetAABB();
+
+		// ルアーと魚が当たっているとき
+		if (IsCollision(aabb1, aabb2)) {
+			player_->OnCollision(Bigfish);
+
+			Bigfish->OnCollision(player_);
+		}
+		// ルアーと魚が当たってないとき
+		else {
+			Bigfish->OutCollision();
 		}
 	}
 }

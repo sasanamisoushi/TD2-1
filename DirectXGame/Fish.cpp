@@ -1,10 +1,13 @@
 #include "Fish.h"
-#include "math.h"
 #include <cstdlib>
 #include <cassert>
 #include <numbers>
 
-void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, bool moveRight) {
+void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight) {
+	// ワールドトランスフォームの初期化
+	worldTransform_.Initialize();
+	
+	
 	// NULLポインタチェック
 	assert(model);
 	// モデル
@@ -12,6 +15,23 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, boo
 
 	// カメラ
 	camera_ = camera;
+
+	state_ = FishState::Appear;
+
+	targetPos_ = targetPos;
+	
+
+	//出現開始位置
+	if (rand() % 2 == 0) {
+		worldTransform_.translation_ = {moveRight ? -15.0f : 15.0f, targetPos_.y, targetPos_.z};
+	} else {
+		worldTransform_.translation_ = {0.0f, targetPos_.y, targetPos_.z + 20.0f}; // 奥から
+	}
+
+	worldTransform_.scale_ = {0.01f, 0.01f, 0.01f}; // 最初は小さめ
+
+	// 出現完了後の最終サイズ
+	finalScale_ = {0.2f, 0.2f, 0.2f};
 
 	//画面の範囲
 	const float screenLeft = -14.0f;
@@ -28,10 +48,8 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, boo
 	// 魚がゲットできる時間
 	fishGetTimer_ = 90;
 
-	// ワールドトランスフォームの初期化
-	worldTransform_.Initialize();
-	worldTransform_.translation_ = position;
-	worldTransform_.scale_ = {0.2f, 0.2f, 0.2f};
+	
+	
 	worldTransform_.translation_.x = randomPos;
 
 	
@@ -56,28 +74,43 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, boo
 }
 
 void Fish::Update() {
+	switch (state_) {
+	case FishState::Appear:
+		appearTimer_++;
 
-	// 移動
-	worldTransform_.translation_.x += direction_.x*speed_;
+		// 線形補間して少しずつ目的地へ
+		worldTransform_.translation_ = Lerp(worldTransform_.translation_, targetPos_, 0.05f);
+		worldTransform_.scale_ = Lerp(worldTransform_.scale_, finalScale_, 0.05f);
 
-	// 端で反転（ヒステリシスを持たせる）
-	if (worldTransform_.translation_.x > rigdhtLimit_+0.1f) {
-		direction_.x = -1.0f;                   // 左へ
-		velocity_.x = direction_.x * speed_;
-		worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f; // 左向きに回転
-		worldTransform_.translation_.x = rigdhtLimit_;
-	} else if (worldTransform_.translation_.x < leftLimit_-0.1f) {
-		direction_.x = 1.0f;                     // 右へ
-		velocity_.x = direction_.x * speed_;
-		worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // 右向きに回転
-		worldTransform_.translation_.x = leftLimit_;
+		// 一定時間経過で通常行動へ
+		if (appearTimer_ > appearDuration_) {
+			state_ = FishState::Normal;
+		}
+		break;
+
+	case FishState::Normal:
+		// 移動
+		worldTransform_.translation_.x += direction_.x * speed_;
+
+		// 端で反転（ヒステリシスを持たせる）
+		if (worldTransform_.translation_.x > rigdhtLimit_ + 0.1f) {
+			direction_.x = -1.0f; // 左へ
+			velocity_.x = direction_.x * speed_;
+			worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f; // 左向きに回転
+			worldTransform_.translation_.x = rigdhtLimit_;
+		} else if (worldTransform_.translation_.x < leftLimit_ - 0.1f) {
+			direction_.x = 1.0f; // 右へ
+			velocity_.x = direction_.x * speed_;
+			worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // 右向きに回転
+			worldTransform_.translation_.x = leftLimit_;
+		}
+
+		
+		break;
 	}
-
+	
 	// 行列更新
 	WorldTransformUpdate(worldTransform_);
-
-	
-
 }
 
 void Fish::Draw() { 
