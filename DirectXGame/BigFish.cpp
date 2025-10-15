@@ -1,5 +1,4 @@
 #include "BigFish.h"
-#include "math.h"
 #include <cstdlib>
 #include <cassert>
 #include <numbers>
@@ -49,7 +48,7 @@ void BigFish::Initialize(Model* model, Camera* camera, const Vector3& position, 
 		worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 	}
 
-
+	fishGetTimer_ = 30;
 }
 
 void BigFish::Update() {
@@ -78,4 +77,33 @@ void BigFish::Draw() {
 	// 3Dモデル描画前処理
 	model_->Draw(worldTransform_, *camera_);
 
+}
+
+AABB BigFish::GetAABB() {
+	KamataEngine::Vector3 worldPos = GetWorldPosition();
+
+	AABB aabb;
+
+	aabb.min = {(worldPos.x - 0.5f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
+	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
+
+	return aabb;
+}
+
+void BigFish::OnCollision(const Player* player) {
+	// ルアーと当たっているとき
+	(void)player;
+	// ゲットタイマーを減らす
+	fishGetTimer_--;
+	// ゲットタイマーが0になったらゲット
+	if (fishGetTimer_ < 0) {
+		isLureCheck_ = true;
+	}
+}
+
+void BigFish::OutCollision() {
+
+	// ルアーと当たっていないとき
+	// ゲットタイマーをリセット
+	fishGetTimer_ = 30;
 }
