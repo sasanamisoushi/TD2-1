@@ -87,5 +87,5 @@ private:
 
 	Vector3 finalScale_;
 
-	const int point_ = 100;
+	const int point_ = 200;
 };

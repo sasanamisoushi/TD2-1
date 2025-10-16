@@ -11,13 +11,13 @@ void GameScene::Initialize() {
 
 	player_ = new Player();
 	
-	model_ = Model::CreateFromOBJ("player", true);
-	playerModel_ = Model::CreateFromOBJ("enemy", true);
+	model_ = Model::CreateFromOBJ("network", true);
+	playerModel_ = Model::CreateFromOBJ("player", true);
 
 	getTimer_ = 90;
 
-	Vector3 playerPosition = {5, 10, 0};
-	Vector3 lurePosition = {0, 8, 0};
+	Vector3 playerPosition = {-11, 10, 0};
+	Vector3 lurePosition = {0, 7, 0};
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
 
 	// カメラの初期化
