@@ -10,9 +10,11 @@ void GameScene::Initialize() {
 	srand((unsigned int)time(nullptr));
 
 	player_ = new Player();
+
 	
 	model_ = Model::CreateFromOBJ("network", true);
 	playerModel_ = Model::CreateFromOBJ("player", true);
+
 
 	getTimer_ = 90;
 
@@ -34,7 +36,8 @@ void GameScene::Initialize() {
 	// 魚のモデル
 	fishModel_ = Model::CreateFromOBJ("fish");
 	bigFishModel_ = Model::CreateFromOBJ("fish");
-	rubbishModel_ = Model::CreateFromOBJ("trash");
+	rubbishModel_ = Model::CreateFromOBJ("trash",true);
+	swimmyModel_ = Model::CreateFromOBJ("suimii",true);
 
 	// 制限数
 	const int totalFishMax = 10; // 全体の最大数
@@ -49,8 +52,8 @@ void GameScene::Initialize() {
 		bool moveRight = (rand() % 2 == 0);
 		bool isBigFish = (rand() % 100 < 40);
 		bool isRubbish = (rand() % 100 < 20);
+		//bool isSwimmy = (rand() % 100 < 10);
 
-	
 		Vector3 fishPos;
 		bool setPos = false;
 
@@ -59,11 +62,7 @@ void GameScene::Initialize() {
 		for (int confirmation = 0; confirmation < 50 && !setPos; confirmation++) {
 
 			// ランダムな位置に生成
-			fishPos = {
-				0.0f, 
-				static_cast<float>(rand() % 60) / 10.0f - 2.0f, 
-				static_cast<float>((rand() % 40 - 20) / 10.0f)
-			};
+			fishPos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
 
 			setPos = true;
 
@@ -167,15 +166,23 @@ GameScene::~GameScene() {
 	delete score_;
 
 	for (auto& rubbishs : rubbishes_) {
-	
+
 		delete rubbishs;
 	}
 	rubbishes_.clear();
 
 	delete rubbishModel_;
 
-	for (int i = 0; i < 3; i++) {
+	for (auto& eventFish : swimmys_) {
 	
+		delete eventFish;
+	}
+	swimmys_.clear();
+
+	delete swimmyModel_;
+
+	for (int i = 0; i < 3; i++) {
+
 		delete numSprite_[i];
 		numSprite_[i] = nullptr;
 	}
@@ -188,17 +195,22 @@ void GameScene::Update() {
 		fish->Update();
 	}
 
-	//大きい魚
+	// 大きい魚
 	for (auto& bigFish : BigFishes_) {
 		bigFish->Update();
 	}
 
-	//ゴミ
+	// ゴミ
 	for (auto& rubbishs : rubbishes_) {
 		rubbishs->Update();
 	}
-	
-	
+
+	for (auto& eventFish : swimmys_) {
+
+		eventFish->Update();
+	}
+
+
 	// 魚が取れた時
 	int caughtFishCount = 0;
 	fishes_.remove_if([&caughtFishCount](Fish* fish) 
@@ -222,7 +234,7 @@ void GameScene::Update() {
 		return false;
 	});
 
-	//ゴミが釣れた時
+	// ゴミが釣れた時
 	rubbishes_.remove_if([&caughtFishCount](Rubbish* rubbish) {
 		if (rubbish->IsLureCheck()) {
 			delete rubbish;
@@ -232,9 +244,19 @@ void GameScene::Update() {
 		return false;
 	});
 
-	//捕まえた数だけ再生成
+	//イベント魚が取れた時
+	swimmys_.remove_if([&caughtFishCount](EventFish* eventFish) {
+		if (eventFish->IsLureCheck()) {
+			delete eventFish;
+			caughtFishCount++;
+			return true;
+		}
+		return false;
+	});
+
+	// 捕まえた数だけ再生成
 	for (int i = 0; i < caughtFishCount; i++) {
-		SpawnFish(); 
+		SpawnFish();
 	}
 
 	player_->Update();
@@ -255,7 +277,6 @@ void GameScene::Update() {
 			isFinish = true;
 		}
 	}
-
 
 #ifdef _DEBUG
 	ImGui::Begin("Game Scene");
@@ -291,7 +312,7 @@ void GameScene::Update() {
 		index++;
 	}
 
-	ImGui::Text("Spawned %d small fish and %d big fish \nand rubbish %d\n", smallCount, bigCount,rubbishCount);
+	ImGui::Text("Spawned %d small fish and %d big fish \nand rubbish %d\n", smallCount, bigCount, rubbishCount);
 
 	ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
 	ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
@@ -317,12 +338,17 @@ void GameScene::Draw() {
 		rubbishs->Draw();
 	}
 
+	for (auto& eventFish : swimmys_) {
+
+		eventFish->Draw();
+	}
+
 	player_->Draw();
 
 	
 	Model::PostDraw();
 
-	//2d描画
+	// 2d描画
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
 	// 数字の描画
@@ -400,6 +426,22 @@ void GameScene::CheckAllCollisions() {
 			Rubbishs->OutCollision();
 		}
 	}
+
+	// 自キャラとイベント魚全ての当たり判定
+	for (EventFish* evenet : swimmys_) {
+		aabb2 = evenet->GetAABB();
+
+		// ルアーと魚が当たっているとき
+		if (IsCollision(aabb1, aabb2)) {
+			player_->OnCollision(evenet);
+
+			evenet->OnCollision(player_);
+		}
+		// ルアーと魚が当たってないとき
+		else {
+			evenet->OutCollision();
+		}
+	}
 }
 
 void GameScene::SpawnFish() {
@@ -445,7 +487,7 @@ void GameScene::SpawnFish() {
 	}
 
 	// === 種類をランダムに選択 ===
-	int type = rand() % 3; // 0:小魚, 1:大魚, 2:ゴミ
+	int type = rand() % 4; // 0:小魚, 1:大魚, 2:ゴミ,4イベント魚
 
 	if (type == 0) {
 		auto* fish = new Fish();
@@ -455,9 +497,101 @@ void GameScene::SpawnFish() {
 		auto* big = new BigFish();
 		big->Initialize(bigFishModel_, &camera_, score_, fishPos, moveRight);
 		BigFishes_.push_back(big);
-	} else {
+	} else if (type == 2) {
 		auto* rub = new Rubbish();
 		rub->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 		rubbishes_.push_back(rub);
+	} /*else {
+		auto* eventFish = new EventFish();
+		eventFish->Initialize(swimmyModel_, &camera_, fishPos, moveRight, getTimer_, new SwimmyEvent());
+		swimmys_.push_back(eventFish);
+	}*/
+}
+
+void GameScene::StartEvent(Event* event) {
+	currentEvent_ = event;
+	event->isActive_ = true;
+	event->Start(this);
+}
+
+void GameScene::UpdateEvent() {
+	if (currentEvent_ && currentEvent_->isActive_) {
+		currentEvent_->Update(this);
 	}
+}
+
+void GameScene::EndEvent() {
+	if (currentEvent_) {
+		currentEvent_->End(this);
+		currentEvent_->isActive_ = false;
+		currentEvent_ = nullptr;
+	}
+}
+
+void GameScene::ClearAllFish() {
+	// 小さい魚を削除
+	for (auto& fish : fishes_) {
+		delete fish;
+	}
+	fishes_.clear();
+	smallCount = 0;
+
+	// 大きい魚を削除
+	for (auto& bigFish : BigFishes_) {
+		delete bigFish;
+	}
+	BigFishes_.clear();
+	bigCount = 0;
+
+	// ゴミを削除
+	for (auto& rubbish : rubbishes_) {
+		delete rubbish;
+	}
+	rubbishes_.clear();
+	rubbishCount = 0;
+}
+
+Vector3 GameScene::GetRandomPos() {
+	Vector3 pos;
+	bool setPos = false;
+	for (int attempt = 0; attempt < 50 && !setPos; attempt++) {
+		pos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
+		setPos = true;
+		// 他の魚と距離チェック（小魚・大魚・ゴミ）
+		for (auto& fish : fishes_) {
+			if (fabs(pos.y - fish->GetWorldPosition().y) < 1.5f) {
+				setPos = false;
+				break;
+			}
+		}
+		for (auto& big : BigFishes_) {
+			if (fabs(pos.y - big->GetWorldPosition().y) < 2.5f) {
+				setPos = false;
+				break;
+			}
+		}
+		for (auto& rub : rubbishes_) {
+			if (fabs(pos.y - rub->GetWorldPosition().y) < 2.5f) {
+				setPos = false;
+				break;
+			}
+		}
+	}
+	if (!setPos)
+		pos = {0.0f, static_cast<float>((rand() % 40) / 10.0f + 1.0f), 0.0f};
+	return pos;
+}
+
+void GameScene::AddFish(Fish* fish) {
+	fishes_.push_back(fish);
+	smallCount++;
+}
+
+GameScene* GameScene::instance_ = nullptr;
+
+GameScene* GameScene::GetInstance() {
+	if (!instance_) {
+		instance_ = new GameScene();
+	}
+	return instance_;
 }

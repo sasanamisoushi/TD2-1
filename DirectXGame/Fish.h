@@ -6,7 +6,14 @@ using namespace KamataEngine;
 
 class Player;
 
+
+enum class FishEventType {
+	None,            //通常
+	swmmyFish        //swmmy
+};
+
 class Score;
+
 
 enum class FishState {
 	Appear, //登場中
@@ -20,7 +27,7 @@ public:
 	void Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight, int getTimer);
 
 	// 更新
-	void Update();
+	virtual void Update();
 
 	// 描画
 	void Draw();
@@ -32,7 +39,7 @@ public:
 	AABB GetAABB();
 
 	// ルアーと当たっている
-	void OnCollision(Player* player);
+	virtual void OnCollision(Player* player);
 	// ルアーと当たってない
 	void OutCollision();
 
@@ -45,6 +52,12 @@ public:
 	int fishGetTimer_;
 	// タイマーのリセット
 	int resetTimer_;
+
+	//イベントタイプを設定
+	void SetEventType(FishEventType type) { eventType_ = type; }
+
+	//イベントタイプを取得
+	FishEventType GetEventType() const { return eventType_; }
 	
 private:
 	// ワールド変換データ
@@ -86,6 +99,11 @@ private:
 
 	Vector3 finalScale_;
 
+
+	//最初は普通の魚を出す
+	FishEventType eventType_ = FishEventType::None;
+
 	const int point_ = 100;
 	
+
 };
