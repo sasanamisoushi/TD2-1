@@ -26,7 +26,7 @@ private:
 	// ルアーの移動
 	static inline const float kLureMoveSpeedX = 0.001f;
 	static inline const float kLureMoveSpeedY = 0.001f;
-	static inline const float kAttenuation = 0.3f;
+	static inline const float kAttenuation = 0.03f;
 
 	// 釣れた時とルアーを上にあげた時にルアーのpositionを初期化する時に使う
 	Vector3 resetPos_;
@@ -41,7 +41,7 @@ private:
 
 	int isLeft; // ルアーが右に行った時に使う
 
-	
+	int coolTime; // ゲームスタートしたときやルアーを回収とかしたときにすぐにルアーが落ちないようにする
 
 public:
 
