@@ -25,8 +25,12 @@ private:
 	
 	// ルアーの移動
 	static inline const float kLureMoveSpeedX = 0.001f;
+	static inline const float kLureMoveSpeedY = 0.001f;
+	static inline const float kAttenuation = 0.3f;
 
-	static inline const float kLureMoveSpeedY = 0.001f; 
+	// 釣れた時とルアーを上にあげた時にルアーのpositionを初期化する時に使う
+	Vector3 resetPos_;
+
 	// プレイヤーの描画座標
 	float playerDrawPosX;
 	float playerDrawPosY;
@@ -37,11 +41,14 @@ private:
 
 	int isLeft; // ルアーが右に行った時に使う
 
+	
+
 public:
 
 	// 初期化
 	void Initialize(KamataEngine::Model* model, KamataEngine::Model* playerModel, KamataEngine::Camera* camera, 
 		KamataEngine::Vector3& position, KamataEngine::Vector3& playerPosition);
+
 	// 更新
 	void Update();
 	// ボタン処理
@@ -57,14 +64,21 @@ public:
 
 	Vector3 GetLurePos() const { return worldTransform_.translation_; }
 
-	KamataEngine::Vector3 GetWorldPosition();
+	//===== 当たり判定 ======
 
+	KamataEngine::Vector3 GetWorldPosition();
 	AABB GetAABB();
 
-	//小さい魚
+  //小さい魚
 	void OnCollision(const Fish* fish);
 
 	//大きい魚
 	void OnCollision(const BigFish* Bigfish);
+  
+	//=======================
+	
+	void Reset();
+
+	
 
 };

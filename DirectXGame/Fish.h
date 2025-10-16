@@ -14,7 +14,8 @@ enum class FishState {
 class Fish {
 public:
 	// 初期化（座標と速度方向を指定）
-	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight);
+
+	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight,int getTimer);
 
 	// 更新
 	void Update();
@@ -40,7 +41,8 @@ public:
 
 	// 魚がゲットできる時間
 	int fishGetTimer_;
-
+	// タイマーのリセット
+	int resetTimer_;
 	
 private:
 	// ワールド変換データ
