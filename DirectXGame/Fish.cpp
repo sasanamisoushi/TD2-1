@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <numbers>
+#include "Player.h"
 
 void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight,int getTimer) {
   
@@ -143,19 +144,18 @@ AABB Fish::GetAABB()
 	return aabb;
 }
 
-void Fish::OnCollision(const Player* player) 
+void Fish::OnCollision(Player* player) 
 {
 	// ルアーと当たっているとき
-	(void)player; 
+	(void)player;
 	// ゲットタイマーを減らす
 	fishGetTimer_--;
 	// ゲットタイマーが0になったらゲット
 	if (fishGetTimer_ < 0) 
 	{
 		isLureCheck_ = true;
-		
+		player->Reset();
 	}
-	
 }
 
 void Fish::OutCollision()
