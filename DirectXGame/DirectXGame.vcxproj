@@ -115,6 +115,7 @@
     <ClCompile Include="math.cpp" />
     <ClCompile Include="orthographicCamera.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Rubbish.cpp" />
     <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -201,6 +202,7 @@
     <ClInclude Include="math.h" />
     <ClInclude Include="orthographicCamera.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Rubbish.h" />
     <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

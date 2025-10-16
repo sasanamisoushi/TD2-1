@@ -4,6 +4,7 @@
 #include <vector>
 #include "Fish.h"
 #include "BigFish.h"
+#include "Rubbish.h"
 
 class GameScene 
 {
@@ -38,7 +39,6 @@ private:
 	Model* playerModel_ = nullptr;
 	Camera camera_;
 
-	//========================================
 	//魚
 	//========================================
 	// 魚モデル
@@ -50,6 +50,10 @@ private:
 	//大きい魚のモデル
 	Model* bigFishModel_ = nullptr;
 	std::list<BigFish*> BigFishes_;
+
+	//ゴミ
+	Model* rubbishModel_ = nullptr;
+	std::list<Rubbish*> rubbishes_;
 
 	// 現在数をカウント
 	int smallCount = 0;
