@@ -15,9 +15,10 @@ void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* playerM
 	worldTransform_.translation_ = position;
 	resetPos_ = position;
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	//worldTransform_.rotation_.x = std::numbers::pi_v<float> / 2.0f;
 	playerWorldTransform_.Initialize();
 	playerWorldTransform_.translation_ = playerPosition;
-	playerWorldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	playerWorldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 	camera_ = camera;
 
 	isLureThrow = false;
@@ -46,7 +47,7 @@ void Player::InputMove() {
 		} else {
 			acceleration.x -= kLureMoveSpeedX;
 		}
-		if (worldTransform_.translation_.x > 10.0f && !isLeft) {
+		if (worldTransform_.translation_.x > 12.0f && !isLeft) {
 			velocity_.x = 0;
 			acceleration.x = 0;
 			isLeft = true;
@@ -106,6 +107,11 @@ void Player::WorldTransformUpdate() {
 	worldTransform_.translation_.z += velocity_.z;
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
+
+	playerWorldTransform_.matWorld_ = MakeAffineMatrix(playerWorldTransform_.scale_, playerWorldTransform_.rotation_, playerWorldTransform_.translation_);
+	playerWorldTransform_.TransferMatrix();
+
+
 }
 
 void Player::Draw() {
@@ -129,8 +135,8 @@ AABB Player::GetAABB() {
 
 	AABB aabb;
 
-	aabb.min = {(worldPos.x - 0.5f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
-	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
+	aabb.min = {(worldPos.x - 0.3f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
+	aabb.max = {(worldPos.x + 0.3f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
 
 	return aabb;
 }

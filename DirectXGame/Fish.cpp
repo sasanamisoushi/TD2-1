@@ -156,7 +156,7 @@ void Fish::OnCollision(Player* player)
 	if (fishGetTimer_ < 0) 
 	{
 		isLureCheck_ = true;
-		score_->AddScore(point_);
+		score_->AddScoreCombo(point_);
 		player->Reset();
 	}
 }
