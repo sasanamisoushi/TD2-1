@@ -14,6 +14,8 @@ void GameScene::Initialize() {
 	model_ = Model::CreateFromOBJ("player", true);
 	playerModel_ = Model::CreateFromOBJ("enemy", true);
 
+	getTimer_ = 30;
+
 	Vector3 playerPosition = {5, 10, 0};
 	Vector3 lurePosition = {0, 8, 0};
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
@@ -45,6 +47,9 @@ void GameScene::Initialize() {
 
 		bool moveRight = (rand() % 2 == 0);
 		bool isBigFish = (rand() % 100 < 40);
+
+		// 魚の初期化
+		//fish->Initialize(fishModel_, &camera_, fishPos, moveRight, getTimer_);
 
 		Vector3 fishPos;
 		bool setPos = false;
@@ -96,7 +101,7 @@ void GameScene::Initialize() {
 			bigCount++;
 		} else {
 			// 魚の初期化
-			fish->Initialize(fishModel_, &camera_, fishPos, moveRight);
+			fish->Initialize(fishModel_, &camera_, fishPos, moveRight, getTimer_);
 			// 配列に登録
 			fishes_.push_back(fish);
 			smallCount++;
@@ -351,7 +356,7 @@ void GameScene::SpawnFish(bool isBigFish) {
 		bigCount++;
 	} else {
 		Fish* fish = new Fish();
-		fish->Initialize(fishModel_, &camera_, fishPos, moveRight);
+		fish->Initialize(fishModel_, &camera_, fishPos, moveRight,getTimer_);
 		fishes_.push_back(fish);
 		smallCount++;
 	}

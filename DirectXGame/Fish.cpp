@@ -3,7 +3,8 @@
 #include <cassert>
 #include <numbers>
 
-void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight) {
+void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight,int getTimer) {
+  
 	// NULLポインタチェック
 	assert(model);
 	// モデル
@@ -45,7 +46,8 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bo
 	float randomPos = minPos + static_cast<float>(rand()) / RAND_MAX * (maxPos - minPos);
 
 	// 魚がゲットできる時間
-	fishGetTimer_ = 90;
+	fishGetTimer_ = getTimer;
+	resetTimer_ = getTimer;
 
 	worldTransform_.translation_.x = randomPos;
 
@@ -151,6 +153,7 @@ void Fish::OnCollision(const Player* player)
 	if (fishGetTimer_ < 0) 
 	{
 		isLureCheck_ = true;
+		
 	}
 	
 }
@@ -159,5 +162,5 @@ void Fish::OutCollision()
 { 
 	// ルアーと当たっていないとき
 	// ゲットタイマーをリセット
-	fishGetTimer_ = 90; 
+	fishGetTimer_ = resetTimer_; 
 }
