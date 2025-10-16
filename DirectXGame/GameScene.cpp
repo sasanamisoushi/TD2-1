@@ -104,7 +104,7 @@ void GameScene::Initialize() {
 
 		if (isRubbish) {
 			Rubbish* rubbish = new Rubbish();
-			rubbish->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
+			rubbish->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 			rubbishes_.push_back(rubbish);
 			rubbishCount++;
 		} else if (isBigFish && bigCount < bigFishMax) {
@@ -457,7 +457,7 @@ void GameScene::SpawnFish() {
 		BigFishes_.push_back(big);
 	} else {
 		auto* rub = new Rubbish();
-		rub->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
+		rub->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 		rubbishes_.push_back(rub);
 	}
 }

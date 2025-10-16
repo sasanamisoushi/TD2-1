@@ -46,8 +46,18 @@ void Score::AddScore(int score)
 	score_ += score; 
 }
 
+void Score::SubtractScore(int score)
+{
+	if (score_ > 0)
+	{
+		score_ -= score;
+	}
+}
+
 void Score::ResetScore()
-{ score_ = 0; }
+{ 
+	score_ = 0;
+}
 
 
 void Score::Update()
