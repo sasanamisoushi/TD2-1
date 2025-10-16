@@ -145,6 +145,12 @@ GameScene::~GameScene() {
 	BigFishes_.clear();
 
 	delete bigFishModel_;
+
+	for (int i = 0; i < 3; i++) {
+	
+		delete numSprite_[i];
+		numSprite_[i] = nullptr;
+	}
 }
 
 void GameScene::Update() {
