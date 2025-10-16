@@ -30,6 +30,7 @@ void GameScene::Initialize() {
 	// 魚のモデル
 	fishModel_ = Model::CreateFromOBJ("fish");
 	bigFishModel_ = Model::CreateFromOBJ("fish");
+	rubbishModel_ = Model::CreateFromOBJ("trash");
 
 	// 制限数
 	const int totalFishMax = 10; // 全体の最大数
@@ -39,18 +40,12 @@ void GameScene::Initialize() {
 
 	int attempts = 0;
 	while (attempts < totalFishMax) {
-		
-
-		// 魚を生成
-		Fish* fish = new Fish();
-		BigFish* bigFish = new BigFish();
 
 		bool moveRight = (rand() % 2 == 0);
 		bool isBigFish = (rand() % 100 < 40);
+		bool isRubbish = (rand() % 100 < 20);
 
-		// 魚の初期化
-		//fish->Initialize(fishModel_, &camera_, fishPos, moveRight, getTimer_);
-
+	
 		Vector3 fishPos;
 		bool setPos = false;
 
@@ -84,6 +79,15 @@ void GameScene::Initialize() {
 					break;
 				}
 			}
+
+			// ゴミの距離チェック
+			for (auto& Rubbishs : rubbishes_) {
+				float distanceY = fabs(fishPos.y - Rubbishs->GetWorldPosition().y);
+				if (distanceY < 2.5f) {
+					setPos = false;
+					break;
+				}
+			}
 		}
 
 		if (!setPos) {
@@ -93,13 +97,19 @@ void GameScene::Initialize() {
 			    0.0f};
 		}
 
-		if (isBigFish && bigCount < bigFishMax) {
+		if (isRubbish) {
+			Rubbish* rubbish = new Rubbish();
+			rubbish->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
+			rubbishes_.push_back(rubbish);
+		} else if (isBigFish && bigCount < bigFishMax) {
+			BigFish* bigFish = new BigFish();
 			// 大きい魚の初期化
 			bigFish->Initialize(bigFishModel_, &camera_, fishPos, moveRight);
 			// 配列に登録
 			BigFishes_.push_back(bigFish);
 			bigCount++;
 		} else {
+			Fish* fish = new Fish();
 			// 魚の初期化
 			fish->Initialize(fishModel_, &camera_, fishPos, moveRight, getTimer_);
 			// 配列に登録
@@ -146,6 +156,14 @@ GameScene::~GameScene() {
 
 	delete bigFishModel_;
 
+	for (auto& rubbishs : rubbishes_) {
+	
+		delete rubbishs;
+	}
+	rubbishes_.clear();
+
+	delete rubbishModel_;
+
 	for (int i = 0; i < 3; i++) {
 	
 		delete numSprite_[i];
@@ -155,15 +173,20 @@ GameScene::~GameScene() {
 
 void GameScene::Update() {
 
-	// 魚の挙動
+	// 小さい魚
 	for (auto& fish : fishes_) {
 		fish->Update();
 	}
 
+	//大きい魚
 	for (auto& bigFish : BigFishes_) {
 		bigFish->Update();
 	}
 
+	//ゴミ
+	for (auto& rubbishs : rubbishes_) {
+		rubbishs->Update();
+	}
 	
 	
 	// 魚が取れた時
@@ -256,6 +279,10 @@ void GameScene::Draw() {
 
 	for (auto& bigFish : BigFishes_) {
 		bigFish->Draw();
+	}
+
+	for (auto& rubbishs : rubbishes_) {
+		rubbishs->Draw();
 	}
 
 	player_->Draw();
