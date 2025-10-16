@@ -19,6 +19,8 @@ public:
 
 	void Initialize();
 
+	~Score();
+
 	void Update();
 
 	void Draw();
