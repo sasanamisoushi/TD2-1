@@ -14,7 +14,7 @@ void GameScene::Initialize() {
 	model_ = Model::CreateFromOBJ("player", true);
 	playerModel_ = Model::CreateFromOBJ("enemy", true);
 
-	getTimer_ = 30;
+	getTimer_ = 90;
 
 	Vector3 playerPosition = {5, 10, 0};
 	Vector3 lurePosition = {0, 8, 0};
