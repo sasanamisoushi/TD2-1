@@ -6,6 +6,8 @@ using namespace KamataEngine;
 
 class Player;
 
+class Score;
+
 enum class FishState {
 	Appear, //登場中
 	Normal, //通常行動
@@ -15,7 +17,7 @@ class Fish {
 public:
 	// 初期化（座標と速度方向を指定）
 
-	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight,int getTimer);
+	void Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight, int getTimer);
 
 	// 更新
 	void Update();
@@ -57,6 +59,8 @@ private:
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
+	Score* score_;
+
 	//向き
 	Vector3 direction_;
 	
@@ -82,5 +86,6 @@ private:
 
 	Vector3 finalScale_;
 
+	const int point_ = 100;
 	
 };

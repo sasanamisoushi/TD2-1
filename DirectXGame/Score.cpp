@@ -3,6 +3,15 @@
 
 using namespace KamataEngine;
 
+Score::~Score() 
+{
+	for (int i = 0; i < 10; i++) 
+	{
+		delete sprites_[i];
+		sprites_[i] = nullptr;
+	}
+}
+
 void Score::Initialize()
 {
 	
@@ -29,10 +38,17 @@ void Score::Initialize()
 	sprites_[8] = Sprite::Create(tex_[0], {180, 0}, collar, {0.0f, 0.0f}, false, false);
 	sprites_[9] = Sprite::Create(tex_[0], {200, 0}, collar, {0.0f, 0.0f}, false, false);
 
-	score_ = 6543210;
+	score_ = 0;
 }
 
-Score::~Score() {}
+void Score::AddScore(int score)
+{
+	score_ += score; 
+}
+
+void Score::ResetScore()
+{ score_ = 0; }
+
 
 void Score::Update()
 {

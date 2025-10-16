@@ -6,6 +6,7 @@ using namespace KamataEngine;
 
 class Player;
 
+class Score;
 
 enum class BigFishState {
 	Appear, // 登場中
@@ -15,7 +16,7 @@ enum class BigFishState {
 class BigFish {
 public:
 	// 初期化（座標と速度方向を指定）
-	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight);
+	void Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight);
 
 	// 更新
 	void Update();
@@ -52,6 +53,8 @@ private:
 	// カメラ
 	Camera* camera_ = nullptr;
 
+	Score* score_;
+
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
@@ -83,4 +86,6 @@ private:
 	float appearDuration_ = 60.0f;
 
 	Vector3 finalScale_;
+
+	const int point_ = 100;
 };
