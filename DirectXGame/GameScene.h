@@ -23,6 +23,8 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
+	int getTimer_;
+
 	
 private:
 

@@ -7,7 +7,7 @@ using namespace DirectX;
 #include <cassert>
 #include <numbers>
 
-void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, bool moveRight) {
+void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, bool moveRight,int getTimer) {
 	// NULLポインタチェック
 	assert(model);
 	// モデル
@@ -29,7 +29,8 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& position, boo
 	float randomPos = minPos + static_cast<float>(rand()) / RAND_MAX * (maxPos - minPos);
 
 	// 魚がゲットできる時間
-	fishGetTimer_ = 90;
+	fishGetTimer_ = getTimer;
+	resetTimer_ = getTimer;
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -122,6 +123,7 @@ void Fish::OnCollision(const Player* player)
 	if (fishGetTimer_ < 0) 
 	{
 		isLureCheck_ = true;
+		
 	}
 	
 }
@@ -130,5 +132,5 @@ void Fish::OutCollision()
 { 
 	// ルアーと当たっていないとき
 	// ゲットタイマーをリセット
-	fishGetTimer_ = 90; 
+	fishGetTimer_ = resetTimer_; 
 }

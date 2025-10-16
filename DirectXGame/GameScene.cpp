@@ -10,6 +10,8 @@ void GameScene::Initialize()
 	model_ = Model::CreateFromOBJ("player", true);
 	playerModel_ = Model::CreateFromOBJ("enemy", true);
 
+	getTimer_ = 90;
+
 	Vector3 playerPosition = {5, 10, 0};
 	Vector3 lurePosition = {0, 8, 0};
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
@@ -39,7 +41,7 @@ void GameScene::Initialize()
 		bool moveRight = (rand() % 2 == 0);
 
 		// 魚の初期化
-		fish->Initialize(fishModel_, &camera_, fishPos, moveRight);
+		fish->Initialize(fishModel_, &camera_, fishPos, moveRight,getTimer_);
 
 		// 配列に登録
 		fishes_.push_back(fish);
@@ -75,6 +77,7 @@ void GameScene::Update()
 		return false;
 	});
 	
+
 	player_->Update();
 	if (Input::GetInstance()->TriggerKey(DIK_S)) {
 		isFinish = true;
@@ -100,8 +103,6 @@ void GameScene::Update()
 
 	ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
 	ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
-
-	
 
 	ImGui::End();
 #endif
