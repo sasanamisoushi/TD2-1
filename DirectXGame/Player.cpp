@@ -133,10 +133,16 @@ void Player::OnCollision(const Fish* fish)
 	(void)fish; 
 }
 
+
 void Player::Reset()
 { 
 	worldTransform_.translation_ = resetPos_; 
 	isKeyPush = false;
 	isLureThrow = false;
 	isLeft = false;
+void Player::OnCollision(const BigFish* Bigfish) 
+{
+
+	(void)Bigfish;
+
 }

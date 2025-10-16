@@ -6,16 +6,10 @@ using namespace KamataEngine;
 
 class Player;
 
-enum class FishState {
-	Appear, //登場中
-	Normal, //通常行動
-};
-
-class Fish {
+class BigFish {
 public:
 	// 初期化（座標と速度方向を指定）
-
-	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight,int getTimer);
+	void Initialize(Model* model, Camera* camera, const Vector3& position, bool moveRight);
 
 	// 更新
 	void Update();
@@ -25,62 +19,47 @@ public:
 
 	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
 
-	KamataEngine::Vector3 GetWorldPosition();
-
 	AABB GetAABB();
 
 	// ルアーと当たっている
 	void OnCollision(const Player* player);
+
 	// ルアーと当たってない
 	void OutCollision();
 
 	// フラグ
-	// 魚がルアーの範囲内にいるか
 	bool isLureCheck_ = false;
 	bool IsLureCheck() const { return isLureCheck_; }
 
 	// 魚がゲットできる時間
-	int fishGetTimer_;
-	// タイマーのリセット
-	int resetTimer_;
-	
+	int fishGetTimer_ = 30;
+
 private:
 	// ワールド変換データ
-	KamataEngine::WorldTransform worldTransform_;
+	WorldTransform worldTransform_;
 
 	// モデル
 	Model* model_ = nullptr;
 
-	//カメラ
+	// カメラ
 	Camera* camera_ = nullptr;
 
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
-	//向き
+	// 向き
 	Vector3 direction_;
-	
-	// 速度
-	Vector3 velocity_ = {};
 
-	static inline const float speed_ = 0.01f;
+	// 速度
+	Vector3 velocity_{};
+
+	// 定数速度
+	static inline const float speed_ = 0.05f;
+
+	// 半径
 	float radius_ = 1.0f;
 
+	// 泳ぐ範囲
 	float leftLimit_ = 0.0f;
 	float rigdhtLimit_ = 0.0f;
-
-	FishState state_ = FishState::Appear;
-
-	 // 目的位置
-	Vector3 targetPos_;
-
-	//登場演出タイマー
-	float appearTimer_ = 0.0f;
-
-	//約1秒で登場
-	float appearDuration_= 60.0f;
-
-	Vector3 finalScale_;
-
-	
 };
