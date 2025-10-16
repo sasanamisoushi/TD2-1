@@ -3,8 +3,10 @@
 #include <cassert>
 #include <numbers>
 #include "Player.h"
+#include "Score.h"
 
-void BigFish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight) {
+
+void BigFish::Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight) {
 	// NULLポインタチェック
 	assert(model);
 	// モデル
@@ -16,6 +18,8 @@ void BigFish::Initialize(Model* model, Camera* camera, const Vector3& targetPos,
 	state_ = BigFishState::Appear;
 	
 	targetPos_ = targetPos;
+
+	score_ = score;
 
 	Vector3 spawnPos;
 	// 出現開始位置
@@ -136,6 +140,7 @@ void BigFish::OnCollision(Player* player) {
 	if (fishGetTimer_ < 0) 
 	{
 		isLureCheck_ = true;
+		score_->AddScore(point_);
 		player->Reset();
 	}
 }

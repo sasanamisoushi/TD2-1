@@ -6,10 +6,14 @@ using namespace KamataEngine;
 
 class Player;
 
+
 enum class FishEventType {
 	None,            //通常
 	swmmyFish        //swmmy
 };
+
+class Score;
+
 
 enum class FishState {
 	Appear, //登場中
@@ -20,7 +24,7 @@ class Fish {
 public:
 	// 初期化（座標と速度方向を指定）
 
-	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight,int getTimer);
+	void Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight, int getTimer);
 
 	// 更新
 	virtual void Update();
@@ -68,6 +72,8 @@ private:
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
+	Score* score_;
+
 	//向き
 	Vector3 direction_;
 	
@@ -93,6 +99,11 @@ private:
 
 	Vector3 finalScale_;
 
+
 	//最初は普通の魚を出す
 	FishEventType eventType_ = FishEventType::None;
+
+	const int point_ = 100;
+	
+
 };

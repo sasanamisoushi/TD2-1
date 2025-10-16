@@ -3,8 +3,10 @@
 #include <cassert>
 #include <numbers>
 #include "Player.h"
+#include "Score.h"
 
-void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight,int getTimer) {
+
+void Fish::Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight, int getTimer) {
   
 	// NULLポインタチェック
 	assert(model);
@@ -17,6 +19,8 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bo
 	state_ = FishState::Appear;
 
 	targetPos_ = targetPos;
+
+	score_ = score;
 	
 	Vector3 spawnPos;
 	//出現開始位置
@@ -152,6 +156,7 @@ void Fish::OnCollision(Player* player)
 	if (fishGetTimer_ < 0) 
 	{
 		isLureCheck_ = true;
+		score_->AddScoreCombo(point_);
 		player->Reset();
 	}
 }

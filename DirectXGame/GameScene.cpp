@@ -11,13 +11,15 @@ void GameScene::Initialize() {
 
 	player_ = new Player();
 
-	model_ = Model::CreateFromOBJ("player", true);
-	playerModel_ = Model::CreateFromOBJ("enemy", true);
+	
+	model_ = Model::CreateFromOBJ("network", true);
+	playerModel_ = Model::CreateFromOBJ("player", true);
+
 
 	getTimer_ = 90;
 
-	Vector3 playerPosition = {5, 10, 0};
-	Vector3 lurePosition = {0, 8, 0};
+	Vector3 playerPosition = {-11, 10, 0};
+	Vector3 lurePosition = {0, 7, 0};
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
 
 	// カメラの初期化
@@ -26,6 +28,10 @@ void GameScene::Initialize() {
 	camera_.translation_ = {0.0f, 5.0f, -20.0f};
 	camera_.rotation_ = {0.0f, 0.0f, 0.0f};
 	camera_.UpdateMatrix();
+
+	// Scoreの初期化
+	score_ = new Score();
+	score_->Initialize();
 
 	// 魚のモデル
 	fishModel_ = Model::CreateFromOBJ("fish");
@@ -97,26 +103,28 @@ void GameScene::Initialize() {
 
 		if (isRubbish) {
 			Rubbish* rubbish = new Rubbish();
-			rubbish->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
+			rubbish->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 			rubbishes_.push_back(rubbish);
 			rubbishCount++;
 		} else if (isBigFish && bigCount < bigFishMax) {
 			BigFish* bigFish = new BigFish();
 			// 大きい魚の初期化
-			bigFish->Initialize(bigFishModel_, &camera_, fishPos, moveRight);
+			bigFish->Initialize(bigFishModel_, &camera_, score_, fishPos, moveRight);
 			// 配列に登録
 			BigFishes_.push_back(bigFish);
 			bigCount++;
 		} else {
 			Fish* fish = new Fish();
 			// 魚の初期化
-			fish->Initialize(fishModel_, &camera_, fishPos, moveRight, getTimer_);
+			fish->Initialize(fishModel_, &camera_, score_, fishPos, moveRight, getTimer_);
 			// 配列に登録
 			fishes_.push_back(fish);
 			smallCount++;
 		}
 		attempts++;
 	}
+
+	
 
 	// タイマー
 	// 数字の描画
@@ -154,6 +162,8 @@ GameScene::~GameScene() {
 	BigFishes_.clear();
 
 	delete bigFishModel_;
+
+	delete score_;
 
 	for (auto& rubbishs : rubbishes_) {
 
@@ -203,8 +213,10 @@ void GameScene::Update() {
 
 	// 魚が取れた時
 	int caughtFishCount = 0;
-	fishes_.remove_if([&caughtFishCount](Fish* fish) {
-		if (fish->IsLureCheck()) {
+	fishes_.remove_if([&caughtFishCount](Fish* fish) 
+	{
+		if (fish->IsLureCheck())
+		{
 			delete fish;
 			caughtFishCount++;
 			return true;
@@ -332,6 +344,8 @@ void GameScene::Draw() {
 	}
 
 	player_->Draw();
+
+	
 	Model::PostDraw();
 
 	// 2d描画
@@ -352,6 +366,8 @@ void GameScene::Draw() {
 	numSprite_[0]->Draw();
 	numSprite_[1]->Draw();
 	numSprite_[2]->Draw();
+
+	score_->Draw();
 
 	Sprite::PostDraw();
 }
@@ -475,15 +491,15 @@ void GameScene::SpawnFish() {
 
 	if (type == 0) {
 		auto* fish = new Fish();
-		fish->Initialize(fishModel_, &camera_, fishPos, moveRight, getTimer_);
+		fish->Initialize(fishModel_, &camera_, score_, fishPos, moveRight, getTimer_);
 		fishes_.push_back(fish);
 	} else if (type == 1) {
 		auto* big = new BigFish();
-		big->Initialize(bigFishModel_, &camera_, fishPos, moveRight);
+		big->Initialize(bigFishModel_, &camera_, score_, fishPos, moveRight);
 		BigFishes_.push_back(big);
 	} else if (type == 2) {
 		auto* rub = new Rubbish();
-		rub->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
+		rub->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 		rubbishes_.push_back(rub);
 	} /*else {
 		auto* eventFish = new EventFish();
