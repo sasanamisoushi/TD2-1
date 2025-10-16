@@ -109,6 +109,10 @@ void GameScene::Initialize() {
 		attempts++;
 	}
 
+	// Scoreの初期化
+	score_ = new Score();
+	score_->Initialize();
+
 	// タイマー
 	// 数字の描画
 	numTexHandles_[0] = TextureManager::Load("num/0.png");
@@ -145,6 +149,7 @@ GameScene::~GameScene() {
 	BigFishes_.clear();
 
 	delete bigFishModel_;
+	delete score_;
 }
 
 void GameScene::Update() {
@@ -253,6 +258,8 @@ void GameScene::Draw() {
 	}
 
 	player_->Draw();
+
+	
 	Model::PostDraw();
 
 	//2d描画
@@ -273,6 +280,8 @@ void GameScene::Draw() {
 	numSprite_[0]->Draw();
 	numSprite_[1]->Draw();
 	numSprite_[2]->Draw();
+
+	score_->Draw();
 
 	Sprite::PostDraw();
 }
