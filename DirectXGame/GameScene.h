@@ -4,6 +4,7 @@
 #include <vector>
 #include "Fish.h"
 #include "BigFish.h"
+#include "Score.h"
 #include "Rubbish.h"
 
 class GameScene 
@@ -38,6 +39,7 @@ private:
 	Model* model_ = nullptr;
 	Model* playerModel_ = nullptr;
 	Camera camera_;
+	Score* score_ = nullptr;
 
 	//魚
 	//========================================
