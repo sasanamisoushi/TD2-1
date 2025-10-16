@@ -6,6 +6,8 @@ using namespace KamataEngine;
 
 class Player;
 
+class Score;
+
 enum class RubbishState {
 	Appear, // 登場中
 	Normal, // 通常行動
@@ -16,7 +18,7 @@ class Rubbish {
 public:
 
 	//初期化
-	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight);
+	void Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight);
 
 	// 更新
 	void Update();
@@ -59,6 +61,8 @@ private:
 	// 向き
 	Vector3 direction_;
 
+	Score* score_;
+
 	// 速度
 	Vector3 velocity_ = {};
 
@@ -80,5 +84,7 @@ private:
 	float appearDuration_ = 60.0f;
 
 	Vector3 finalScale_;
+
+	const int point_ = 100;
 
 };

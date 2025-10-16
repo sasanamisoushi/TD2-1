@@ -1,8 +1,9 @@
 #include "Rubbish.h"
 #include <numbers>
 #include "Player.h"
+#include "Score.h"
 
-void Rubbish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight) {
+void Rubbish::Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight) {
 	// NULLポインタチェック
 	assert(model);
 	// モデル
@@ -14,6 +15,8 @@ void Rubbish::Initialize(Model* model, Camera* camera, const Vector3& targetPos,
 	state_ = RubbishState::Appear;
 
 	targetPos_ = targetPos;
+
+	score_ = score;
 
 	Vector3 spawnPos;
 	// 出現開始位置
@@ -131,8 +134,10 @@ void Rubbish::OnCollision(Player* player) {
 	// ゲットタイマーを減らす
 	fishGetTimer_--;
 	// ゲットタイマーが0になったらゲット
-	if (fishGetTimer_ < 0) {
+	if (fishGetTimer_ < 0)
+	{
 		isLureCheck_ = true;
+		score_->SubtractScore(point_);
 		player->Reset();
 	}
 
