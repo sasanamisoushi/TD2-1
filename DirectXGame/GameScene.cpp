@@ -37,6 +37,7 @@ void GameScene::Initialize() {
 	const int bigFishMax = 4;    // 大きい魚の最大数
 	bigCount = 0;
 	smallCount = 0;
+	rubbishCount = 0;
 
 	int attempts = 0;
 	while (attempts < totalFishMax) {
@@ -101,6 +102,7 @@ void GameScene::Initialize() {
 			Rubbish* rubbish = new Rubbish();
 			rubbish->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
 			rubbishes_.push_back(rubbish);
+			rubbishCount++;
 		} else if (isBigFish && bigCount < bigFishMax) {
 			BigFish* bigFish = new BigFish();
 			// 大きい魚の初期化
@@ -210,9 +212,19 @@ void GameScene::Update() {
 		return false;
 	});
 
+	//ゴミが釣れた時
+	rubbishes_.remove_if([&caughtFishCount](Rubbish* rubbish) {
+		if (rubbish->IsLureCheck()) {
+			delete rubbish;
+			caughtFishCount++;
+			return true;
+		}
+		return false;
+	});
+
 	//捕まえた数だけ再生成
 	for (int i = 0; i < caughtFishCount; i++) {
-		SpawnFish(false); // 小さい魚を追加
+		SpawnFish(); 
 	}
 
 	player_->Update();
@@ -259,7 +271,17 @@ void GameScene::Update() {
 		index++;
 	}
 
-	ImGui::Text("Spawned %d small fish and %d big fish\n", smallCount, bigCount);
+	for (auto& Rubbishs : rubbishes_) {
+		const Vector3& pos = Rubbishs->GetWorldPosition();
+
+		ImGui::Text("Rubbish %d", index);
+		ImGui::SameLine();
+		ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+		ImGui::Text("GetTimer %d", Rubbishs->fishGetTimer_);
+		index++;
+	}
+
+	ImGui::Text("Spawned %d small fish and %d big fish \nand rubbish %d\n", smallCount, bigCount,rubbishCount);
 
 	ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
 	ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
@@ -348,13 +370,30 @@ void GameScene::CheckAllCollisions() {
 			Bigfish->OutCollision();
 		}
 	}
+
+	// 自キャラとゴミ全ての当たり判定
+	for (Rubbish* Rubbishs : rubbishes_) {
+		aabb2 = Rubbishs->GetAABB();
+
+		// ルアーと魚が当たっているとき
+		if (IsCollision(aabb1, aabb2)) {
+			player_->OnCollision(Rubbishs);
+
+			Rubbishs->OnCollision(player_);
+		}
+		// ルアーと魚が当たってないとき
+		else {
+			Rubbishs->OutCollision();
+		}
+	}
 }
 
-void GameScene::SpawnFish(bool isBigFish) {
+void GameScene::SpawnFish() {
 	bool moveRight = (rand() % 2 == 0);
 	Vector3 fishPos;
 	bool setPos = false;
 
+	// === 位置を決定 ===
 	for (int confirmation = 0; confirmation < 50 && !setPos; confirmation++) {
 		fishPos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
 		setPos = true;
@@ -376,21 +415,35 @@ void GameScene::SpawnFish(bool isBigFish) {
 				break;
 			}
 		}
+
+		// ゴミと距離確認
+		for (auto& Rubbish : rubbishes_) {
+			float distanceY = fabs(fishPos.y - Rubbish->GetWorldPosition().y);
+			if (distanceY < 2.5f) {
+				setPos = false;
+				break;
+			}
+		}
 	}
 
 	if (!setPos) {
 		fishPos = {0.0f, static_cast<float>((rand() % 40) / 10.0f + 1.0f), 0.0f};
 	}
 
-	if (isBigFish) {
-		BigFish* bigFish = new BigFish();
-		bigFish->Initialize(bigFishModel_, &camera_, fishPos, moveRight);
-		BigFishes_.push_back(bigFish);
-		bigCount++;
-	} else {
-		Fish* fish = new Fish();
-		fish->Initialize(fishModel_, &camera_, fishPos, moveRight,getTimer_);
+	// === 種類をランダムに選択 ===
+	int type = rand() % 3; // 0:小魚, 1:大魚, 2:ゴミ
+
+	if (type == 0) {
+		auto* fish = new Fish();
+		fish->Initialize(fishModel_, &camera_, fishPos, moveRight, getTimer_);
 		fishes_.push_back(fish);
-		smallCount++;
+	} else if (type == 1) {
+		auto* big = new BigFish();
+		big->Initialize(bigFishModel_, &camera_, fishPos, moveRight);
+		BigFishes_.push_back(big);
+	} else {
+		auto* rub = new Rubbish();
+		rub->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
+		rubbishes_.push_back(rub);
 	}
 }

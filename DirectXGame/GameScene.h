@@ -28,7 +28,7 @@ public:
 
 	int getTimer_;
 
-	void SpawnFish(bool isBigFish);
+	void SpawnFish();
 
 
 	
@@ -58,6 +58,7 @@ private:
 	// 現在数をカウント
 	int smallCount = 0;
 	int bigCount = 0;
+	int rubbishCount = 0;
 
 	//終了フラグ
 	bool isFinish = false;

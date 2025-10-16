@@ -4,6 +4,14 @@
 
 using namespace KamataEngine;
 
+class Player;
+
+enum class RubbishState {
+	Appear, // 登場中
+	Normal, // 通常行動
+};
+
+
 class Rubbish {
 public:
 
@@ -17,6 +25,23 @@ public:
 	void Draw();
 
 	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
+
+	AABB GetAABB();
+
+	// ルアーと当たっている
+	void OnCollision(Player* player);
+
+	// ルアーと当たってない
+	void OutCollision();
+
+	// フラグ
+	bool isLureCheck_ = false;
+	bool IsLureCheck() const { return isLureCheck_; }
+
+	// 魚がゲットできる時間
+	int fishGetTimer_;
+	// タイマーのリセット
+	int resetTimer_;
 
 private:
 	// ワールド変換データ
@@ -43,5 +68,17 @@ private:
 	float leftLimit_ = 0.0f;
 	float rigdhtLimit_ = 0.0f;
 
+	RubbishState state_ = RubbishState::Appear;
+
+	// 目的位置
+	Vector3 targetPos_;
+
+	// 登場演出タイマー
+	float appearTimer_ = 0.0f;
+
+	// 約1秒で登場
+	float appearDuration_ = 60.0f;
+
+	Vector3 finalScale_;
 
 };

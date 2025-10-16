@@ -1,5 +1,6 @@
 #include "Rubbish.h"
 #include <numbers>
+#include "Player.h"
 
 void Rubbish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight) {
 	// NULLポインタチェック
@@ -9,6 +10,28 @@ void Rubbish::Initialize(Model* model, Camera* camera, const Vector3& targetPos,
 
 	// カメラ
 	camera_ = camera;
+
+	state_ = RubbishState::Appear;
+
+	targetPos_ = targetPos;
+
+	Vector3 spawnPos;
+	// 出現開始位置
+	if (rand() % 2 == 0) {
+		spawnPos = {moveRight ? -15.0f : 15.0f, targetPos_.y, targetPos_.z};
+	} else {
+		spawnPos = {0.0f, targetPos_.y, targetPos_.z + 20.0f}; // 奥から
+	}
+
+
+	// ワールドトランスフォームの初期化
+	worldTransform_.Initialize();
+	worldTransform_.translation_ = spawnPos;
+	worldTransform_.scale_ = {0.01f, 0.01f, 0.01f}; // 最初は小さめ
+
+	// 出現完了後の最終サイズ
+	finalScale_ = {0.35f, 0.35f, 0.35f};
+
 
 	// 画面の範囲
 	const float screenLeft = -14.0f;
@@ -22,10 +45,7 @@ void Rubbish::Initialize(Model* model, Camera* camera, const Vector3& targetPos,
 	float maxPos = screenRight - swimRange;
 	float randomPos = minPos + static_cast<float>(rand()) / RAND_MAX * (maxPos - minPos);
 
-	// ワールドトランスフォームの初期化
-	worldTransform_.Initialize();
-	worldTransform_.translation_ = targetPos;
-	worldTransform_.scale_ = {0.35f, 0.35f, 0.35f};
+	
 	worldTransform_.translation_.x = randomPos;
 
 	// 泳ぐ上限
@@ -50,25 +70,76 @@ void Rubbish::Initialize(Model* model, Camera* camera, const Vector3& targetPos,
 }
 
 void Rubbish::Update() {
-	// 移動
-	worldTransform_.translation_.x += direction_.x * speed_;
 
-	// 端で反転（ヒステリシスを持たせる）
-	if (worldTransform_.translation_.x > rigdhtLimit_ + 0.1f) {
-		direction_.x = -1.0f; // 左へ
-		velocity_.x = direction_.x * speed_;
-		worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f; // 左向きに回転
-		worldTransform_.translation_.x = rigdhtLimit_;
-	} else if (worldTransform_.translation_.x < leftLimit_ - 0.1f) {
-		direction_.x = 1.0f; // 右へ
-		velocity_.x = direction_.x * speed_;
-		worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // 右向きに回転
-		worldTransform_.translation_.x = leftLimit_;
+	switch (state_) {
+	case RubbishState::Appear:
+		appearTimer_++;
+
+		// 線形補間して少しずつ目的地へ
+		worldTransform_.translation_ = Lerp(worldTransform_.translation_, targetPos_, 0.05f);
+		worldTransform_.scale_ = Lerp(worldTransform_.scale_, finalScale_, 0.05f);
+
+		// 一定時間経過で通常行動へ
+		if (appearTimer_ > appearDuration_) {
+			state_ = RubbishState::Normal;
+		}
+		break;
+
+	case RubbishState::Normal:
+		// 移動
+		worldTransform_.translation_.x += direction_.x * speed_;
+
+		// 端で反転（ヒステリシスを持たせる）
+		if (worldTransform_.translation_.x > rigdhtLimit_ + 0.1f) {
+			direction_.x = -1.0f; // 左へ
+			velocity_.x = direction_.x * speed_;
+			worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f; // 左向きに回転
+			worldTransform_.translation_.x = rigdhtLimit_;
+		} else if (worldTransform_.translation_.x < leftLimit_ - 0.1f) {
+			direction_.x = 1.0f; // 右へ
+			velocity_.x = direction_.x * speed_;
+			worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // 右向きに回転
+			worldTransform_.translation_.x = leftLimit_;
+		}
+		break;
 	}
+
+	// 行列更新
+	WorldTransformUpdate(worldTransform_);
 }
 
 void Rubbish::Draw() {
 	// 3Dモデル描画前処理
 	model_->Draw(worldTransform_, *camera_);
 
+}
+
+AABB Rubbish::GetAABB() { 
+	KamataEngine::Vector3 worldPos = GetWorldPosition();
+
+	AABB aabb;
+
+	aabb.min = {(worldPos.x - 0.5f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
+	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
+
+	return aabb;
+}
+
+void Rubbish::OnCollision(Player* player) {
+	// ルアーと当たっているとき
+	(void)player;
+	// ゲットタイマーを減らす
+	fishGetTimer_--;
+	// ゲットタイマーが0になったらゲット
+	if (fishGetTimer_ < 0) {
+		isLureCheck_ = true;
+		player->Reset();
+	}
+
+}
+
+void Rubbish::OutCollision() {
+	// ルアーと当たっていないとき
+	// ゲットタイマーをリセット
+	fishGetTimer_ = 30;
 }
