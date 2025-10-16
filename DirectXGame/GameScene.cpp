@@ -10,7 +10,7 @@ void GameScene::Initialize() {
 	srand((unsigned int)time(nullptr));
 
 	player_ = new Player();
-
+	
 	model_ = Model::CreateFromOBJ("player", true);
 	playerModel_ = Model::CreateFromOBJ("enemy", true);
 

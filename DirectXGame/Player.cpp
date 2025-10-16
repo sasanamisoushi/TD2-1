@@ -25,6 +25,8 @@ void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* playerM
 	isKeyPush = false;
 	isLeft = false;
 
+	coolTime = 20;
+
 }
 
 void Player::Update()
@@ -35,6 +37,10 @@ void Player::Update()
 
 void Player::InputMove() {
 
+	if (coolTime > 0) 
+	{
+		coolTime--;
+	}
 	KamataEngine::Vector3 acceleration = {};
 	// ルアーの投げる場所決定の処理
 	if (!isLureThrow) {
@@ -54,18 +60,31 @@ void Player::InputMove() {
 			acceleration.x = 0;
 			isLeft = false;
 		}
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_P)) {
-			velocity_.x = 0;
-			acceleration.x = 0;
-			isLureThrow = true;
+		if (coolTime <= 0) 
+		{
+			if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) {
+				velocity_.x = 0;
+				acceleration.x = 0;
+				isLureThrow = true;
+				coolTime = 20;
+			}
 		}
 		velocity_.x += acceleration.x;
 	}
 	// 魚を釣る
-	if (isLureThrow) {
-		if (!isKeyPush) {
+	if (isLureThrow) 
+	{
+		if (!isKeyPush) 
+		{
+			if (velocity_.y > 0.0f) 
+			{
+				velocity_.y *= (1.0f - kAttenuation);
+			}
 			acceleration.y -= kLureMoveSpeedY;
 		} else {
+			if (velocity_.y < 0.0f) {
+				velocity_.y *= (1.0f - kAttenuation);
+			}
 			acceleration.y += kLureMoveSpeedY;
 		}
 
@@ -73,20 +92,22 @@ void Player::InputMove() {
 			Reset();
 			velocity_.y = 0;
 			acceleration.y = 0;
+			coolTime = 20;
 		}
-		if (worldTransform_.translation_.y < -2.0f ) {
+		if (worldTransform_.translation_.y < -2.0f )
+		{
 			// ルアーが下端に行ったときに
 			velocity_.y = 0;
 			acceleration.y = 0;
 			worldTransform_.translation_.y = -2.0f;
 		}
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) 
+		if (coolTime <= 0) 
 		{
-			isKeyPush = true;
-		}
-		else
-		{
-			isKeyPush = false;
+			if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) {
+				isKeyPush = true;
+			} else {
+				isKeyPush = false;
+			}
 		}
 	} 
 	velocity_.y += acceleration.y;
