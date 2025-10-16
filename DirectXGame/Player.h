@@ -6,6 +6,7 @@
 
 class Fish;
 class BigFish;
+class Rubbish;
 
 class Player 
 {
@@ -74,6 +75,9 @@ public:
 
 	//大きい魚
 	void OnCollision(const BigFish* Bigfish);
+
+	//ゴミ
+	void OnCollision(const Rubbish* Rubbish);
   
 	//=======================
 	

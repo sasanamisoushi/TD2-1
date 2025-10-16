@@ -53,7 +53,7 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bo
 	worldTransform_.translation_.x = randomPos;
 
 	
-		// 泳ぐ上限
+	// 泳ぐ上限
 	leftLimit_ = worldTransform_.translation_.x - swimRange;
 	rigdhtLimit_ = worldTransform_.translation_.x + swimRange;
 
@@ -106,8 +106,6 @@ void Fish::Update() {
 			worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // 右向きに回転
 			worldTransform_.translation_.x = leftLimit_;
 		}
-
-		
 		break;
 	}
 	
