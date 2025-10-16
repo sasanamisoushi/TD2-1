@@ -107,7 +107,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BigFish.cpp" />
-    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="EventFish.cpp" />
     <ClCompile Include="Fish.cpp" />
     <ClCompile Include="GameClearScene.cpp" />
     <ClCompile Include="GameScene.cpp" />
@@ -115,6 +115,7 @@
     <ClCompile Include="math.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Rubbish.cpp" />
+    <ClCompile Include="SwimmyEvent.cpp" />
     <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -195,12 +196,14 @@
   <ItemGroup>
     <ClInclude Include="BigFish.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="EventFish.h" />
     <ClInclude Include="Fish.h" />
     <ClInclude Include="GameClearScene.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rubbish.h" />
+    <ClInclude Include="SwimmyEvent.h" />
     <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

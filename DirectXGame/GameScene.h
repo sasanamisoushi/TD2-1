@@ -5,6 +5,11 @@
 #include "Fish.h"
 #include "BigFish.h"
 #include "Rubbish.h"
+#include "Event.h"
+#include "SwimmyEvent.h"
+#include "EventFish.h"
+
+
 
 class GameScene 
 {
@@ -30,7 +35,23 @@ public:
 
 	void SpawnFish();
 
+	void StartEvent(Event* event);
+	void UpdateEvent();
+	void EndEvent();
 
+	void ClearAllFish();
+
+	Model* GetFishModel() { return fishModel_; }
+	Model* GetSwimmyModel() { return swimmyModel_; }
+
+	Camera* GetCamera() { return &camera_; }
+
+
+	Vector3 GetRandomPos();
+
+	void AddFish(Fish* fish);
+	
+	static GameScene* GetInstance();
 	
 private:
 
@@ -39,8 +60,14 @@ private:
 	Model* playerModel_ = nullptr;
 	Camera camera_;
 
+	
+	Event* currentEvent_ = nullptr;
+	 
+
+	//========================================
 	//魚
 	//========================================
+	
 	// 魚モデル
 	Model* fishModel_ = nullptr;
 
@@ -55,6 +82,10 @@ private:
 	Model* rubbishModel_ = nullptr;
 	std::list<Rubbish*> rubbishes_;
 
+	//イベント魚
+	Model* swimmyModel_ = nullptr;
+	std::list<EventFish*> swimmys_;
+
 	// 現在数をカウント
 	int smallCount = 0;
 	int bigCount = 0;
@@ -68,4 +99,6 @@ private:
 	Sprite* numSprite_[3];
 	int gameTimer_ = 18000;
 	bool isGame_ = true; // ゲーム中か
+
+	static GameScene* instance_;
 };
