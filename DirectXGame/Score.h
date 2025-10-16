@@ -7,6 +7,19 @@ namespace KamataEngine {
 
 class Score
 {
+public:
+
+	~Score();
+
+	void Initialize();
+
+	void AddScore(int score);
+
+	void ResetScore();
+
+	void Update();
+
+	void Draw();
 
 private:
 
@@ -14,14 +27,4 @@ private:
 
 	std::array<KamataEngine::Sprite*, 10> sprites_ = {}; // 配列 描画
 	std::array<int, 10> tex_ = {}; // 配列 数字
-
-public:
-
-	void Initialize();
-
-	~Score();
-
-	void Update();
-
-	void Draw();
 };
