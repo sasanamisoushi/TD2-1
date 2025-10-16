@@ -30,7 +30,7 @@ public:
 	AABB GetAABB();
 
 	// ルアーと当たっている
-	void OnCollision(const Player* player);
+	void OnCollision(Player* player);
 	// ルアーと当たってない
 	void OutCollision();
 

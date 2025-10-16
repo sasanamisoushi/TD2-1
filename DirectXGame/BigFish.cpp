@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <numbers>
+#include "Player.h"
 
 void BigFish::Initialize(Model* model, Camera* camera, const Vector3& position, bool moveRight) {
 	// NULLポインタチェック
@@ -90,14 +91,16 @@ AABB BigFish::GetAABB() {
 	return aabb;
 }
 
-void BigFish::OnCollision(const Player* player) {
+void BigFish::OnCollision(Player* player) {
 	// ルアーと当たっているとき
 	(void)player;
 	// ゲットタイマーを減らす
 	fishGetTimer_--;
 	// ゲットタイマーが0になったらゲット
-	if (fishGetTimer_ < 0) {
+	if (fishGetTimer_ < 0) 
+	{
 		isLureCheck_ = true;
+		player->Reset();
 	}
 }
 

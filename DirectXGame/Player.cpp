@@ -88,11 +88,9 @@ void Player::InputMove() {
 			acceleration.y += kLureMoveSpeedY;
 		}
 
-		if (worldTransform_.translation_.y > 9.5f) {
+		if (worldTransform_.translation_.y > 9.5f) 
+		{
 			Reset();
-			velocity_.y = 0;
-			acceleration.y = 0;
-			coolTime = 20;
 		}
 		if (worldTransform_.translation_.y < -2.0f )
 		{
@@ -155,13 +153,18 @@ void Player::OnCollision(const Fish* fish)
 }
 
 
-void Player::Reset() 
+void Player::Reset()
 {
+	KamataEngine::Vector3 acceleration = {};
 	worldTransform_.translation_ = resetPos_;
 	isKeyPush = false;
 	isLureThrow = false;
 	isLeft = false;
+	velocity_.y = 0;
+	acceleration.y = 0;
+	coolTime = 20;
 }
+
 void Player::OnCollision(const BigFish* Bigfish) 
 {
 	(void)Bigfish;
