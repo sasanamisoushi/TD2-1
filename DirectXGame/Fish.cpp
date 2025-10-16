@@ -3,11 +3,8 @@
 #include <cassert>
 #include <numbers>
 
-
 void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight,int getTimer) {
-	// ワールドトランスフォームの初期化
-	worldTransform_.Initialize();
-	
+  
 	// NULLポインタチェック
 	assert(model);
 	// モデル
@@ -20,14 +17,17 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bo
 
 	targetPos_ = targetPos;
 	
-
+	Vector3 spawnPos;
 	//出現開始位置
 	if (rand() % 2 == 0) {
-		worldTransform_.translation_ = {moveRight ? -15.0f : 15.0f, targetPos_.y, targetPos_.z};
+		spawnPos = {moveRight ? -15.0f : 15.0f, targetPos_.y, targetPos_.z};
 	} else {
-		worldTransform_.translation_ = {0.0f, targetPos_.y, targetPos_.z + 20.0f}; // 奥から
+		spawnPos = {0.0f, targetPos_.y, targetPos_.z + 20.0f}; // 奥から
 	}
 
+	// ワールドトランスフォームの初期化
+	worldTransform_.Initialize();
+	worldTransform_.translation_ = spawnPos;
 	worldTransform_.scale_ = {0.01f, 0.01f, 0.01f}; // 最初は小さめ
 
 	// 出現完了後の最終サイズ
@@ -49,8 +49,6 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bo
 	fishGetTimer_ = getTimer;
 	resetTimer_ = getTimer;
 
-	
-	
 	worldTransform_.translation_.x = randomPos;
 
 	
@@ -72,6 +70,8 @@ void Fish::Initialize(Model* model, Camera* camera, const Vector3& targetPos, bo
 		//左
 		worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 	}
+
+	WorldTransformUpdate(worldTransform_);
 }
 
 void Fish::Update() {
