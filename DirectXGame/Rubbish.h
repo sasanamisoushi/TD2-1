@@ -6,15 +6,16 @@ using namespace KamataEngine;
 
 class Player;
 
-
-enum class BigFishState {
+enum class RubbishState {
 	Appear, // 登場中
 	Normal, // 通常行動
 };
 
-class BigFish {
+
+class Rubbish {
 public:
-	// 初期化（座標と速度方向を指定）
+
+	//初期化
 	void Initialize(Model* model, Camera* camera, const Vector3& targetPos, bool moveRight);
 
 	// 更新
@@ -44,7 +45,7 @@ public:
 
 private:
 	// ワールド変換データ
-	WorldTransform worldTransform_;
+	KamataEngine::WorldTransform worldTransform_;
 
 	// モデル
 	Model* model_ = nullptr;
@@ -59,21 +60,17 @@ private:
 	Vector3 direction_;
 
 	// 速度
-	Vector3 velocity_{};
+	Vector3 velocity_ = {};
 
-	// 定数速度
-	static inline const float speed_ = 0.05f;
-
-	// 半径
+	static inline const float speed_ = 0.01f;
 	float radius_ = 1.0f;
 
-	// 泳ぐ範囲
 	float leftLimit_ = 0.0f;
 	float rigdhtLimit_ = 0.0f;
 
-	BigFishState state_ = BigFishState::Appear;
+	RubbishState state_ = RubbishState::Appear;
 
-	 // 目的位置
+	// 目的位置
 	Vector3 targetPos_;
 
 	// 登場演出タイマー
@@ -83,4 +80,5 @@ private:
 	float appearDuration_ = 60.0f;
 
 	Vector3 finalScale_;
+
 };

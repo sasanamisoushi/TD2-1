@@ -6,8 +6,7 @@
 using namespace KamataEngine;
 using namespace MathUtility;
 
-void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* playerModel, KamataEngine::Camera* camera, KamataEngine::Vector3& position, KamataEngine::Vector3& playerPosition)
-{
+void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* playerModel, KamataEngine::Camera* camera, KamataEngine::Vector3& position, KamataEngine::Vector3& playerPosition) {
 	assert(model);
 	assert(playerModel);
 	model_ = model;
@@ -26,19 +25,16 @@ void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* playerM
 	isLeft = false;
 
 	coolTime = 20;
-
 }
 
-void Player::Update()
-{
+void Player::Update() {
 	InputMove();
 	WorldTransformUpdate();
 }
 
 void Player::InputMove() {
 
-	if (coolTime > 0) 
-	{
+	if (coolTime > 0) {
 		coolTime--;
 	}
 	KamataEngine::Vector3 acceleration = {};
@@ -60,8 +56,7 @@ void Player::InputMove() {
 			acceleration.x = 0;
 			isLeft = false;
 		}
-		if (coolTime <= 0) 
-		{
+		if (coolTime <= 0) {
 			if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) {
 				velocity_.x = 0;
 				acceleration.x = 0;
@@ -72,12 +67,9 @@ void Player::InputMove() {
 		velocity_.x += acceleration.x;
 	}
 	// 魚を釣る
-	if (isLureThrow) 
-	{
-		if (!isKeyPush) 
-		{
-			if (velocity_.y > 0.0f) 
-			{
+	if (isLureThrow) {
+		if (!isKeyPush) {
+			if (velocity_.y > 0.0f) {
 				velocity_.y *= (1.0f - kAttenuation);
 			}
 			acceleration.y -= kLureMoveSpeedY;
@@ -88,31 +80,27 @@ void Player::InputMove() {
 			acceleration.y += kLureMoveSpeedY;
 		}
 
-		if (worldTransform_.translation_.y > 9.5f) 
-		{
+		if (worldTransform_.translation_.y > 9.5f) {
 			Reset();
 		}
-		if (worldTransform_.translation_.y < -2.0f )
-		{
+		if (worldTransform_.translation_.y < -2.0f) {
 			// ルアーが下端に行ったときに
 			velocity_.y = 0;
 			acceleration.y = 0;
 			worldTransform_.translation_.y = -2.0f;
 		}
-		if (coolTime <= 0) 
-		{
+		if (coolTime <= 0) {
 			if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) {
 				isKeyPush = true;
 			} else {
 				isKeyPush = false;
 			}
 		}
-	} 
+	}
 	velocity_.y += acceleration.y;
 }
 
-void Player::WorldTransformUpdate()
-{
+void Player::WorldTransformUpdate() {
 	worldTransform_.translation_.x += velocity_.x;
 	worldTransform_.translation_.y += velocity_.y;
 	worldTransform_.translation_.z += velocity_.z;
@@ -147,14 +135,9 @@ AABB Player::GetAABB() {
 	return aabb;
 }
 
-void Player::OnCollision(const Fish* fish) 
-{
-	(void)fish; 
-}
+void Player::OnCollision(const Fish* fish) { (void)fish; }
 
-
-void Player::Reset()
-{
+void Player::Reset() {
 	KamataEngine::Vector3 acceleration = {};
 	worldTransform_.translation_ = resetPos_;
 	isKeyPush = false;
@@ -165,7 +148,10 @@ void Player::Reset()
 	coolTime = 20;
 }
 
-void Player::OnCollision(const BigFish* Bigfish) 
-{
+void Player::OnCollision(const BigFish* Bigfish) {
 	(void)Bigfish;
+}
+
+void Player::OnCollision(const Rubbish* Rubbish) { 
+	(void)Rubbish; 
 }

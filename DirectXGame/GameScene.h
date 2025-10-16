@@ -5,6 +5,7 @@
 #include "Fish.h"
 #include "BigFish.h"
 #include "Score.h"
+#include "Rubbish.h"
 
 class GameScene 
 {
@@ -28,7 +29,7 @@ public:
 
 	int getTimer_;
 
-	void SpawnFish(bool isBigFish);
+	void SpawnFish();
 
 
 	
@@ -40,7 +41,6 @@ private:
 	Camera camera_;
 	Score* score_ = nullptr;
 
-	//========================================
 	//魚
 	//========================================
 	// 魚モデル
@@ -53,9 +53,14 @@ private:
 	Model* bigFishModel_ = nullptr;
 	std::list<BigFish*> BigFishes_;
 
+	//ゴミ
+	Model* rubbishModel_ = nullptr;
+	std::list<Rubbish*> rubbishes_;
+
 	// 現在数をカウント
 	int smallCount = 0;
 	int bigCount = 0;
+	int rubbishCount = 0;
 
 	//終了フラグ
 	bool isFinish = false;
