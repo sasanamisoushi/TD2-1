@@ -114,6 +114,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Score.cpp" />
     <ClCompile Include="Rubbish.cpp" />
     <ClCompile Include="SwimmyEvent.cpp" />
     <ClCompile Include="TitleScene.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Score.h" />
     <ClInclude Include="Rubbish.h" />
     <ClInclude Include="SwimmyEvent.h" />
     <ClInclude Include="TitleScene.h" />

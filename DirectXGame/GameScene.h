@@ -4,6 +4,7 @@
 #include <vector>
 #include "Fish.h"
 #include "BigFish.h"
+#include "Score.h"
 #include "Rubbish.h"
 #include "SwimmyEvent.h"
 #include "EventFish.h"
@@ -57,6 +58,7 @@ private:
 	Model* model_ = nullptr;
 	Model* playerModel_ = nullptr;
 	Camera camera_;
+	Score* score_ = nullptr;
 
 	
 	
