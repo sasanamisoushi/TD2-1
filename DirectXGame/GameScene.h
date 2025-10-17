@@ -6,9 +6,9 @@
 #include "BigFish.h"
 #include "Score.h"
 #include "Rubbish.h"
-#include "Event.h"
 #include "SwimmyEvent.h"
 #include "EventFish.h"
+#include "SwimmyEvent.h"
 
 
 
@@ -36,9 +36,7 @@ public:
 
 	void SpawnFish();
 
-	void StartEvent(Event* event);
-	void UpdateEvent();
-	void EndEvent();
+	
 
 	void ClearAllFish();
 
@@ -63,7 +61,7 @@ private:
 	Score* score_ = nullptr;
 
 	
-	Event* currentEvent_ = nullptr;
+	
 	 
 
 	//========================================
@@ -92,6 +90,7 @@ private:
 	int smallCount = 0;
 	int bigCount = 0;
 	int rubbishCount = 0;
+	int eventCount = 0;
 
 	//終了フラグ
 	bool isFinish = false;
@@ -103,4 +102,7 @@ private:
 	bool isGame_ = true; // ゲーム中か
 
 	static GameScene* instance_;
+
+	//群れのイベント管理用
+	SwimmyEvent swimmyEvent_;
 };

@@ -20,7 +20,11 @@ void Fish::Initialize(Model* model, Camera* camera, Score* score, const Vector3&
 
 	targetPos_ = targetPos;
 
+
+	moveRight_ = moveRight;
+  
 	score_ = score;
+
 	
 	Vector3 spawnPos;
 	//出現開始位置
@@ -166,4 +170,18 @@ void Fish::OutCollision()
 	// ルアーと当たっていないとき
 	// ゲットタイマーをリセット
 	fishGetTimer_ = resetTimer_; 
+}
+
+void Fish::SetTexture(const std::string& filePath) { 
+	
+	textureHandle_ = TextureManager::Load(filePath);
+
+}
+
+float Fish::GetMoveDirectionY() const { 
+	return moveRight_ ? 1.0f : -1.0f; 
+}
+
+void Fish::SetWorldPosition(const Vector3& pos) {
+	worldTransform_.translation_ = pos; 
 }

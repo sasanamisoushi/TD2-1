@@ -58,6 +58,21 @@ public:
 
 	//イベントタイプを取得
 	FishEventType GetEventType() const { return eventType_; }
+
+	//魚の見た目を変える
+	void SetTexture(const std::string& filePath);
+
+	float GetMoveDirectionY() const;
+
+	void SetWorldPosition(const Vector3& pos);
+
+	// 移動方向（角度）を設定
+	void SetMoveDirectionY(float dir) { direction_.y = dir; }
+
+	// 右向き／左向きフラグを設定
+	void SetIsMoveRight(bool flag) { moveRight_ = flag; }
+
+	bool GetIsMoveRight() const { return moveRight_; }
 	
 private:
 	// ワールド変換データ
@@ -96,6 +111,8 @@ private:
 
 	//約1秒で登場
 	float appearDuration_= 60.0f;
+
+	bool moveRight_ = true;
 
 	Vector3 finalScale_;
 
