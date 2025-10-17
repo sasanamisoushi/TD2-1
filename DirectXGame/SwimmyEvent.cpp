@@ -91,7 +91,7 @@ void SwimmyEvent::SpawnFishGroup(const Vector3& centerPos, int count, float spre
 	
 
 	Fish* leaderFish = new Fish();
-	leaderFish->Initialize(leaderModel_, camera_, centerPos, moveRight, 30);
+	leaderFish->Initialize(leaderModel_, camera_,nullptr, centerPos, moveRight, 30);
 
 	//イベント魚として設定
 	leaderFish->SetEventType(FishEventType::swmmyFish);
@@ -123,7 +123,7 @@ void SwimmyEvent::SpawnFishGroup(const Vector3& centerPos, int count, float spre
 		
 		// リーダーと同じ向きで初期化
 		Fish* fish = new Fish();
-		fish->Initialize(fishGroupModel_, camera_, spawnPos, moveRight,30);
+		fish->Initialize(fishGroupModel_, camera_,nullptr, spawnPos, moveRight,30);
 
 		//イベント用魚
 		fish->SetEventType(FishEventType::swmmyFish);

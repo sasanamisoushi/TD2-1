@@ -4,7 +4,7 @@
 
 class EventFish : public Fish {
 public:
-	void Initialize(Model* model, Camera* camera, const Vector3& pos, bool moveRight, int getTimer);
+	void Initialize(Model* model, Camera* camera, Score* Score, const Vector3& pos, bool moveRight, int getTimer);
 	void Update() override;
 	void OnCollision(Player* player) override;
 
