@@ -1,8 +1,8 @@
 #include "EventFish.h"
 #include "GameScene.h"
 
-void EventFish::Initialize(Model* model, Camera* camera, const Vector3& pos, bool moveRight, int getTimer) {
-	Fish::Initialize(model, camera, pos, moveRight,getTimer);
+void EventFish::Initialize(Model* model, Camera* camera, Score* Score, const Vector3& pos, bool moveRight, int getTimer) { 
+	Fish::Initialize(model, camera, Score, pos, moveRight, getTimer); 
 }
 
 void EventFish::Update() { 

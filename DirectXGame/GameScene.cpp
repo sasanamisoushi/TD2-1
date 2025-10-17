@@ -123,7 +123,7 @@ void GameScene::Initialize() {
 			rubbishCount++;
 		} else if (isSwimmy && eventCount < EventFisMax) {
 			EventFish* eventFish = new EventFish();
-			eventFish->Initialize(rubbishModel_, &camera_, fishPos, moveRight, getTimer_);
+			eventFish->Initialize(rubbishModel_, &camera_,nullptr, fishPos, moveRight, getTimer_);
 			swimmys_.push_back(eventFish);
 			eventCount++;
 
@@ -539,7 +539,7 @@ void GameScene::SpawnFish() {
 		rubbishes_.push_back(rub);
 	} else {
 		auto* eventFish = new EventFish();
-		eventFish->Initialize(swimmyModel_, &camera_, fishPos, moveRight, getTimer_);
+		eventFish->Initialize(swimmyModel_, &camera_,nullptr, fishPos, moveRight, getTimer_);
 
 		eventFish->SetOnTriggered([this](const Vector3& centerPos) { swimmyEvent_.SpawnFishGroup(centerPos, 8, 3.0f); });
 		swimmys_.push_back(eventFish);
