@@ -1,14 +1,19 @@
 #pragma once
 #include "Fish.h"
-#include "Event.h"
+#include <functional>
 
 class EventFish : public Fish {
 public:
-	void Initialize(Model* model, Camera* camera, const Vector3& pos, bool moveRight, int getTimer, Event* event);
+	void Initialize(Model* model, Camera* camera, const Vector3& pos, bool moveRight, int getTimer);
 	void Update() override;
 	void OnCollision(Player* player) override;
 
+	 // イベント発火時に呼ばれるコールバック
+	void SetOnTriggered(std::function<void(const Vector3&)> callback) { onTriggered_ = callback; }
+
+
 private:
-	Event* event_ = nullptr;
+
 	bool hasTriggered_ = false;
+	std::function<void(const Vector3&)> onTriggered_;
 };

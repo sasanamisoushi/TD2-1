@@ -23,6 +23,8 @@ void GameScene::Initialize() {
 	// カメラの初期化
 	camera_.Initialize();
 
+	
+
 	camera_.translation_ = {0.0f, 5.0f, -20.0f};
 	camera_.rotation_ = {0.0f, 0.0f, 0.0f};
 	camera_.UpdateMatrix();
@@ -33,12 +35,25 @@ void GameScene::Initialize() {
 	rubbishModel_ = Model::CreateFromOBJ("trash",true);
 	swimmyModel_ = Model::CreateFromOBJ("suimii",true);
 
+	// イベントの初期化
+	swimmyEvent_.Initialize(fishModel_, swimmyModel_, & camera_);
+
+	// ★ イベント終了時に魚を再生成
+	swimmyEvent_.SetOnEventEnd([this]() {
+		for (int i = 0; i < 10; i++) { // 10匹くらい再生成
+			SpawnFish();
+		}
+	});
+
 	// 制限数
 	const int totalFishMax = 10; // 全体の最大数
 	const int bigFishMax = 4;    // 大きい魚の最大数
+	const int EventFisMax = 1;   //イベントの魚の最大数
 	bigCount = 0;
 	smallCount = 0;
 	rubbishCount = 0;
+	eventCount = 0;
+
 
 	int attempts = 0;
 	while (attempts < totalFishMax) {
@@ -46,7 +61,7 @@ void GameScene::Initialize() {
 		bool moveRight = (rand() % 2 == 0);
 		bool isBigFish = (rand() % 100 < 40);
 		bool isRubbish = (rand() % 100 < 20);
-		//bool isSwimmy = (rand() % 100 < 10);
+		bool isSwimmy = (rand() % 100 < 10);
 
 		Vector3 fishPos;
 		bool setPos = false;
@@ -100,6 +115,12 @@ void GameScene::Initialize() {
 			rubbish->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
 			rubbishes_.push_back(rubbish);
 			rubbishCount++;
+		} else if (isSwimmy && eventCount < EventFisMax) {
+			EventFish* eventFish = new EventFish();
+			eventFish->Initialize(rubbishModel_, &camera_, fishPos, moveRight, getTimer_);
+			swimmys_.push_back(eventFish);
+			eventCount++;
+
 		} else if (isBigFish && bigCount < bigFishMax) {
 			BigFish* bigFish = new BigFish();
 			// 大きい魚の初期化
@@ -117,6 +138,8 @@ void GameScene::Initialize() {
 		}
 		attempts++;
 	}
+
+	
 
 	// タイマー
 	// 数字の描画
@@ -171,6 +194,8 @@ GameScene::~GameScene() {
 
 	delete swimmyModel_;
 
+	
+
 	for (int i = 0; i < 3; i++) {
 
 		delete numSprite_[i];
@@ -199,6 +224,9 @@ void GameScene::Update() {
 
 		eventFish->Update();
 	}
+
+	//群れの更新
+	swimmyEvent_.Update();
 
 
 	// 魚が取れた時
@@ -233,8 +261,15 @@ void GameScene::Update() {
 	});
 
 	//イベント魚が取れた時
-	swimmys_.remove_if([&caughtFishCount](EventFish* eventFish) {
+	swimmys_.remove_if([&](EventFish* eventFish) {
 		if (eventFish->IsLureCheck()) {
+			Vector3 centerPos = eventFish->GetWorldPosition();
+
+			ClearAllFish();
+
+			// --- イベント群れを生成 ---
+			swimmyEvent_.SpawnFishGroup(centerPos, 8, 3.0f);
+
 			delete eventFish;
 			caughtFishCount++;
 			return true;
@@ -332,6 +367,10 @@ void GameScene::Draw() {
 	}
 
 	player_->Draw();
+	
+	//群れの描画
+	swimmyEvent_.Draw();
+
 	Model::PostDraw();
 
 	// 2d描画
@@ -485,32 +524,16 @@ void GameScene::SpawnFish() {
 		auto* rub = new Rubbish();
 		rub->Initialize(rubbishModel_, &camera_, fishPos, moveRight);
 		rubbishes_.push_back(rub);
-	} /*else {
+	} else {
 		auto* eventFish = new EventFish();
-		eventFish->Initialize(swimmyModel_, &camera_, fishPos, moveRight, getTimer_, new SwimmyEvent());
+		eventFish->Initialize(swimmyModel_, &camera_, fishPos, moveRight, getTimer_);
+
+		eventFish->SetOnTriggered([this](const Vector3& centerPos) { swimmyEvent_.SpawnFishGroup(centerPos, 8, 3.0f); });
 		swimmys_.push_back(eventFish);
-	}*/
-}
-
-void GameScene::StartEvent(Event* event) {
-	currentEvent_ = event;
-	event->isActive_ = true;
-	event->Start(this);
-}
-
-void GameScene::UpdateEvent() {
-	if (currentEvent_ && currentEvent_->isActive_) {
-		currentEvent_->Update(this);
 	}
 }
 
-void GameScene::EndEvent() {
-	if (currentEvent_) {
-		currentEvent_->End(this);
-		currentEvent_->isActive_ = false;
-		currentEvent_ = nullptr;
-	}
-}
+
 
 void GameScene::ClearAllFish() {
 	// 小さい魚を削除
@@ -573,9 +596,9 @@ void GameScene::AddFish(Fish* fish) {
 
 GameScene* GameScene::instance_ = nullptr;
 
-GameScene* GameScene::GetInstance() {
-	if (!instance_) {
-		instance_ = new GameScene();
-	}
-	return instance_;
-}
+//GameScene* GameScene::GetInstance() {
+//	if (!instance_) {
+//		instance_ = new GameScene();
+//	}
+//	return instance_;
+//}

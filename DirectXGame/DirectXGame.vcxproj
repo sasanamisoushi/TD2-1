@@ -195,7 +195,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BigFish.h" />
-    <ClInclude Include="Event.h" />
     <ClInclude Include="EventFish.h" />
     <ClInclude Include="Fish.h" />
     <ClInclude Include="GameClearScene.h" />

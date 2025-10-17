@@ -1,10 +1,8 @@
 #include "EventFish.h"
 #include "GameScene.h"
 
-void EventFish::Initialize(Model* model, Camera* camera, const Vector3& pos, bool moveRight, int getTimer, Event* event) {
+void EventFish::Initialize(Model* model, Camera* camera, const Vector3& pos, bool moveRight, int getTimer) {
 	Fish::Initialize(model, camera, pos, moveRight,getTimer);
-	event_ = event;
-
 }
 
 void EventFish::Update() { 
@@ -12,10 +10,14 @@ void EventFish::Update() {
 
 void EventFish::OnCollision(Player* player) {
 	Fish::OnCollision(player);
-	if (!hasTriggered_ && event_) {
+
+	if (!hasTriggered_) {
 		hasTriggered_ = true;
-		// イベントを開始
-		GameScene* scene = GameScene::GetInstance();
-		scene->StartEvent(event_);
+		isLureCheck_ = true;
+
+		// イベント発生（群れを出すなど）
+		if (onTriggered_) {
+			onTriggered_(GetWorldPosition());
+		}
 	}
 }
