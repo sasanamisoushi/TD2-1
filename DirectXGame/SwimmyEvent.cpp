@@ -1,4 +1,16 @@
+#define NOMINMAX
+#include <algorithm>
 #include "SwimmyEvent.h"
+
+static float VecLength(const KamataEngine::Vector3& v) { return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z); }
+
+static KamataEngine::Vector3 VecNormalize(const KamataEngine::Vector3& v) {
+	float len = VecLength(v);
+	if (len <= 1e-6f)
+		return {0.0f, 0.0f, 0.0f};
+	return {v.x / len, v.y / len, v.z / len};
+}
+
 
 void SwimmyEvent::Initialize(Model* fishModel, Model* leaderModel, Camera* camera) {
 
@@ -35,29 +47,36 @@ void SwimmyEvent::Update() {
 	for (size_t i = 1; i < fishes_.size(); i++) {
 		Fish* fish = fishes_[i];
 
-		// リーダーと同じ方向に向かせる
-		fish->SetMoveDirectionY(leaderDir); 
+		// 方向をスムーズに補間
+		float currentDir = fish->GetMoveDirectionY();
+		float newDir = currentDir + (leaderDir - currentDir) * 0.05f;
+		// 少しランダムに揺らぎを入れる
+		newDir += (float(rand()) / RAND_MAX - 0.5f) * 0.05f;
+
+		fish->SetMoveDirectionY(newDir);
 		fish->SetIsMoveRight(leaderMoveRight);
 
-		// リーダーの周囲に留まるように補間移動
-		Vector3 targetPos = leaderPos;
-		targetPos.x += cosf(i * 0.8f) * 2.0f;
-		targetPos.y += sinf(i * 0.8f) * 2.0f;
-
-		// 魚の現在位置を取得
+		  // 固定オフセットを使って追従
+		Vector3 targetPos = leaderPos + fish->GetInitialOffset();
 		Vector3 current = fish->GetWorldPosition();
 
-		// 少しずつ追従する
-		Vector3 toTarget = targetPos - current;
+		// 目標までのベクトル
+		Vector3 toTarget = {targetPos.x - current.x, targetPos.y - current.y, targetPos.z - current.z};
+		// 距離と正規化（自前のユーティリティを使用）
+		float distance = VecLength(toTarget);
+		if (distance > 0.01f) {
+			Vector3 dir = VecNormalize(toTarget);
 
-		//リーダーの向きに応じて、少し方向を傾ける（自然な追従効果）
-		current.x += cosf(leaderDir) * 0.1f;
-		current.y += sinf(leaderDir) * 0.1f;
 
-		// 追従スピード
-		current += toTarget * 0.05f; 
+			// 離れてる魚ほど速く追従
+			float followSpeed = 0.02f + std::min(distance * 0.01f, 0.04f);
 
-		fish->SetWorldPosition(current);
+			current.x += dir.x * followSpeed;
+			current.y += dir.y * followSpeed;
+			current.z += dir.z * followSpeed;
+		}
+
+		 fish->SetWorldPosition(current);
 		fish->Update();
 	}
 
@@ -88,7 +107,6 @@ void SwimmyEvent::SpawnFishGroup(const Vector3& centerPos, int count, float spre
 
 	//----------------中心の赤い魚----------------
 
-	
 
 	Fish* leaderFish = new Fish();
 	leaderFish->Initialize(leaderModel_, camera_,nullptr, centerPos, moveRight, 30);
@@ -96,39 +114,23 @@ void SwimmyEvent::SpawnFishGroup(const Vector3& centerPos, int count, float spre
 	//イベント魚として設定
 	leaderFish->SetEventType(FishEventType::swmmyFish);
 
+	leaderFish->SetInitialOffset({0, 0, 0});
+
 	//群れのリストに追加
 	fishes_.push_back(leaderFish);
 
-	 //リーダーの方向を取得
-	float leaderDir = leaderFish->GetMoveDirectionY();
+	
+	for (int i = 0; i < count; ++i) {
+		Vector3 offset = {(float(rand()) / RAND_MAX - 0.5f) * 2.0f * spreadRadius, (float(rand()) / RAND_MAX - 0.5f) * 2.0f * spreadRadius, (float(rand()) / RAND_MAX - 0.5f) * 2.0f * spreadRadius};
 
-	 //リーダーの向きに合わせる（右向きならtrue, 左向きならfalse）
-	bool sameDir = (leaderDir > 0.0f);
-
-	//群れ全体の方向をリーダーに統一
-	moveRight = sameDir;
-
-	for (int i=0;i<count;++i){
-
-		//ランダムな位置オフセットを生成
-		Vector3 offset = {
-			(float(rand()) / RAND_MAX - 0.5f) * 2.0f * spreadRadius, 
-			(float(rand()) / RAND_MAX - 0.5f) * 2.0f * spreadRadius, 
-			(float(rand()) / RAND_MAX - 0.5f) * 2.0f * spreadRadius
-		};
-
-		//群れの中心にオフセットを加えた座標が魚の出現位置
 		Vector3 spawnPos = centerPos + offset;
 
-		
-		// リーダーと同じ向きで初期化
 		Fish* fish = new Fish();
-		fish->Initialize(fishGroupModel_, camera_,nullptr, spawnPos, moveRight,30);
-
-		//イベント用魚
+		fish->Initialize(fishGroupModel_, camera_, nullptr, spawnPos, moveRight, 30);
 		fish->SetEventType(FishEventType::swmmyFish);
-
-		//群れリスト
+		fish->SetInitialOffset(offset); // ★ オフセットを記憶
+		fish->SetInEvent(true);
+		leaderFish->SetInEvent(true);
 		fishes_.push_back(fish);
 	}
 }
@@ -142,6 +144,9 @@ void SwimmyEvent::Reset() {
 	fishes_.clear();
 	isActive_ = false;
 	groupTimer_ = 0;
+
+
+
 
 	// ★ イベント終了通知
 	if (onEventEnd_) {

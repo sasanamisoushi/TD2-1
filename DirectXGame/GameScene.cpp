@@ -123,7 +123,7 @@ void GameScene::Initialize() {
 			rubbishCount++;
 		} else if (isSwimmy && eventCount < EventFisMax) {
 			EventFish* eventFish = new EventFish();
-			eventFish->Initialize(rubbishModel_, &camera_,nullptr, fishPos, moveRight, getTimer_);
+			eventFish->Initialize(swimmyModel_, &camera_, nullptr, fishPos, moveRight, getTimer_);
 			swimmys_.push_back(eventFish);
 			eventCount++;
 
@@ -523,7 +523,7 @@ void GameScene::SpawnFish() {
 	}
 
 	// === 種類をランダムに選択 ===
-	int type = rand() % 4; // 0:小魚, 1:大魚, 2:ゴミ,4イベント魚
+	int type = rand() % 3; // 0:小魚, 1:大魚, 2:ゴミ,4イベント魚
 
 	if (type == 0) {
 		auto* fish = new Fish();
@@ -537,11 +537,15 @@ void GameScene::SpawnFish() {
 		auto* rub = new Rubbish();
 		rub->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 		rubbishes_.push_back(rub);
-	} else {
+	} else if(type==3 && swimmys_.empty()){
 		auto* eventFish = new EventFish();
 		eventFish->Initialize(swimmyModel_, &camera_,nullptr, fishPos, moveRight, getTimer_);
 
-		eventFish->SetOnTriggered([this](const Vector3& centerPos) { swimmyEvent_.SpawnFishGroup(centerPos, 8, 3.0f); });
+		eventFish->SetOnTriggered([this](const Vector3& centerPos) {
+			
+			swimmyEvent_.SpawnFishGroup(centerPos, 8, 3.0f); 
+			
+			});
 		swimmys_.push_back(eventFish);
 	}
 }
@@ -608,10 +612,3 @@ void GameScene::AddFish(Fish* fish) {
 }
 
 GameScene* GameScene::instance_ = nullptr;
-
-//GameScene* GameScene::GetInstance() {
-//	if (!instance_) {
-//		instance_ = new GameScene();
-//	}
-//	return instance_;
-//}
