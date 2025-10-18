@@ -129,9 +129,8 @@ void GameScene::Initialize() {
 
 		} else if (isBigFish && bigCount < bigFishMax) {
 			BigFish* bigFish = new BigFish();
-			// 大きい魚の初期化
+			// 大きい魚の初期化（FishのInitializeと一致する形）
 			bigFish->Initialize(bigFishModel_, &camera_, score_, fishPos, moveRight);
-			// 配列に登録
 			BigFishes_.push_back(bigFish);
 			bigCount++;
 		} else {
