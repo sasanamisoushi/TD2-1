@@ -73,7 +73,13 @@ public:
 	void SetIsMoveRight(bool flag) { moveRight_ = flag; }
 
 	bool GetIsMoveRight() const { return moveRight_; }
-	
+
+	void SetInitialOffset(const KamataEngine::Vector3& offset) { initialOffset_ = offset; }
+	KamataEngine::Vector3 GetInitialOffset() const { return initialOffset_; }
+
+	void SetInEvent(bool inEvent) { inEvent_ = inEvent; }
+	bool IsInEvent() const { return inEvent_; }
+
 private:
 	// ワールド変換データ
 	KamataEngine::WorldTransform worldTransform_;
@@ -122,5 +128,11 @@ private:
 
 	const int point_ = 100;
 	
+	Vector3 initialOffset_ = {0.0f, 0.0f, 0.0f};
+
+	//イベント参加フラグ
+	//通常       :false
+	//イベント中  :true
+	bool inEvent_ = false;
 
 };
