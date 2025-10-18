@@ -6,148 +6,82 @@
 #include "Score.h"
 
 
+
 void BigFish::Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight) {
-	// NULLポインタチェック
-	assert(model);
-	// モデル
-	model_ = model;
-
-	// カメラ
-	camera_ = camera;
-
-	state_ = BigFishState::Appear;
 	
-	targetPos_ = targetPos;
 
 	score_ = score;
+	targetPos_ = targetPos;
+	State_ = BigFishState::Appear;
 
-	Vector3 spawnPos;
-	// 出現開始位置
-	if (rand() % 2 == 0) {
-		spawnPos = {moveRight ? -15.0f : 15.0f, targetPos_.y, targetPos_.z};
-	} else {
-		spawnPos = {0.0f, targetPos_.y, targetPos_.z + 20.0f}; // 奥から
-	}
+	// Fishの基本初期化（共通部分）
+	Fish::Initialize(model, camera, score, targetPos, moveRight, 30);
 
-	// ワールドトランスフォームの初期化
-	worldTransform_.Initialize();
-	worldTransform_.translation_ = spawnPos;
-	worldTransform_.scale_ = {0.01f, 0.01f, 0.01f}; // 最初は小さめ
-	
-	// 出現完了後の最終サイズ
+	// BigFish専用パラメータ
 	finalScale_ = {0.35f, 0.35f, 0.35f};
+	GetWorldTransform().scale_ = {0.01f, 0.01f, 0.01f}; // 出現時は小さい
 
-	// 画面の範囲
-	const float screenLeft = -12.0f;
-	const float screenRight = 12.0f;
-
-	// 泳ぐ範囲ランダム
-	float swimRange = static_cast<float>(rand() % 5 + 4);
-
-	// 出現ランダム
-	float minPos = screenLeft + swimRange;
-	float maxPos = screenRight - swimRange;
-	float randomPos = minPos + static_cast<float>(rand()) / RAND_MAX * (maxPos - minPos);
-
-	worldTransform_.translation_.x = randomPos;
-
-	// 泳ぐ上限
-	leftLimit_ = worldTransform_.translation_.x - swimRange;
-	rigdhtLimit_ = worldTransform_.translation_.x + swimRange;
-
-	// 移動方向
-	direction_ = moveRight ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(-1.0f, 0.0f, 0.0f);
-
-	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
-
-	// 角度調整
-	if (moveRight) {
-		// 右
-		worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
-	} else {
-		// 左
-		worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
-	}
-
-	fishGetTimer_ = 30;
-
-	WorldTransformUpdate(worldTransform_);
+	WorldTransformUpdate(GetWorldTransform());
 }
 
 void BigFish::Update() {
 
-	switch (state_) {
+	switch (State_) {
 	case BigFishState::Appear:
 		appearTimer_++;
 
 		// 線形補間して少しずつ目的地へ
-		worldTransform_.translation_ = Lerp(worldTransform_.translation_, targetPos_, 0.05f);
-		worldTransform_.scale_ = Lerp(worldTransform_.scale_, finalScale_, 0.05f);
+		GetWorldTransform().translation_ = Lerp(GetWorldTransform().translation_, targetPos_, 0.05f);
+		GetWorldTransform().scale_ = Lerp(GetWorldTransform().scale_, finalScale_, 0.05f);
 
 		// 一定時間経過で通常行動へ
 		if (appearTimer_ > appearDuration_) {
-			state_ = BigFishState::Normal;
+			State_ = BigFishState::Normal;
 		}
 		break;
 
 	case BigFishState::Normal:
-		// 移動
-		worldTransform_.translation_.x += direction_.x * speed_;
-
-		// 端で反転（ヒステリシスを持たせる）
-		if (worldTransform_.translation_.x > rigdhtLimit_ + 0.1f) {
-			direction_.x = -1.0f; // 左へ
-			velocity_.x = direction_.x * speed_;
-			worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f; // 左向きに回転
-			worldTransform_.translation_.x = rigdhtLimit_;
-		} else if (worldTransform_.translation_.x < leftLimit_ - 0.1f) {
-			direction_.x = 1.0f; // 右へ
-			velocity_.x = direction_.x * speed_;
-			worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // 右向きに回転
-			worldTransform_.translation_.x = leftLimit_;
-		}
+		//通常の魚の移動を継続
+		Fish::Update();
+		// 常にスケールを固定
+		GetWorldTransform().scale_ = finalScale_;
 		break;
 	}
 
 	// 行列更新
-	WorldTransformUpdate(worldTransform_);
+	WorldTransformUpdate(GetWorldTransform());
 
 }
 
-void BigFish::Draw() {
-	// 3Dモデル描画前処理
-	model_->Draw(worldTransform_, *camera_);
 
-}
+
+
 
 AABB BigFish::GetAABB() {
-	KamataEngine::Vector3 worldPos = GetWorldPosition();
+	Vector3 worldPos = GetWorldPosition();
 
+	float sizeScale = 1.5f; // 通常魚より大きめ
 	AABB aabb;
-
-	aabb.min = {(worldPos.x - 0.5f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
-	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
+	aabb.min = {worldPos.x - 0.5f * sizeScale, worldPos.y - 0.5f * sizeScale, worldPos.z - 0.5f * sizeScale};
+	aabb.max = {worldPos.x + 0.5f * sizeScale, worldPos.y + 0.5f * sizeScale, worldPos.z + 0.5f * sizeScale};
 
 	return aabb;
 }
 
 void BigFish::OnCollision(Player* player) {
-	// ルアーと当たっているとき
-	(void)player;
-	// ゲットタイマーを減らす
-	fishGetTimer_--;
-	// ゲットタイマーが0になったらゲット
-	if (fishGetTimer_ < 0) 
-	{
-		isLureCheck_ = true;
+	// Fishの共通当たり処理（タイマー処理など）
+	Fish::OnCollision(player);
+
+	if (isLureCheck_) {
+		// BigFishはスコア加算
 		score_->AddScore(point_);
-		player->Reset();
 	}
+	
 }
 
 void BigFish::OutCollision() {
 
-	// ルアーと当たっていないとき
-	// ゲットタイマーをリセット
-	fishGetTimer_ = 30;
+	 Fish::OutCollision();
+
+	
 }

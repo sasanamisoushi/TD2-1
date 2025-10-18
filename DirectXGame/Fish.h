@@ -33,6 +33,7 @@ public:
 	void Draw();
 
 	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
+	WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 	KamataEngine::Vector3 GetWorldPosition();
 
@@ -41,7 +42,7 @@ public:
 	// ルアーと当たっている
 	virtual void OnCollision(Player* player);
 	// ルアーと当たってない
-	void OutCollision();
+	virtual void OutCollision();
 
 	// フラグ
 	// 魚がルアーの範囲内にいるか
