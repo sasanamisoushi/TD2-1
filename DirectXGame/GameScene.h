@@ -8,6 +8,8 @@
 #include "Rubbish.h"
 #include "SwimmyEvent.h"
 #include "EventFish.h"
+#include "bearEvent.h"
+#include "weatherEvent.h"
 #include "Fade.h"
 
 class GameScene 
@@ -64,6 +66,9 @@ private:
 	Model* playerModel_ = nullptr;
 	Camera camera_;
 	Score* score_ = nullptr;
+	SwimmyEvent* swimmyEvent_=nullptr;
+	bearEvent* bearEvent_=nullptr;
+	weatherEvent* weatherEvent_=nullptr;
 
 	
 	// フェード
@@ -89,9 +94,21 @@ private:
 	Model* rubbishModel_ = nullptr;
 	std::list<Rubbish*> rubbishes_;
 
-	//イベント魚
+	//========================================
+	// イベント魚
+	//========================================
+
+	//スイミー
 	Model* swimmyModel_ = nullptr;
-	std::list<EventFish*> swimmys_;
+	std::list<EventFish*> events_;
+	
+
+	//ベアー
+	Model* bearModel_ = nullptr;
+	
+
+	//天気
+	Model* weatherModel_ = nullptr;
 
 	// 現在数をカウント
 	int smallCount = 0;
@@ -110,8 +127,7 @@ private:
 
 	static GameScene* instance_;
 
-	//群れのイベント管理用
-	SwimmyEvent swimmyEvent_;
+
 
 	//フェード用のタイマー
 	float timer;
