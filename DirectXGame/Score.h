@@ -25,12 +25,21 @@ public:
 
 	void Draw();
 
+	void RankingDraw();
+
+	void FileOpen();
+
+	void FileWrite();
+
 private:
 
 	int score_;
 
 	int combo_;
 
+	std::array<int, 3> rankingScore_;
+
 	std::array<KamataEngine::Sprite*, 10> sprites_ = {}; // 配列 描画
+	std::array<std::array<KamataEngine::Sprite*, 10>,3> rankingSprites = {}; // 配列 描画 １位
 	std::array<int, 10> tex_ = {}; // 配列 数字
 };

@@ -294,6 +294,7 @@ void GameScene::Update() {
 	player_->Update();
 	if (Input::GetInstance()->TriggerKey(DIK_S)) {
 		isFinish = true;
+		score_->FileWrite();
 	}
 
 	CheckAllCollisions();
@@ -307,6 +308,7 @@ void GameScene::Update() {
 			gameTimer_ = 0;
 			isGame_ = false;
 			isFinish = true;
+			score_->FileWrite();
 		}
 	}
 
@@ -548,8 +550,6 @@ void GameScene::SpawnFish() {
 		swimmys_.push_back(eventFish);
 	}
 }
-
-
 
 void GameScene::ClearAllFish() {
 	// 小さい魚を削除

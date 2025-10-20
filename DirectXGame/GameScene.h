@@ -8,8 +8,6 @@
 #include "Rubbish.h"
 #include "SwimmyEvent.h"
 #include "EventFish.h"
-#include "SwimmyEvent.h"
-
 
 
 class GameScene 

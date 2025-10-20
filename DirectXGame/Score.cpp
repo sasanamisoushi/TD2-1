@@ -1,5 +1,6 @@
 #include "Score.h"
 #include "KamataEngine.h"
+#include <stdio.h>
 
 using namespace KamataEngine;
 
@@ -9,6 +10,13 @@ Score::~Score()
 	{
 		delete sprites_[i];
 		sprites_[i] = nullptr;
+	}
+	for (int i = 0; i < 3; i++) 
+	{
+		for (int j = 0; j < 10; j++)
+		{
+			delete rankingSprites[i][j];
+		}
 	}
 }
 
@@ -38,7 +46,18 @@ void Score::Initialize()
 	sprites_[8] = Sprite::Create(tex_[0], {1210, 10}, collar, {0.0f, 0.0f}, false, false);
 	sprites_[9] = Sprite::Create(tex_[0], {1240, 10}, collar, {0.0f, 0.0f}, false, false);
 
+	for (int i = 0; i < 3; i++) 
+	{
+		for (int j = 0; j < 10; j++)
+		{
+			rankingSprites[i][j] = Sprite::Create(tex_[0], {float(970 + (30 * j)), float(60 + (40 * i))}, collar, {0.0f, 0.0f}, false, false);
+		}
+	}
+
 	score_ = 0;
+
+	FileOpen();
+
 }
 
 void Score::AddScore(int score)
@@ -61,15 +80,21 @@ void Score::SubtractScore(int score)
 	combo_ = 0;
 	if (score_ > 0)
 	{
-		score_ -= score;
+		if (score_ - score <= 0)
+		{
+			score_ = 0;
+		} 
+		else 
+		{
+			score_ -= score;
+		}
 	}
 }
 
 void Score::ResetScore()
 { 
-	score_ = 0;
+	score_ = 0; 
 }
-
 
 void Score::Update()
 {
@@ -77,6 +102,11 @@ void Score::Update()
 	{
 		delete sprites_[i];
 		sprites_[i] = nullptr;
+	}
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 10; j++) {
+			delete rankingSprites[i][j];
+		}
 	}
 }
 
@@ -94,5 +124,124 @@ void Score::Draw()
 	{
 		sprites_[i]->SetTextureHandle(tex_[keta[i]]);
 		sprites_[i]->Draw();
+	}
+}
+
+void Score::RankingDraw()
+{
+	int ketaNum = 10; // 桁数
+	std::array<std::array<int, 10>,3> keta = {0};
+	int viewScore[3];
+
+	for (int i = 0; i < 3; i++) 
+	{
+		viewScore[i] = rankingScore_[i];
+	}
+	
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < ketaNum; j++) 
+		{
+			keta[i][ketaNum - j - 1] = viewScore[i] % 10;
+			viewScore[i] /= 10;
+		}
+		
+	}
+	for (int i = 0; i < 3; i++) 
+	{
+		for (int j = 0; j < ketaNum; j++)
+		{
+			rankingSprites[i][j]->SetTextureHandle(tex_[keta[i][j]]);
+			rankingSprites[i][j]->Draw();
+		}
+	}
+}
+
+void Score::FileOpen()
+{
+	FILE* fp;
+	char scoreFile[] = "score.txt";
+	int err;
+	err = fopen_s(&fp, scoreFile, "r");
+	int readScore = {};
+	if (err != 0) 
+	{
+		//return err;
+	} 
+	else
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			while (fscanf_s(fp, "%d", &readScore) == 10) {
+				fscanf_s(fp, "%d", &readScore);
+			}
+			rankingScore_[i] = readScore;
+		}
+
+		fclose(fp);
+	}
+}
+
+void Score::FileWrite() {
+	FILE* fp;
+	char scoreFile[] = "score.txt";
+	int err;
+	err = fopen_s(&fp, scoreFile, "r");
+	int readScore = {};
+	if (err != 0) {
+		// return err;
+	} else {
+		for (int i = 0; i < 3; i++) {
+			while (fscanf_s(fp, "%d", &readScore) == 10) {
+				fscanf_s(fp, "%d", &readScore);
+			}
+			rankingScore_[i] = readScore;
+		}
+		fclose(fp);
+	}
+	err = fopen_s(&fp, scoreFile, "w");
+	if (err != 0) {
+		// return err;
+	}
+	else
+	{
+		if (score_ > rankingScore_[0]) 
+		{
+			while (1) {
+				fprintf_s(fp, "%d\n", score_);
+				fprintf_s(fp, "%d\n", rankingScore_[0]);
+				fprintf_s(fp, "%d\n", rankingScore_[1]);
+				break;
+			}
+		} 
+		else if (score_ > rankingScore_[1])
+		{
+			while (1) {
+				fprintf_s(fp, "%d\n", rankingScore_[0]);
+				fprintf_s(fp, "%d\n", score_);
+				fprintf_s(fp, "%d\n", rankingScore_[1]);
+				break;
+			}
+		} 
+		else if (score_ > rankingScore_[2])
+		{
+			while (1) {
+				fprintf_s(fp, "%d\n", rankingScore_[0]);
+				fprintf_s(fp, "%d\n", rankingScore_[1]);
+				fprintf_s(fp, "%d\n", score_);
+				break;
+			}
+		}
+		else
+		{
+			while (1) {
+				fprintf_s(fp, "%d\n", rankingScore_[0]);
+				fprintf_s(fp, "%d\n", rankingScore_[1]);
+				fprintf_s(fp, "%d\n", rankingScore_[2]);
+				break;
+			}
+		}
+
+		fclose(fp);
 	}
 }
