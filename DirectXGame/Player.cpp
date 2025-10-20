@@ -115,6 +115,7 @@ void Player::WorldTransformUpdate() {
 }
 
 void Player::Draw() {
+	
 	model_->Draw(worldTransform_, *camera_);
 	playerModel_->Draw(playerWorldTransform_, *camera_);
 }
