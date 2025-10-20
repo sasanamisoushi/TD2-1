@@ -8,11 +8,19 @@
 #include "Rubbish.h"
 #include "SwimmyEvent.h"
 #include "EventFish.h"
-
+#include "Fade.h"
 
 class GameScene 
 {
 public:
+
+	//フェード
+	enum class Phase {
+		kFadeIn,
+		kMain,
+		kfadeOut
+
+	};
 
 	//初期化
 	void Initialize();
@@ -48,7 +56,6 @@ public:
 
 	void AddFish(Fish* fish);
 	
-	static GameScene* GetInstance();
 	
 private:
 
@@ -59,7 +66,9 @@ private:
 	Score* score_ = nullptr;
 
 	
-	
+	// フェード
+	Fade* fade_ = nullptr;
+	Phase phase_ = Phase::kFadeIn;
 	 
 
 	//========================================
@@ -103,4 +112,11 @@ private:
 
 	//群れのイベント管理用
 	SwimmyEvent swimmyEvent_;
+
+	//フェード用のタイマー
+	float timer;
+
+	
+
+	
 };

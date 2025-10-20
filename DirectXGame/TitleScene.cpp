@@ -1,11 +1,50 @@
 #include "TitleScene.h"
+using namespace KamataEngine;
 
-void TitleScene::Initialize() {}
+void TitleScene::Initialize() {
+	
+	//フェードとフェード管理の初期化
+	fade_ = new Fade();
+	fade_->Initialize();
+	fade_->Start(Fade::Status::FadeIn, 1.0f);
+
+	phase_ = Phase::kFadeIn;
+
+	timer = 0;
+
+}
 
 void TitleScene::Update() {
-	if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		isFinish = true;
+	
+
+	fade_->Update();
+	switch (phase_) {
+	case TitleScene::Phase::kFadeIn:
+		if (fade_->isFinished()) {
+			phase_ = Phase::kMain; // フェードイン完了 -> メインフェーズへ
+		}
+		break;
+	case TitleScene::Phase::kMain:
+		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+			isFinish = true;
+		}
+
+		break;
+	case TitleScene::Phase::kfadeOut:
+		if (fade_->isFinished()) {
+			// 2秒後にシーン転移
+			timer++;
+			if (timer > 120) {
+				isFinish = true;
+			}
+		}
+
+		break;
+	default:
+		break;
 	}
+
+
 
 #ifdef _DEBUG
 	ImGui::Begin("Title Scene");
@@ -14,4 +53,19 @@ void TitleScene::Update() {
 #endif
 }
 
-void TitleScene::Draw() {}
+void TitleScene::Draw() {
+
+	// DirectXCommonインスタンスの取得
+	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
+
+	// スプライト描画前処理
+	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	//フェード
+	fade_->Draw(dxCommon->GetCommandList());
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
+}
+
+TitleScene::~TitleScene() {}
