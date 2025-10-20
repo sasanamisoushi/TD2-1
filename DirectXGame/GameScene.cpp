@@ -47,12 +47,25 @@ void GameScene::Initialize() {
 	bigFishModel_ = Model::CreateFromOBJ("fish");
 	rubbishModel_ = Model::CreateFromOBJ("trash", true);
 	swimmyModel_ = Model::CreateFromOBJ("suimii", true);
+	bearModel_ = Model::CreateFromOBJ("bear", true);
+	weatherModel_ = Model::CreateFromOBJ("weather", true);
 
 	// イベントの初期化
-	swimmyEvent_.Initialize(fishModel_, swimmyModel_, &camera_);
+	swimmyEvent_ = new SwimmyEvent();
+	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_);
+	
+	//クマイベントの初期化
+	bearEvent_ = new bearEvent();
+	bearEvent_->Initialize();
+
+	//天気イベントの初期化
+	weatherEvent_ = new weatherEvent();
+	weatherEvent_->Initialize();
+
+
 
 	// ★ イベント終了時に魚を再生成
-	swimmyEvent_.SetOnEventEnd([this]() {
+	swimmyEvent_->SetOnEventEnd([this]() {
 		for (int i = 0; i < 10; i++) { // 10匹くらい再生成
 			SpawnFish();
 		}
@@ -73,7 +86,7 @@ void GameScene::Initialize() {
 		bool moveRight = (rand() % 2 == 0);
 		bool isBigFish = (rand() % 100 < 40);
 		bool isRubbish = (rand() % 100 < 20);
-		bool isSwimmy = (rand() % 100 < 10);
+		bool isEvent = (rand() % 100 < 10);
 
 		Vector3 fishPos;
 		bool setPos = false;
@@ -127,10 +140,30 @@ void GameScene::Initialize() {
 			rubbish->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 			rubbishes_.push_back(rubbish);
 			rubbishCount++;
-		} else if (isSwimmy && eventCount < EventFisMax) {
+		} else if (isEvent && eventCount < EventFisMax) {
 			EventFish* eventFish = new EventFish();
-			eventFish->Initialize(swimmyModel_, &camera_, nullptr, fishPos, moveRight, getTimer_);
-			swimmys_.push_back(eventFish);
+			Model* eventModel = nullptr;
+			EventFish::FishEventType eventType{};
+
+			int eventTypeRand = rand() % 3; 
+			switch (eventTypeRand) {
+			case 0:
+				eventModel = swimmyModel_;
+				eventType = EventFish::FishEventType::SwimmyGroup;
+				break;
+			case 1:
+				eventModel = bearModel_;
+				eventType = EventFish::FishEventType::BearHelp;
+				break;
+			case 2:
+				eventModel = weatherModel_;
+				eventType = EventFish::FishEventType::WeatherChange;
+				break;
+			}
+
+			eventFish->Initialize(eventModel, &camera_, nullptr, fishPos, moveRight, getTimer_);
+			eventFish->SetEventType(eventType);
+			events_.push_back(eventFish);
 			eventCount++;
 
 		} else if (isBigFish && bigCount < bigFishMax) {
@@ -197,13 +230,20 @@ GameScene::~GameScene() {
 
 	delete rubbishModel_;
 
-	for (auto& eventFish : swimmys_) {
+
+	delete swimmyEvent_;
+	delete swimmyModel_;
+	delete bearEvent_;
+	delete bearModel_;
+	delete weatherEvent_;
+	delete weatherModel_;
+	for (auto& eventFish : events_) {
 
 		delete eventFish;
 	}
-	swimmys_.clear();
+	events_.clear();
 
-	delete swimmyModel_;
+	
 
 	for (int i = 0; i < 3; i++) {
 
@@ -240,13 +280,25 @@ void GameScene::Update() {
 			rubbishs->Update();
 		}
 
-		for (auto& eventFish : swimmys_) {
+		for (auto& eventFish : events_) {
 
 			eventFish->Update();
 		}
 
 		// 群れの更新
-		swimmyEvent_.Update();
+		if (swimmyEvent_) {
+			swimmyEvent_->Update();
+		}
+
+		//クマの更新
+		if (bearEvent_) {
+			bearEvent_->Update();
+		}
+
+		//天気の更新
+		if (weatherEvent_) {
+			weatherEvent_->Update();
+		}
 
 		// 魚が取れた時
 		int caughtFishCount = 0;
@@ -280,14 +332,30 @@ void GameScene::Update() {
 		});
 
 		// イベント魚が取れた時
-		swimmys_.remove_if([&](EventFish* eventFish) {
+		events_.remove_if([&](EventFish* eventFish) {
 			if (eventFish->IsLureCheck()) {
 				Vector3 centerPos = eventFish->GetWorldPosition();
 
+				EventFish::FishEventType type = eventFish->GetEventType();
+
+				//通常の魚を消す
 				ClearAllFish();
 
-				// --- イベント群れを生成 ---
-				swimmyEvent_.SpawnFishGroup(centerPos, 8, 3.0f);
+				switch (type) {
+				case EventFish::FishEventType::SwimmyGroup:
+					// --- イベント群れを生成 ---
+					swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
+					break;
+				case EventFish::FishEventType::BearHelp:
+
+					break;
+				case EventFish::FishEventType::WeatherChange:
+					break;
+				default:
+					break;
+				}
+
+				
 
 				delete eventFish;
 				caughtFishCount++;
@@ -396,7 +464,7 @@ void GameScene::Draw() {
 		rubbishs->Draw();
 	}
 
-	for (auto& eventFish : swimmys_) {
+	for (auto& eventFish : events_) {
 
 		eventFish->Draw();
 	}
@@ -406,7 +474,20 @@ void GameScene::Draw() {
 	player_->Draw();
 
 	// 群れの描画
-	swimmyEvent_.Draw();
+	if (swimmyEvent_) {
+		swimmyEvent_->Draw();
+	}
+
+	//クマの描画
+	if (bearEvent_) {
+		bearEvent_->Draw();
+	}
+
+	//天気の描画
+	if (weatherEvent_) {
+	
+		weatherEvent_->Draw();
+	}
 
 	Model::PostDraw();
 
@@ -492,7 +573,7 @@ void GameScene::CheckAllCollisions() {
 	}
 
 	// 自キャラとイベント魚全ての当たり判定
-	for (EventFish* evenet : swimmys_) {
+	for (EventFish* evenet : events_) {
 		aabb2 = evenet->GetAABB();
 
 		// ルアーと魚が当たっているとき
@@ -565,12 +646,26 @@ void GameScene::SpawnFish() {
 		auto* rub = new Rubbish();
 		rub->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 		rubbishes_.push_back(rub);
-	} else if (type == 3 && swimmys_.empty()) {
+	} else if (type == 3 && events_.empty()) {
 		auto* eventFish = new EventFish();
 		eventFish->Initialize(swimmyModel_, &camera_, nullptr, fishPos, moveRight, getTimer_);
 
-		eventFish->SetOnTriggered([this](const Vector3& centerPos) { swimmyEvent_.SpawnFishGroup(centerPos, 8, 3.0f); });
-		swimmys_.push_back(eventFish);
+		eventFish->SetOnTriggered([this](const Vector3& centerPos,EventFish::FishEventType type) { 
+			switch (type) {
+			case EventFish::FishEventType::SwimmyGroup:
+				swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
+				break;
+			case EventFish::FishEventType::BearHelp:
+
+				break;
+			case EventFish::FishEventType::WeatherChange:
+				break;
+			
+			}
+		 }
+		
+		);
+		events_.push_back(eventFish);
 	}
 }
 

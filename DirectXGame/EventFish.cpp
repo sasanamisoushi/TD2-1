@@ -17,7 +17,7 @@ void EventFish::OnCollision(Player* player) {
 
 		// イベント発生（群れを出すなど）
 		if (onTriggered_) {
-			onTriggered_(GetWorldPosition());
+			onTriggered_(GetWorldPosition(), eventType_);
 		}
 	}
 }

@@ -106,6 +106,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bearEvent.cpp" />
     <ClCompile Include="BigFish.cpp" />
     <ClCompile Include="EventFish.cpp" />
     <ClCompile Include="Fade.cpp" />
@@ -119,6 +120,7 @@
     <ClCompile Include="Rubbish.cpp" />
     <ClCompile Include="SwimmyEvent.cpp" />
     <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="weatherEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\TerrainPS.hlsl">
@@ -196,6 +198,7 @@
     <None Include="Resources\shaders\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bearEvent.h" />
     <ClInclude Include="BigFish.h" />
     <ClInclude Include="EventFish.h" />
     <ClInclude Include="Fade.h" />
@@ -208,6 +211,7 @@
     <ClInclude Include="Rubbish.h" />
     <ClInclude Include="SwimmyEvent.h" />
     <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="weatherEvent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
