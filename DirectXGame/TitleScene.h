@@ -1,7 +1,16 @@
 #pragma once
 #include "KamataEngine.h"
+#include "Fade.h"
+
 class TitleScene {
 public:
+
+	//フェード
+	enum class Phase {
+		kFadeIn,
+		kMain,
+		kfadeOut
+	};
 
 	//初期化
 	void Initialize();
@@ -16,11 +25,18 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
+	~TitleScene();
+
 private:
 
 	//終了フラグ
 	bool isFinish = false;
 
+	//フェード
+	Fade* fade_ = nullptr;
+	Phase phase_ = Phase::kFadeIn;
 
+	//フェード用
+	int timer;
 
 };
