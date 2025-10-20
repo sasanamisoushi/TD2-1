@@ -1,6 +1,22 @@
 #include "GameClearScene.h"
+#include "math.h"
+#include <cstdlib>
+#include <ctime>
 
-void GameClearScene::Initialize() {}
+using namespace KamataEngine;
+
+
+void GameClearScene::Initialize()
+{
+	score_ = new Score();
+	score_->Initialize();
+}
+
+GameClearScene::~GameClearScene()
+{
+	delete score_;
+}
+
 
 void GameClearScene::Update() {
 	if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
@@ -13,4 +29,20 @@ void GameClearScene::Update() {
 #endif
 }
 
-void GameClearScene::Draw() {}
+void GameClearScene::Draw()
+{
+	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
+	// 3Dモデル描画前処理
+	Model::PreDraw(dxCommon->GetCommandList());
+
+	Model::PostDraw();
+
+	// 2d描画
+	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	score_->Draw();
+	score_->RankingDraw();
+
+	Sprite::PostDraw();
+
+}

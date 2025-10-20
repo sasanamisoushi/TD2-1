@@ -303,23 +303,26 @@ void GameScene::Update() {
 
 		player_->Update();
 
-		if (Input::GetInstance()->TriggerKey(DIK_S)) {
-			isFinish = true;
-		}
 
+	if (Input::GetInstance()->TriggerKey(DIK_S)) {
+		isFinish = true;
+		score_->FileWrite();
+	}
 		CheckAllCollisions();
 
-		// タイマー処理
-		if (isGame_) {
-			if (gameTimer_ > 0) {
-				gameTimer_--;
-			}
-			if (gameTimer_ <= 0) {
-				gameTimer_ = 0;
-				isGame_ = false;
-				isFinish = true;
-			}
+
+	// タイマー処理
+	if (isGame_) {
+		if (gameTimer_ > 0) {
+			gameTimer_--;
 		}
+		if (gameTimer_ <= 0) {
+			gameTimer_ = 0;
+			isGame_ = false;
+			isFinish = true;
+			score_->FileWrite();
+		}
+  }
 
 #ifdef _DEBUG
 		ImGui::Begin("Game Scene");

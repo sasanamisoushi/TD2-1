@@ -1,8 +1,12 @@
 #pragma once
 #include "KamataEngine.h"
+#include "Score.h"
 
 class GameClearScene {
 public:
+
+	~GameClearScene();
+
 	// 初期化
 	void Initialize();
 
@@ -18,4 +22,6 @@ public:
 private:
 	// 終了フラグ
 	bool isFinish = false;
+
+	Score* score_ = nullptr;
 };
