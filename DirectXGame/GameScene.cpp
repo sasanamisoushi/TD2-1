@@ -265,6 +265,8 @@ void GameScene::Update() {
 		}
 		break;
 	case GameScene::Phase::kMain: {
+
+		player_->Update();
 		// 小さい魚
 		for (auto& fish : fishes_) {
 			fish->Update();
@@ -298,6 +300,25 @@ void GameScene::Update() {
 		//天気の更新
 		if (weatherEvent_) {
 			weatherEvent_->Update();
+		}
+
+		float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
+
+		// --- すでにいる全ての魚に速度補正を再適用 ---
+		for (auto& fish : fishes_) {
+			fish->SetSpeedMultiplier(currentSpeedMultiplier);
+		}
+
+		for (auto& big : BigFishes_) {
+			big->SetSpeedMultiplier(currentSpeedMultiplier);
+		}
+
+		for (auto& rub : rubbishes_) {
+			rub->SetSpeedMultiplier(currentSpeedMultiplier);
+		}
+
+		for (auto& eventFish : events_) {
+			eventFish->SetSpeedMultiplier(currentSpeedMultiplier);
 		}
 
 		// 魚が取れた時
@@ -338,11 +359,12 @@ void GameScene::Update() {
 
 				EventFish::FishEventType type = eventFish->GetEventType();
 
-				//通常の魚を消す
-				ClearAllFish();
+				
 
 				switch (type) {
 				case EventFish::FishEventType::SwimmyGroup:
+					// 通常の魚を消す
+					ClearAllFish();
 					// --- イベント群れを生成 ---
 					swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
 					break;
@@ -350,6 +372,12 @@ void GameScene::Update() {
 
 					break;
 				case EventFish::FishEventType::WeatherChange:
+
+					if (weatherEvent_) {
+					
+						weatherEvent_->TriggerRandomWeather();
+					}
+
 					break;
 				default:
 					break;
@@ -369,7 +397,7 @@ void GameScene::Update() {
 			SpawnFish();
 		}
 
-		player_->Update();
+		
 
 
 	if (Input::GetInstance()->TriggerKey(DIK_S)) {
@@ -432,6 +460,20 @@ void GameScene::Update() {
 		ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
 
 		ImGui::End();
+		ImGui::Begin("Event Fish ");
+		int eventIndex = 0;
+		for (auto& eventFish : events_) {
+			const Vector3& pos = eventFish->GetWorldPosition();
+			ImGui::Separator();
+			ImGui::Text("EventFish %d", eventIndex);
+			ImGui::SameLine();
+			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+			ImGui::Text("GetTimer: %d", eventFish->fishGetTimer_);
+			ImGui::Text("EventType: %d", static_cast<int>(eventFish->GetEventType())); // ← イベント種類確認用
+			eventIndex++;
+		}
+		ImGui::End();
+		
 #endif
 	} break;
 
@@ -631,41 +673,66 @@ void GameScene::SpawnFish() {
 		fishPos = {0.0f, static_cast<float>((rand() % 40) / 10.0f + 1.0f), 0.0f};
 	}
 
-	// === 種類をランダムに選択 ===
-	int type = rand() % 3; // 0:小魚, 1:大魚, 2:ゴミ,4イベント魚
+	// === 天候補正を取得 ===
+	float bigFishChance = weatherEvent_->GetBigFishSpawnRate();      // 虹で上がる
+	float rubbishChance = weatherEvent_->GetRubbishSpawnRate();      // 隕石で上がる
+	float speedMultiplier = weatherEvent_->GetFishSpeedMultiplier(); // 雨・雲で変化
 
-	if (type == 0) {
-		auto* fish = new Fish();
-		fish->Initialize(fishModel_, &camera_, score_, fishPos, moveRight, getTimer_);
-		fishes_.push_back(fish);
-	} else if (type == 1) {
-		auto* big = new BigFish();
-		big->Initialize(bigFishModel_, &camera_, score_, fishPos, moveRight);
-		BigFishes_.push_back(big);
-	} else if (type == 2) {
-		auto* rub = new Rubbish();
-		rub->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
-		rubbishes_.push_back(rub);
-	} else if (type == 3 && events_.empty()) {
+	// === 正規化（合計が1を超えないように）=== 
+	float total = bigFishChance + rubbishChance;
+	if (total > 1.0f) {
+		bigFishChance /= total;
+		rubbishChance /= total;
+	}
+
+	// === 出現確率を決定 ===
+	float r = static_cast<float>(rand()) / RAND_MAX;
+
+	 // --- イベント魚出現チェック（独立確率） ---
+	float eventChance = 0.05f; // 5%の確率でイベント魚出現
+	if (r < eventChance && events_.empty()) {
 		auto* eventFish = new EventFish();
 		eventFish->Initialize(swimmyModel_, &camera_, nullptr, fishPos, moveRight, getTimer_);
 
-		eventFish->SetOnTriggered([this](const Vector3& centerPos,EventFish::FishEventType type) { 
+		eventFish->SetOnTriggered([this](const Vector3& centerPos, EventFish::FishEventType type) {
 			switch (type) {
 			case EventFish::FishEventType::SwimmyGroup:
 				swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
 				break;
 			case EventFish::FishEventType::BearHelp:
-
 				break;
 			case EventFish::FishEventType::WeatherChange:
+				if (weatherEvent_) {
+					// 天候イベント発動！
+					weatherEvent_->TriggerRandomWeather();
+				}
 				break;
-			
 			}
-		 }
-		
-		);
+		});
+
 		events_.push_back(eventFish);
+		return; // イベント魚を出したら他は生成しない
+	}
+
+	// === 通常の魚生成（天候補正を反映） ===
+	if (r < rubbishChance) {
+		// 🗑️ ゴミを生成
+		auto* rub = new Rubbish();
+		rub->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
+		rub->SetSpeedMultiplier(speedMultiplier);
+		rubbishes_.push_back(rub);
+	} else if (r < rubbishChance + bigFishChance) {
+		// 🐋 大魚を生成
+		auto* big = new BigFish();
+		big->Initialize(bigFishModel_, &camera_, score_, fishPos, moveRight);
+		big->SetSpeedMultiplier(speedMultiplier);
+		BigFishes_.push_back(big);
+	} else {
+		// 🐠 小魚を生成
+		auto* fish = new Fish();
+		fish->Initialize(fishModel_, &camera_, score_, fishPos, moveRight, getTimer_);
+		fish->SetSpeedMultiplier(speedMultiplier);
+		fishes_.push_back(fish);
 	}
 }
 

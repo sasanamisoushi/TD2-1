@@ -45,6 +45,9 @@ public:
 	// タイマーのリセット
 	int resetTimer_;
 
+	void SetSpeedMultiplier(float multiplier);
+	float GetSpeedMultiplier() const { return speedMultiplier_; }
+
 private:
 	// ワールド変換データ
 	KamataEngine::WorldTransform worldTransform_;
@@ -86,5 +89,7 @@ private:
 	Vector3 finalScale_;
 
 	const int point_ = 100;
+
+	float speedMultiplier_ = 0.01f; // 天気などによる速度補正
 
 };

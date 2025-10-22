@@ -81,6 +81,9 @@ public:
 	void SetInEvent(bool inEvent) { inEvent_ = inEvent; }
 	bool IsInEvent() const { return inEvent_; }
 
+	void SetSpeedMultiplier(float multiplier);
+	float GetSpeedMultiplier() const { return speedMultiplier_; }
+
 private:
 	// ワールド変換データ
 	KamataEngine::WorldTransform worldTransform_;
@@ -135,5 +138,8 @@ private:
 	//通常       :false
 	//イベント中  :true
 	bool inEvent_ = false;
+
+	 float baseSpeed_ = 0.05f;      // 通常の移動速度
+	float speedMultiplier_ = 0.01f; // 天気などによる速度補正
 
 };
