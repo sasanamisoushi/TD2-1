@@ -101,6 +101,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			case Scene::kTitle:
 				if (titleScene != nullptr) {
 					titleScene->Update();
+				    score->ResetScore();
 					if (titleScene->IsFinished()) {
 						nextSceneEnum = Scene::kGame;
 					}

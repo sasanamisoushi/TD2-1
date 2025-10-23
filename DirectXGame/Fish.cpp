@@ -168,18 +168,12 @@ void Fish::OnCollision(Player* player)
 	}
 }
 
-void Fish::OnCollision(bearEvent* bearEvent)
-{
+void Fish::OnCollisionBear(bearEvent* bearEvent) {
 	// ルアーと当たっているとき
 	(void)bearEvent;
-	// ゲットタイマーを減らす
-	fishGetTimer_-= 9;
-	// ゲットタイマーが0になったらゲット
-	if (fishGetTimer_ < 0) {
-		isLureCheck_ = true;
-		score_->AddScore((point_ + 50));
-		bearEvent->Reset();
-	}
+	isLureCheck_ = true;
+	score_->AddScore((point_ + 50));
+	bearEvent->Reset();
 }
 
 void Fish::OutCollision()
@@ -187,6 +181,11 @@ void Fish::OutCollision()
 	// ルアーと当たっていないとき
 	// ゲットタイマーをリセット
 	fishGetTimer_ = resetTimer_; 
+}
+
+void Fish::OutCollisionBear()
+{
+
 }
 
 void Fish::SetTexture(const std::string& filePath) { 

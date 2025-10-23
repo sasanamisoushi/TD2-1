@@ -15,7 +15,7 @@ void bearEvent::Initialize(
 	lureWorldTransform_.translation_ = position;
 	lureWorldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	// 熊
-	bearModel_ = bearModel_;
+	bearModel_ = bearModel;
 	bearWorldTransform_.Initialize();
 	bearWorldTransform_.translation_ = bearPosition;
 	bearWorldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
@@ -24,13 +24,21 @@ void bearEvent::Initialize(
 
 	// イベント発生フラグ
 	isBearEvent_ = false;
+	isLureThrowTimer_ = false;
+	isLureThrow_ = false;
 	// 位置リセット
 	resetPos_ = position;
 
-	isDown_ = true;
+	isLeft = false;
+	isDown_ = false;
 	isUp_ = false;
 	upTimer_ = 0;
 	downTimer_ = 0;
+
+	// タイマー
+	timer_ = 0.0f;
+	// 持続時間
+	duration_ = 120.0f;
 }
 
 void bearEvent::Update() 
@@ -76,13 +84,17 @@ void bearEvent::lureMove()
 		if (lureThrowTimer_ < 0)
 		{
 			isLureThrow_ = true;
+			isDown_ = true;
+			velocity_.x = 0;
+			acceleration.x = 0;
+			downTimer_ = 90;
 		}
 		if (!isLeft) {
 			acceleration.x += kLureMoveSpeedX;
 		} else {
 			acceleration.x -= kLureMoveSpeedX;
 		}
-		if (lureWorldTransform_.translation_.x > 12.0f && !isLeft) {
+		if (lureWorldTransform_.translation_.x > 10.0f && !isLeft) {
 			velocity_.x = 0;
 			acceleration.x = 0;
 			isLeft = true;
@@ -94,7 +106,7 @@ void bearEvent::lureMove()
 		}
 		velocity_.x += acceleration.x;
 	}
-	else
+	if (isLureThrow_)
 	{
 		lureUpDown();
 		if (isDown_)
@@ -104,7 +116,7 @@ void bearEvent::lureMove()
 			}
 			acceleration.y -= kLureMoveSpeedY;
 		} 
-		else if (isUp_)
+		if (isUp_)
 		{
 			if (velocity_.y < 0.0f) {
 				velocity_.y *= (1.0f - kAttenuation);
@@ -117,8 +129,13 @@ void bearEvent::lureMove()
 			acceleration.y = 0;
 			lureWorldTransform_.translation_.y = -2.0f;
 		}
-	}
-	velocity_.y += acceleration.y;
+		if (lureWorldTransform_.translation_.y > 9.5f)
+		{
+			Reset();
+
+		}
+		velocity_.y += acceleration.y;
+	}	
 }
 
 // ルアーを投げるタイミングのタイマー
@@ -126,7 +143,7 @@ void bearEvent::RandomLureThrow()
 {
 	if (!isLureThrowTimer_)
 	{
-		lureThrowTimer_ = rand() % 10 + 10;
+		lureThrowTimer_ = rand() % 30 + (rand() % 60 + 60);
 		isLureThrowTimer_ = true;
 	}
 }
@@ -145,14 +162,18 @@ void bearEvent::WorldTransformUpdate()
 
 void bearEvent::Reset()
 {
+	KamataEngine::Vector3 acceleration = {};
 	lureWorldTransform_.translation_ = resetPos_;
 	isLureThrowTimer_ = false;
 	isLureThrow_ = false;
-	isLeft = false;
-	isDown_ = true;
+	RandomLeftRight();
+	isDown_ = false;
 	isUp_ = false;
 	upTimer_ = 0;
 	downTimer_ = 0;
+	RandomLureThrow();
+	velocity_.y = 0;
+	acceleration.y = 0;
 }
 
 KamataEngine::Vector3 bearEvent::GetWorldPosition() 
@@ -172,8 +193,8 @@ AABB bearEvent::GetAABB()
 
 	AABB aabb;
 
-	aabb.min = {worldPos.x - 0.5f / 2.0f, worldPos.y - 0.5f / 2.0f, worldPos.z - 0.5f / 2.0f};
-	aabb.max = {worldPos.x + 0.5f / 2.0f, worldPos.y + 0.5f / 2.0f, worldPos.z + 0.5f / 2.0f};
+	aabb.min = {(worldPos.x - 0.3f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 2.0f) / 2.0f};
+	aabb.max = {(worldPos.x + 0.3f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 2.0f) / 2.0f};
 
 	return aabb;
 }
@@ -191,7 +212,7 @@ void bearEvent::lureUpDown()
 	if (isDown_ && downTimer_ > 0) 
 	{
 		downTimer_--;
-		if (downTimer_ < 0) 
+		if (downTimer_ <= 0) 
 		{
 			isDown_ = false;
 			isUp_ = true;
@@ -200,7 +221,7 @@ void bearEvent::lureUpDown()
 	if (isUp_ && upTimer_ > 0)
 	{
 		upTimer_--;
-		if (upTimer_ < 0)
+		if (upTimer_ <= 0)
 		{
 			isUp_ = false;
 			isDown_ = true;
@@ -209,11 +230,24 @@ void bearEvent::lureUpDown()
 	// タイマーの設定
 	if (isDown_ && downTimer_ <= 0)
 	{
-		downTimer_ = rand() % 10 + 10;
+		downTimer_ = (rand() % 30 + 20) + (rand() % 30 + 20);
 	}
 	if (isUp_ && upTimer_ <= 0) 
 	{
-		upTimer_ = rand() % 10 + 10;
+		upTimer_ = (rand() % 30 + 20) + (rand() % 30 + 20);
 	}
 
+}
+
+void bearEvent::RandomLeftRight() 
+{
+	int random = rand() % 2;
+	if (!random)
+	{
+		isLeft = false;
+	}
+	else 
+	{
+		isLeft = true;
+	}
 }
