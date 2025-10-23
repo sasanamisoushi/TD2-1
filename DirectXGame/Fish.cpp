@@ -3,6 +3,7 @@
 #include <cassert>
 #include <numbers>
 #include "Player.h"
+#include "bearEvent.h"
 #include "Score.h"
 
 
@@ -164,6 +165,20 @@ void Fish::OnCollision(Player* player)
 		isLureCheck_ = true;
 		score_->AddScoreCombo(point_);
 		player->Reset();
+	}
+}
+
+void Fish::OnCollision(bearEvent* bearEvent)
+{
+	// ルアーと当たっているとき
+	(void)bearEvent;
+	// ゲットタイマーを減らす
+	fishGetTimer_-= 9;
+	// ゲットタイマーが0になったらゲット
+	if (fishGetTimer_ < 0) {
+		isLureCheck_ = true;
+		score_->AddScoreCombo(point_);
+		bearEvent->Reset();
 	}
 }
 

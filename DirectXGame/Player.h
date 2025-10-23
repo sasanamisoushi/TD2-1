@@ -70,7 +70,7 @@ public:
 	KamataEngine::Vector3 GetWorldPosition();
 	AABB GetAABB();
 
-  //小さい魚
+	//小さい魚
 	void OnCollision(const Fish* fish);
 
 	//大きい魚

@@ -6,6 +6,7 @@ using namespace KamataEngine;
 
 class Player;
 
+class bearEvent;
 
 enum class FishEventType {
 	None,            //通常
@@ -41,6 +42,7 @@ public:
 
 	// ルアーと当たっている
 	virtual void OnCollision(Player* player);
+	virtual void OnCollision(bearEvent* bearEvent);
 	// ルアーと当たってない
 	virtual void OutCollision();
 

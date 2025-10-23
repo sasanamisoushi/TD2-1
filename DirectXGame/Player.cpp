@@ -40,7 +40,8 @@ void Player::InputMove() {
 	}
 	KamataEngine::Vector3 acceleration = {};
 	// ルアーの投げる場所決定の処理
-	if (!isLureThrow) {
+	if (!isLureThrow)
+	{
 
 		if (!isLeft) {
 			acceleration.x += kLureMoveSpeedX;
@@ -142,8 +143,6 @@ AABB Player::GetAABB() {
 	return aabb;
 }
 
-void Player::OnCollision(const Fish* fish) { (void)fish; }
-
 void Player::Reset() {
 	KamataEngine::Vector3 acceleration = {};
 	worldTransform_.translation_ = resetPos_;
@@ -154,6 +153,9 @@ void Player::Reset() {
 	acceleration.y = 0;
 	coolTime = 20;
 }
+
+void Player::OnCollision(const Fish* fish) 
+{ (void)fish; }
 
 void Player::OnCollision(const BigFish* Bigfish) {
 	(void)Bigfish;

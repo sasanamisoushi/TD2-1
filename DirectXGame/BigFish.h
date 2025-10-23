@@ -7,6 +7,8 @@ using namespace KamataEngine;
 
 class Player;
 
+class bearEvent;
+
 class Score;
 
 enum class BigFishState {
@@ -27,6 +29,9 @@ public:
 
 	// ルアーと当たっている
 	void OnCollision(Player* player) override;
+
+	// ルアーと当たっている
+	void OnCollision(bearEvent* bearEvent) override;
 
 	// ルアーと当たってない
 	void OutCollision() override;
