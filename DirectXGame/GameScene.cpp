@@ -2,6 +2,7 @@
 #include "math.h"
 #include <cstdlib>
 #include <ctime>
+#include <numbers>
 
 using namespace KamataEngine;
 
@@ -46,24 +47,35 @@ void GameScene::Initialize(Score* score) {
 	bearModel_ = Model::CreateFromOBJ("bear", true);
 	bearLureModel_ = Model::CreateFromOBJ("bearLure", true);
 	weatherModel_ = Model::CreateFromOBJ("weather", true);
+	backgroundModel_ = Model::CreateFromOBJ("gameBackground");
+
+	// 背景モデルの生成
+	backgroundModel_ = Model::CreateFromOBJ("gameBackground", true);
 
 	score_ = score;
 
 	// イベントの初期化
 	swimmyEvent_ = new SwimmyEvent();
 	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_);
-	
-	//クマイベントの初期化
-	Vector3 bearLurePosition; // ルアーの描画位置
-	Vector3 bearPosition; // 熊の描画位置
-	bearEvent_ = new bearEvent();
-	bearEvent_->Initialize(bearLureModel_,bearModel_,&camera_,bearLurePosition,bearPosition);
 
-	//天気イベントの初期化
+	// クマイベントの初期化
+	Vector3 bearLurePosition; // ルアーの描画位置
+	Vector3 bearPosition;     // 熊の描画位置
+	bearEvent_ = new bearEvent();
+	bearEvent_->Initialize(bearLureModel_, bearModel_, &camera_, bearLurePosition, bearPosition);
+
+	// 天気イベントの初期化
+
 	weatherEvent_ = new weatherEvent();
 	weatherEvent_->Initialize();
+	
 
+	// 背景オブジェクトのワールド座標設定
+	backgroundTransform_.Initialize();
+	backgroundTransform_.translation_ = {0.0f,5.0f, 10.0f}; // ← zを大きくしてt奥に
+	backgroundTransform_.scale_ = {5.0f, 3.0f, 10.0f};        // サイズ調整
 
+	WorldTransformUpdate(backgroundTransform_);
 
 	// ★ イベント終了時に魚を再生成
 	swimmyEvent_->SetOnEventEnd([this]() {
@@ -146,7 +158,7 @@ void GameScene::Initialize(Score* score) {
 			Model* eventModel = nullptr;
 			EventFish::FishEventType eventType{};
 
-			int eventTypeRand = rand() % 3; 
+			int eventTypeRand = rand() % 3;
 			switch (eventTypeRand) {
 			case 0:
 				eventModel = swimmyModel_;
@@ -229,7 +241,6 @@ GameScene::~GameScene() {
 
 	delete rubbishModel_;
 
-
 	delete swimmyEvent_;
 	delete swimmyModel_;
 	delete bearEvent_;
@@ -243,8 +254,6 @@ GameScene::~GameScene() {
 	}
 	events_.clear();
 
-	
-
 	for (int i = 0; i < 3; i++) {
 
 		delete numSprite_[i];
@@ -257,7 +266,7 @@ void GameScene::Update() {
 	fade_->Update();
 	switch (phase_) {
 	case GameScene::Phase::kFadeIn:
-		
+
 		if (fade_->isFinished()) {
 			phase_ = Phase::kMain; // フェードイン完了 -> メインフェーズへ
 		}
@@ -290,15 +299,16 @@ void GameScene::Update() {
 			swimmyEvent_->Update();
 		}
 
-		//クマの更新
+		// クマの更新
 		if (bearEvent_) {
 			bearEvent_->Update();
 		}
 
-		//天気の更新
+		// 天気の更新
 		if (weatherEvent_) {
 			weatherEvent_->Update();
 		}
+		
 
 		float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
 
@@ -356,8 +366,6 @@ void GameScene::Update() {
 				Vector3 centerPos = eventFish->GetWorldPosition();
 
 				EventFish::FishEventType type = eventFish->GetEventType();
-				
-				
 
 				switch (type) {
 				case EventFish::FishEventType::SwimmyGroup:
@@ -372,7 +380,7 @@ void GameScene::Update() {
 				case EventFish::FishEventType::WeatherChange:
 
 					if (weatherEvent_) {
-					
+
 						weatherEvent_->TriggerRandomWeather();
 					}
 
@@ -380,8 +388,6 @@ void GameScene::Update() {
 				default:
 					break;
 				}
-
-				
 
 				delete eventFish;
 				caughtFishCount++;
@@ -395,28 +401,24 @@ void GameScene::Update() {
 			SpawnFish();
 		}
 
-		
-
-
-	if (Input::GetInstance()->TriggerKey(DIK_S)) {
-		isFinish = true;
-		score_->FileWrite();
-	}
-		CheckAllCollisions();
-
-
-	// タイマー処理
-	if (isGame_) {
-		if (gameTimer_ > 0) {
-			gameTimer_--;
-		}
-		if (gameTimer_ <= 0) {
-			gameTimer_ = 0;
-			isGame_ = false;
+		if (Input::GetInstance()->TriggerKey(DIK_S)) {
 			isFinish = true;
 			score_->FileWrite();
 		}
-  }
+		CheckAllCollisions();
+
+		// タイマー処理
+		if (isGame_) {
+			if (gameTimer_ > 0) {
+				gameTimer_--;
+			}
+			if (gameTimer_ <= 0) {
+				gameTimer_ = 0;
+				isGame_ = false;
+				isFinish = true;
+				score_->FileWrite();
+			}
+		}
 
 #ifdef _DEBUG
 		ImGui::Begin("Game Scene");
@@ -428,8 +430,8 @@ void GameScene::Update() {
 			ImGui::Text("Fish %d", index);
 			ImGui::SameLine();
 			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-			ImGui::Text("fishAABB min x,%f y,%f z,%f", fish->GetAABB().min.x, fish->GetAABB().min.y,fish->GetAABB().min.z);
-			ImGui::Text("fishAABB max x,%f y,%f z,%f", fish->GetAABB().max.x, fish->GetAABB().max.y,fish->GetAABB().max.z);
+			ImGui::Text("fishAABB min x,%f y,%f z,%f", fish->GetAABB().min.x, fish->GetAABB().min.y, fish->GetAABB().min.z);
+			ImGui::Text("fishAABB max x,%f y,%f z,%f", fish->GetAABB().max.x, fish->GetAABB().max.y, fish->GetAABB().max.z);
 			ImGui::Text("playerPos %d", fish->fishHit_);
 			ImGui::Text("GetTimer %d", fish->fishGetTimer_);
 			index++;
@@ -474,11 +476,11 @@ void GameScene::Update() {
 			eventIndex++;
 		}
 		ImGui::End();
-		
+
 		ImGui::Begin("playerAABB ");
 
-		ImGui::Text("playerAABB min x,%f y,%f z,%f", player_->GetAABB().min.x, player_->GetAABB().min.y,player_->GetAABB().min.z);
-		ImGui::Text("playerAABB max x,%f y,%f z,%f", player_->GetAABB().max.x, player_->GetAABB().max.y,player_->GetAABB().max.z);
+		ImGui::Text("playerAABB min x,%f y,%f z,%f", player_->GetAABB().min.x, player_->GetAABB().min.y, player_->GetAABB().min.z);
+		ImGui::Text("playerAABB max x,%f y,%f z,%f", player_->GetAABB().max.x, player_->GetAABB().max.y, player_->GetAABB().max.z);
 		ImGui::Text("playerPos %d", player_->playerHit_);
 
 		ImGui::End();
@@ -497,9 +499,18 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
+
+	
+
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
+
 	// 3Dモデル描画前処理
 	Model::PreDraw(dxCommon->GetCommandList());
+
+	backgroundModel_->Draw(backgroundTransform_, camera_);
+
+	weatherEvent_->Draw();
+
 	// 魚の描画
 	for (auto& fish : fishes_) {
 		fish->Draw();
@@ -528,16 +539,15 @@ void GameScene::Draw() {
 		swimmyEvent_->Draw();
 	}
 
-	//クマの描画
+	// クマの描画
 	if (bearEvent_) {
 		bearEvent_->Draw();
 	}
 
-	//天気の描画
-	if (weatherEvent_) {
 	
-		weatherEvent_->Draw();
-	}
+
+		
+	
 
 	Model::PostDraw();
 
@@ -569,7 +579,7 @@ void GameScene::Draw() {
 
 void GameScene::CheckAllCollisions() {
 	// 判定対象1と2の座標
-	AABB aabb1, aabb2,aabb3;
+	AABB aabb1, aabb2, aabb3;
 
 	// 自キャラの座標
 	aabb1 = player_->GetAABB();
@@ -578,21 +588,19 @@ void GameScene::CheckAllCollisions() {
 	aabb3 = bearEvent_->GetAABB();
 
 	// 自キャラと魚全ての当たり判定
-	for (Fish* fish : fishes_) 
-	{
+	for (Fish* fish : fishes_) {
 		aabb2 = fish->GetAABB();
-		
+
 		// プレイヤー
 		// ルアーと魚が当たっているとき
 		if (IsCollision(aabb1, aabb2)) {
 			player_->OnCollision(fish);
-  			player_->playerHit_ = true;
- 			fish->fishHit_ = true;
+			player_->playerHit_ = true;
+			fish->fishHit_ = true;
 			fish->OnCollision(player_);
 		}
 		// ルアーと魚が当たってないとき
-		else 
-		{
+		else {
 			player_->playerHit_ = false;
 			fish->fishHit_ = false;
 			fish->OutCollision();
@@ -600,8 +608,7 @@ void GameScene::CheckAllCollisions() {
 
 		// 熊
 		// ルアーと魚が当たっているとき
-		if (bearEvent_->isBearEvent_)
-		{
+		if (bearEvent_->isBearEvent_) {
 			if (IsCollision(aabb3, aabb2)) {
 				bearEvent_->OnCollision(fish);
 
@@ -676,8 +683,6 @@ void GameScene::CheckAllCollisions() {
 			evenet->OutCollision();
 		}
 	}
-
-
 }
 
 void GameScene::SpawnFish() {
@@ -727,7 +732,7 @@ void GameScene::SpawnFish() {
 	float rubbishChance = weatherEvent_->GetRubbishSpawnRate();      // 隕石で上がる
 	float speedMultiplier = weatherEvent_->GetFishSpeedMultiplier(); // 雨・雲で変化
 
-	// === 正規化（合計が1を超えないように）=== 
+	// === 正規化（合計が1を超えないように）===
 	float total = bigFishChance + rubbishChance;
 	if (total > 1.0f) {
 		bigFishChance /= total;
@@ -737,7 +742,7 @@ void GameScene::SpawnFish() {
 	// === 出現確率を決定 ===
 	float r = static_cast<float>(rand()) / RAND_MAX;
 
-	 // --- イベント魚出現チェック（独立確率） ---
+	// --- イベント魚出現チェック（独立確率） ---
 	float eventChance = 0.05f; // 5%の確率でイベント魚出現
 	if (r < eventChance && events_.empty()) {
 		auto* eventFish = new EventFish();
