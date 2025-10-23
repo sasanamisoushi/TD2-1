@@ -31,17 +31,15 @@ public:
 	void OnCollision(Player* player) override;
 
 	// ルアーと当たっている
-	void OnCollision(bearEvent* bearEvent) override;
+	void OnCollisionBear(bearEvent* bearEvent) override;
 
 	// ルアーと当たってない
 	void OutCollision() override;
 
-	
+	void OutCollisionBear() override;
 
 private:
 	BigFishState State_ = BigFishState::Appear;
-
-	
 
 	// モデル
 	Model* model_ = nullptr;

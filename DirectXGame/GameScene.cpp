@@ -54,8 +54,8 @@ void GameScene::Initialize(Score* score) {
 	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_);
 	
 	//クマイベントの初期化
-	Vector3 bearLurePosition; // ルアーの描画位置
-	Vector3 bearPosition; // 熊の描画位置
+	Vector3 bearLurePosition = {0, 7, 0}; // ルアーの描画位置
+	Vector3 bearPosition = {-12, 10, 0};  // 熊の描画位置
 	bearEvent_ = new bearEvent();
 	bearEvent_->Initialize(bearLureModel_,bearModel_,&camera_,bearLurePosition,bearPosition);
 
@@ -367,7 +367,7 @@ void GameScene::Update() {
 					swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
 					break;
 				case EventFish::FishEventType::BearHelp:
-
+					bearEvent_->isBearEvent_ = true;
 					break;
 				case EventFish::FishEventType::WeatherChange:
 
@@ -403,7 +403,7 @@ void GameScene::Update() {
 		score_->FileWrite();
 	}
 		CheckAllCollisions();
-
+		CheckBearCollisions();
 
 	// タイマー処理
 	if (isGame_) {
@@ -419,6 +419,11 @@ void GameScene::Update() {
   }
 
 #ifdef _DEBUG
+
+	if (Input::GetInstance()->TriggerKey(DIK_B)) {
+	  bearEvent_->isBearEvent_ = true;
+  }
+	
 		ImGui::Begin("Game Scene");
 
 		int index = 0;
@@ -428,8 +433,7 @@ void GameScene::Update() {
 			ImGui::Text("Fish %d", index);
 			ImGui::SameLine();
 			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-			ImGui::Text("fishAABB min x,%f y,%f z,%f", fish->GetAABB().min.x, fish->GetAABB().min.y,fish->GetAABB().min.z);
-			ImGui::Text("fishAABB max x,%f y,%f z,%f", fish->GetAABB().max.x, fish->GetAABB().max.y,fish->GetAABB().max.z);
+			
 			ImGui::Text("playerPos %d", fish->fishHit_);
 			ImGui::Text("GetTimer %d", fish->fishGetTimer_);
 			index++;
@@ -441,6 +445,8 @@ void GameScene::Update() {
 			ImGui::Text("BigFish %d", index);
 			ImGui::SameLine();
 			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+			ImGui::Text("fishAABB min x,%f y,%f z,%f", BigFish->GetAABB().min.x, BigFish->GetAABB().min.y, BigFish->GetAABB().min.z);
+			ImGui::Text("fishAABB max x,%f y,%f z,%f", BigFish->GetAABB().max.x, BigFish->GetAABB().max.y, BigFish->GetAABB().max.z);
 			ImGui::Text("GetTimer %d", BigFish->fishGetTimer_);
 			index++;
 		}
@@ -569,13 +575,10 @@ void GameScene::Draw() {
 
 void GameScene::CheckAllCollisions() {
 	// 判定対象1と2の座標
-	AABB aabb1, aabb2,aabb3;
+	AABB aabb1, aabb2;
 
 	// 自キャラの座標
 	aabb1 = player_->GetAABB();
-
-	// 熊の座標
-	aabb3 = bearEvent_->GetAABB();
 
 	// 自キャラと魚全ての当たり判定
 	for (Fish* fish : fishes_) 
@@ -597,21 +600,6 @@ void GameScene::CheckAllCollisions() {
 			fish->fishHit_ = false;
 			fish->OutCollision();
 		}
-
-		// 熊
-		// ルアーと魚が当たっているとき
-		if (bearEvent_->isBearEvent_)
-		{
-			if (IsCollision(aabb3, aabb2)) {
-				bearEvent_->OnCollision(fish);
-
-				fish->OnCollision(bearEvent_);
-			}
-			// ルアーと魚が当たってないとき
-			else {
-				fish->OutCollision();
-			}
-		}
 	}
 
 	// 自キャラと大きい魚全ての当たり判定
@@ -628,20 +616,6 @@ void GameScene::CheckAllCollisions() {
 		// ルアーと魚が当たってないとき
 		else {
 			Bigfish->OutCollision();
-		}
-
-		// 熊
-		// ルアーと魚が当たっているとき
-		if (bearEvent_->isBearEvent_) {
-			if (IsCollision(aabb3, aabb2)) {
-				bearEvent_->OnCollision(Bigfish);
-
-				Bigfish->OnCollision(bearEvent_);
-			}
-			// ルアーと魚が当たってないとき
-			else {
-				Bigfish->OutCollision();
-			}
 		}
 	}
 
@@ -678,6 +652,51 @@ void GameScene::CheckAllCollisions() {
 	}
 
 
+}
+
+void GameScene::CheckBearCollisions() 
+{ 
+	AABB aabb1, aabb2; 
+	// 熊の座標
+	aabb1 = bearEvent_->GetAABB();
+
+	for (Fish* fish : fishes_)
+	{
+		aabb2 = fish->GetAABB();
+
+		// 熊
+		// ルアーと魚が当たっているとき
+		if (bearEvent_->isBearEvent_) {
+			if (IsCollision(aabb1, aabb2)) {
+				bearEvent_->OnCollision(fish);
+
+				fish->OnCollisionBear(bearEvent_);
+			}
+			// ルアーと魚が当たってないとき
+			else {
+				fish->OutCollisionBear();
+			}
+		}
+	}
+
+	// 自キャラと大きい魚全ての当たり判定
+	for (BigFish* Bigfish : BigFishes_) 
+	{
+		aabb2 = Bigfish->GetAABB();
+		// 熊
+		// ルアーと魚が当たっているとき
+		if (bearEvent_->isBearEvent_) {
+			if (IsCollision(aabb1, aabb2)) {
+				bearEvent_->OnCollision(Bigfish);
+
+				Bigfish->OnCollisionBear(bearEvent_);
+			}
+			// ルアーと魚が当たってないとき
+			else {
+				Bigfish->OutCollisionBear();
+			}
+		}
+	}
 }
 
 void GameScene::SpawnFish() {

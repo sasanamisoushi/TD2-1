@@ -78,11 +78,10 @@ void BigFish::OnCollision(Player* player)
 	
 }
 
-void BigFish::OnCollision(bearEvent* bearEvent)
-{
+void BigFish::OnCollisionBear(bearEvent* bearEvent) {
 	
 	// Fishの共通当たり処理（タイマー処理など）
-	Fish::OnCollision(bearEvent);
+	Fish::OnCollisionBear(bearEvent);
 
 	if (isLureCheck_) {
 		// BigFishはスコア加算
@@ -93,6 +92,7 @@ void BigFish::OnCollision(bearEvent* bearEvent)
 void BigFish::OutCollision() {
 
 	 Fish::OutCollision();
-
-
 }
+
+void BigFish::OutCollisionBear()
+{ Fish::OutCollisionBear(); }

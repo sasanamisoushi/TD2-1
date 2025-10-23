@@ -39,6 +39,8 @@ public:
 
 	void lureUpDown();
 
+	void RandomLeftRight();
+
 	// イベント発生フラグ
 	int isBearEvent_;
 
