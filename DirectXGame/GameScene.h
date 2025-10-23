@@ -136,7 +136,9 @@ private:
 	//フェード用のタイマー
 	float timer;
 
-	
 
+	//背景モデル
+	Model* backgroundModel_ = nullptr;
+	WorldTransform backgroundTransform_;
 	
 };
