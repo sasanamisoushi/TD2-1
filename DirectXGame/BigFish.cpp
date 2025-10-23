@@ -15,7 +15,7 @@ void BigFish::Initialize(Model* model, Camera* camera, Score* score, const Vecto
 	State_ = BigFishState::Appear;
 
 	// Fishの基本初期化（共通部分）
-	Fish::Initialize(model, camera, score, targetPos, moveRight, 30);
+	Fish::Initialize(model, camera, score, targetPos, moveRight, 90);
 
 	// BigFish専用パラメータ
 	finalScale_ = {0.35f, 0.35f, 0.35f};
@@ -55,15 +55,13 @@ void BigFish::Update() {
 
 
 
-
-
 AABB BigFish::GetAABB() {
 	Vector3 worldPos = GetWorldPosition();
 
-	float sizeScale = 1.5f; // 通常魚より大きめ
+
 	AABB aabb;
-	aabb.min = {worldPos.x - 0.5f * sizeScale, worldPos.y - 0.5f * sizeScale, worldPos.z - 0.5f * sizeScale};
-	aabb.max = {worldPos.x + 0.5f * sizeScale, worldPos.y + 0.5f * sizeScale, worldPos.z + 0.5f * sizeScale};
+	aabb.min = {(worldPos.x - 0.5f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 2.0f) / 2.0f};
+	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 2.0f) / 2.0f};
 
 	return aabb;
 }
