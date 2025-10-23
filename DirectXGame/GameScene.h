@@ -36,6 +36,8 @@ public:
 	// 全ての当たり判定
 	void CheckAllCollisions();
 
+	void CheckBearCollisions();
+
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 

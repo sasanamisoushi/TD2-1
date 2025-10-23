@@ -42,9 +42,10 @@ public:
 
 	// ルアーと当たっている
 	virtual void OnCollision(Player* player);
-	virtual void OnCollision(bearEvent* bearEvent);
+	virtual void OnCollisionBear(bearEvent* bearEvent);
 	// ルアーと当たってない
 	virtual void OutCollision();
+	virtual void OutCollisionBear();
 
 	// フラグ
 	// 魚がルアーの範囲内にいるか
