@@ -132,7 +132,7 @@ KamataEngine::Vector3 Player::GetWorldPosition() {
 	return worldPos;
 }
 
-AABB Player::GetAABB() {
+AABB Player::GetAABB(){
 	KamataEngine::Vector3 worldPos = GetWorldPosition();
 
 	AABB aabb;

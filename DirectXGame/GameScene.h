@@ -25,7 +25,7 @@ public:
 	};
 
 	//初期化
-	void Initialize();
+	void Initialize(Score* score);
 	~GameScene();
 	//更新
 	void Update();

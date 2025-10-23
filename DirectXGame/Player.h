@@ -44,8 +44,10 @@ private:
 
 	int coolTime; // ゲームスタートしたときやルアーを回収とかしたときにすぐにルアーが落ちないようにする
 
-public:
+	
 
+public:
+	int playerHit_ = false;
 	// 初期化
 	void Initialize(KamataEngine::Model* model, KamataEngine::Model* playerModel, KamataEngine::Camera* camera, 
 		KamataEngine::Vector3& position, KamataEngine::Vector3& playerPosition);

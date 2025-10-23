@@ -86,6 +86,8 @@ public:
 	void SetSpeedMultiplier(float multiplier);
 	float GetSpeedMultiplier() const { return speedMultiplier_; }
 
+	int fishHit_ = false;
+
 private:
 	// ワールド変換データ
 	KamataEngine::WorldTransform worldTransform_;

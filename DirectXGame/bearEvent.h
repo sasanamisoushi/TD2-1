@@ -39,6 +39,9 @@ public:
 
 	void lureUpDown();
 
+	// イベント発生フラグ
+	int isBearEvent_;
+
 private:
 	
 	// ルアー
@@ -57,8 +60,7 @@ private:
 	// 持続時間
 	float duration_ = 120.0f;
 
-	// イベント発生フラグ
-	int isBearEvent_;
+	
 	// ルアーを投げるタイミングのタイマー
 	int lureThrowTimer_;
 	// ルアーを投げるタイミングのタイマーが決定したときに止めるためのフラグ

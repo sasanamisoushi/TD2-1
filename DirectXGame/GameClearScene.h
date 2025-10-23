@@ -8,7 +8,7 @@ public:
 	~GameClearScene();
 
 	// 初期化
-	void Initialize();
+	void Initialize(Score* score);
 
 	// 更新
 	void Update();

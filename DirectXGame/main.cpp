@@ -2,7 +2,9 @@
 #include "KamataEngine.h"
 #include "TitleScene.h"
 #include "GameClearScene.h"
+#include "Score.h"
 #include <Windows.h>
+
 
 using namespace KamataEngine;
 
@@ -40,7 +42,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	titleScene = new TitleScene();
 	titleScene->Initialize();
 
-	
+	Score* score;
+	score = new Score();
+	score->Initialize();
 
 	// メインループ
 	while (true) {
@@ -83,11 +87,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				break;
 			case Scene::kGame:
 				gameScene = new GameScene();
-				gameScene->Initialize();
+				gameScene->Initialize(score);
 				break;
 			case Scene::kGameClear:
 				gameClearScene = new GameClearScene();
-				gameClearScene->Initialize();
+				gameClearScene->Initialize(score);
 				break;
 			}
 		}
@@ -160,6 +164,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		delete gameClearScene;
 		break;
 	}
+
+	delete score;
+	score = nullptr;
 
 	// エンジンの終了処理
 	KamataEngine::Finalize();
