@@ -88,7 +88,7 @@ void BigFish::OnCollision(bearEvent* bearEvent)
 
 	if (isLureCheck_) {
 		// BigFishはスコア加算
-		score_->AddScore(point_);
+		score_->AddScoreBear((point_ + 100));
 	}
 }
 

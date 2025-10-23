@@ -48,7 +48,7 @@ void GameScene::Initialize() {
 	rubbishModel_ = Model::CreateFromOBJ("trash", true);
 	swimmyModel_ = Model::CreateFromOBJ("suimii", true);
 	bearModel_ = Model::CreateFromOBJ("bear", true);
-	bearLureModel_ = Model::CreateFromOBJ("", true);
+	bearLureModel_ = Model::CreateFromOBJ("bearLure", true);
 	weatherModel_ = Model::CreateFromOBJ("weather", true);
 
 
@@ -363,7 +363,7 @@ void GameScene::Update() {
 				Vector3 centerPos = eventFish->GetWorldPosition();
 
 				EventFish::FishEventType type = eventFish->GetEventType();
-
+				
 				
 
 				switch (type) {

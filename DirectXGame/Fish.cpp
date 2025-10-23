@@ -177,7 +177,7 @@ void Fish::OnCollision(bearEvent* bearEvent)
 	// ゲットタイマーが0になったらゲット
 	if (fishGetTimer_ < 0) {
 		isLureCheck_ = true;
-		score_->AddScoreCombo(point_);
+		score_->AddScore((point_ + 50));
 		bearEvent->Reset();
 	}
 }
