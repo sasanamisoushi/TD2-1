@@ -132,13 +132,13 @@ KamataEngine::Vector3 Player::GetWorldPosition() {
 	return worldPos;
 }
 
-AABB Player::GetAABB() {
+AABB Player::GetAABB(){
 	KamataEngine::Vector3 worldPos = GetWorldPosition();
 
 	AABB aabb;
 
-	aabb.min = {(worldPos.x - 0.3f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
-	aabb.max = {(worldPos.x + 0.3f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
+	aabb.min = {worldPos.x - 0.5f / 2.0f, worldPos.y - 0.5f / 2.0f, worldPos.z - 0.5f / 2.0f};
+	aabb.max = {worldPos.x + 0.5f / 2.0f, worldPos.y + 0.5f / 2.0f, worldPos.z + 0.5f / 2.0f};
 
 	return aabb;
 }

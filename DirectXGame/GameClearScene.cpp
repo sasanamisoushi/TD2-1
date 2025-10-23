@@ -6,16 +6,12 @@
 using namespace KamataEngine;
 
 
-void GameClearScene::Initialize()
-{
-	score_ = new Score();
-	score_->Initialize();
+void GameClearScene::Initialize(Score* score) 
+{ 
+	score_ = score; 
 }
 
-GameClearScene::~GameClearScene()
-{
-	delete score_;
-}
+GameClearScene::~GameClearScene() {}
 
 
 void GameClearScene::Update() {

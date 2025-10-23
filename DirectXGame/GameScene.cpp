@@ -5,7 +5,7 @@
 
 using namespace KamataEngine;
 
-void GameScene::Initialize() {
+void GameScene::Initialize(Score* score) {
 	// 実行ごとに乱数変更
 	srand((unsigned int)time(nullptr));
 
@@ -28,10 +28,6 @@ void GameScene::Initialize() {
 	Vector3 lurePosition = {0, 7, 0};
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
 
-	// Scoreの初期化
-	score_ = new Score();
-	score_->Initialize();
-
 	// フェードの初期化
 	fade_ = new Fade();
 	fade_->Initialize();
@@ -51,6 +47,7 @@ void GameScene::Initialize() {
 	bearLureModel_ = Model::CreateFromOBJ("bearLure", true);
 	weatherModel_ = Model::CreateFromOBJ("weather", true);
 
+	score_ = score;
 
 	// イベントの初期化
 	swimmyEvent_ = new SwimmyEvent();
@@ -223,8 +220,6 @@ GameScene::~GameScene() {
 	BigFishes_.clear();
 
 	delete bigFishModel_;
-
-	delete score_;
 
 	for (auto& rubbishs : rubbishes_) {
 
@@ -433,6 +428,9 @@ void GameScene::Update() {
 			ImGui::Text("Fish %d", index);
 			ImGui::SameLine();
 			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+			ImGui::Text("fishAABB min x,%f y,%f z,%f", fish->GetAABB().min.x, fish->GetAABB().min.y,fish->GetAABB().min.z);
+			ImGui::Text("fishAABB max x,%f y,%f z,%f", fish->GetAABB().max.x, fish->GetAABB().max.y,fish->GetAABB().max.z);
+			ImGui::Text("playerPos %d", fish->fishHit_);
 			ImGui::Text("GetTimer %d", fish->fishGetTimer_);
 			index++;
 		}
@@ -477,6 +475,13 @@ void GameScene::Update() {
 		}
 		ImGui::End();
 		
+		ImGui::Begin("playerAABB ");
+
+		ImGui::Text("playerAABB min x,%f y,%f z,%f", player_->GetAABB().min.x, player_->GetAABB().min.y,player_->GetAABB().min.z);
+		ImGui::Text("playerAABB max x,%f y,%f z,%f", player_->GetAABB().max.x, player_->GetAABB().max.y,player_->GetAABB().max.z);
+		ImGui::Text("playerPos %d", player_->playerHit_);
+
+		ImGui::End();
 #endif
 	} break;
 
@@ -581,26 +586,31 @@ void GameScene::CheckAllCollisions() {
 		// ルアーと魚が当たっているとき
 		if (IsCollision(aabb1, aabb2)) {
 			player_->OnCollision(fish);
-
+  			player_->playerHit_ = true;
+ 			fish->fishHit_ = true;
 			fish->OnCollision(player_);
 		}
 		// ルアーと魚が当たってないとき
 		else 
 		{
+			player_->playerHit_ = false;
+			fish->fishHit_ = false;
 			fish->OutCollision();
 		}
 
 		// 熊
 		// ルアーと魚が当たっているとき
-		if (IsCollision(aabb3, aabb2)) {
-			bearEvent_->OnCollision(fish);
-
-			fish->OnCollision(bearEvent_);
-		}
-		// ルアーと魚が当たってないとき
-		else 
+		if (bearEvent_->isBearEvent_)
 		{
-			fish->OutCollision();
+			if (IsCollision(aabb3, aabb2)) {
+				bearEvent_->OnCollision(fish);
+
+				fish->OnCollision(bearEvent_);
+			}
+			// ルアーと魚が当たってないとき
+			else {
+				fish->OutCollision();
+			}
 		}
 	}
 
@@ -622,14 +632,16 @@ void GameScene::CheckAllCollisions() {
 
 		// 熊
 		// ルアーと魚が当たっているとき
-		if (IsCollision(aabb3, aabb2)) {
-			bearEvent_->OnCollision(Bigfish);
+		if (bearEvent_->isBearEvent_) {
+			if (IsCollision(aabb3, aabb2)) {
+				bearEvent_->OnCollision(Bigfish);
 
-			Bigfish->OnCollision(bearEvent_);
-		}
-		// ルアーと魚が当たってないとき
-		else {
-			Bigfish->OutCollision();
+				Bigfish->OnCollision(bearEvent_);
+			}
+			// ルアーと魚が当たってないとき
+			else {
+				Bigfish->OutCollision();
+			}
 		}
 	}
 
@@ -675,7 +687,7 @@ void GameScene::SpawnFish() {
 
 	// === 位置を決定 ===
 	for (int confirmation = 0; confirmation < 50 && !setPos; confirmation++) {
-		fishPos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
+		fishPos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, 0.0f};
 		setPos = true;
 
 		// 小さい魚と距離確認
@@ -800,7 +812,7 @@ Vector3 GameScene::GetRandomPos() {
 	Vector3 pos;
 	bool setPos = false;
 	for (int attempt = 0; attempt < 50 && !setPos; attempt++) {
-		pos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
+		pos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, 0.0f};
 		setPos = true;
 		// 他の魚と距離チェック（小魚・大魚・ゴミ）
 		for (auto& fish : fishes_) {
