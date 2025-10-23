@@ -48,15 +48,19 @@ void GameScene::Initialize() {
 	rubbishModel_ = Model::CreateFromOBJ("trash", true);
 	swimmyModel_ = Model::CreateFromOBJ("suimii", true);
 	bearModel_ = Model::CreateFromOBJ("bear", true);
+	bearLureModel_ = Model::CreateFromOBJ("bearLure", true);
 	weatherModel_ = Model::CreateFromOBJ("weather", true);
+
 
 	// イベントの初期化
 	swimmyEvent_ = new SwimmyEvent();
 	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_);
 	
 	//クマイベントの初期化
+	Vector3 bearLurePosition; // ルアーの描画位置
+	Vector3 bearPosition; // 熊の描画位置
 	bearEvent_ = new bearEvent();
-	bearEvent_->Initialize();
+	bearEvent_->Initialize(bearLureModel_,bearModel_,&camera_,bearLurePosition,bearPosition);
 
 	//天気イベントの初期化
 	weatherEvent_ = new weatherEvent();
@@ -235,6 +239,7 @@ GameScene::~GameScene() {
 	delete swimmyModel_;
 	delete bearEvent_;
 	delete bearModel_;
+	delete bearLureModel_;
 	delete weatherEvent_;
 	delete weatherModel_;
 	for (auto& eventFish : events_) {
@@ -356,7 +361,7 @@ void GameScene::Update() {
 				Vector3 centerPos = eventFish->GetWorldPosition();
 
 				EventFish::FishEventType type = eventFish->GetEventType();
-
+				
 				
 
 				switch (type) {
@@ -559,15 +564,20 @@ void GameScene::Draw() {
 
 void GameScene::CheckAllCollisions() {
 	// 判定対象1と2の座標
-	AABB aabb1, aabb2;
+	AABB aabb1, aabb2,aabb3;
 
 	// 自キャラの座標
 	aabb1 = player_->GetAABB();
 
-	// 自キャラと魚全ての当たり判定
-	for (Fish* fish : fishes_) {
-		aabb2 = fish->GetAABB();
+	// 熊の座標
+	aabb3 = bearEvent_->GetAABB();
 
+	// 自キャラと魚全ての当たり判定
+	for (Fish* fish : fishes_) 
+	{
+		aabb2 = fish->GetAABB();
+		
+		// プレイヤー
 		// ルアーと魚が当たっているとき
 		if (IsCollision(aabb1, aabb2)) {
 			player_->OnCollision(fish);
@@ -575,7 +585,21 @@ void GameScene::CheckAllCollisions() {
 			fish->OnCollision(player_);
 		}
 		// ルアーと魚が当たってないとき
-		else {
+		else 
+		{
+			fish->OutCollision();
+		}
+
+		// 熊
+		// ルアーと魚が当たっているとき
+		if (IsCollision(aabb3, aabb2)) {
+			bearEvent_->OnCollision(fish);
+
+			fish->OnCollision(bearEvent_);
+		}
+		// ルアーと魚が当たってないとき
+		else 
+		{
 			fish->OutCollision();
 		}
 	}
@@ -584,11 +608,24 @@ void GameScene::CheckAllCollisions() {
 	for (BigFish* Bigfish : BigFishes_) {
 		aabb2 = Bigfish->GetAABB();
 
+		// プレイヤー
 		// ルアーと魚が当たっているとき
 		if (IsCollision(aabb1, aabb2)) {
 			player_->OnCollision(Bigfish);
 
 			Bigfish->OnCollision(player_);
+		}
+		// ルアーと魚が当たってないとき
+		else {
+			Bigfish->OutCollision();
+		}
+
+		// 熊
+		// ルアーと魚が当たっているとき
+		if (IsCollision(aabb3, aabb2)) {
+			bearEvent_->OnCollision(Bigfish);
+
+			Bigfish->OnCollision(bearEvent_);
 		}
 		// ルアーと魚が当たってないとき
 		else {
@@ -627,6 +664,8 @@ void GameScene::CheckAllCollisions() {
 			evenet->OutCollision();
 		}
 	}
+
+
 }
 
 void GameScene::SpawnFish() {

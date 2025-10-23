@@ -68,7 +68,8 @@ AABB BigFish::GetAABB() {
 	return aabb;
 }
 
-void BigFish::OnCollision(Player* player) {
+void BigFish::OnCollision(Player* player)
+{
 	// Fishの共通当たり処理（タイマー処理など）
 	Fish::OnCollision(player);
 
@@ -79,9 +80,21 @@ void BigFish::OnCollision(Player* player) {
 	
 }
 
+void BigFish::OnCollision(bearEvent* bearEvent)
+{
+	
+	// Fishの共通当たり処理（タイマー処理など）
+	Fish::OnCollision(bearEvent);
+
+	if (isLureCheck_) {
+		// BigFishはスコア加算
+		score_->AddScoreBear((point_ + 100));
+	}
+}
+
 void BigFish::OutCollision() {
 
 	 Fish::OutCollision();
 
-	
+
 }

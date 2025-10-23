@@ -66,6 +66,11 @@ void Score::AddScore(int score)
 	combo_ = 0;
 }
 
+void Score::AddScoreBear(int score) 
+{ 
+	score_ += score; 
+}
+
 void Score::AddScoreCombo(int score) 
 { 
 	if (combo_ < 6) 

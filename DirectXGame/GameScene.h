@@ -105,6 +105,8 @@ private:
 
 	//ベアー
 	Model* bearModel_ = nullptr;
+	// 熊のルアー
+	Model* bearLureModel_ = nullptr;
 	
 
 	//天気

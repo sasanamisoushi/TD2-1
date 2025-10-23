@@ -15,6 +15,8 @@ public:
 
 	void AddScore(int score);
 
+	void AddScoreBear(int score);
+
 	void AddScoreCombo(int score);
 
 	void SubtractScore(int score);
