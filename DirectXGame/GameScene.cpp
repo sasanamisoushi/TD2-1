@@ -72,8 +72,8 @@ void GameScene::Initialize() {
 	});
 
 	// 制限数
-	const int totalFishMax = 10; // 全体の最大数
-	const int bigFishMax = 4;    // 大きい魚の最大数
+	const int totalFishMax = 15; // 全体の最大数
+	const int bigFishMax = 5;    // 大きい魚の最大数
 	const int EventFisMax = 1;   // イベントの魚の最大数
 	bigCount = 0;
 	smallCount = 0;
@@ -161,7 +161,7 @@ void GameScene::Initialize() {
 				break;
 			}
 
-			eventFish->Initialize(eventModel, &camera_, nullptr, fishPos, moveRight, getTimer_);
+			eventFish->Initialize(eventModel, &camera_, score_, fishPos, moveRight);
 			eventFish->SetEventType(eventType);
 			events_.push_back(eventFish);
 			eventCount++;
@@ -690,7 +690,7 @@ void GameScene::SpawnFish() {
 	float eventChance = 0.05f; // 5%の確率でイベント魚出現
 	if (r < eventChance && events_.empty()) {
 		auto* eventFish = new EventFish();
-		eventFish->Initialize(swimmyModel_, &camera_, nullptr, fishPos, moveRight, getTimer_);
+		eventFish->Initialize(swimmyModel_, &camera_, nullptr, fishPos, moveRight);
 
 		eventFish->SetOnTriggered([this](const Vector3& centerPos, EventFish::FishEventType type) {
 			switch (type) {

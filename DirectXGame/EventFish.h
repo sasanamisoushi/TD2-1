@@ -14,7 +14,7 @@ public:
 		WeatherChange // 天候が変わるイベント
 	};
 
-	void Initialize(Model* model, Camera* camera, Score* Score, const Vector3& pos, bool moveRight, int getTimer);
+	void Initialize(Model* model, Camera* camera, Score* Score, const Vector3& pos, bool moveRight);
 	void Update() override;
 	void OnCollision(Player* player) override;
 
@@ -25,11 +25,19 @@ public:
 
 	FishEventType GetEventType() const { return eventType_; }
 
+	AABB GetAABB();
+
 private:
+
+	//スコア
+	Score* score_;
+	const int point_ = 300;
 
 	bool hasTriggered_ = false;
 
 	FishEventType eventType_ = FishEventType::None;
 
 	std::function<void(const Vector3&, FishEventType)> onTriggered_;
+
+	float triggerTimer_;
 };
