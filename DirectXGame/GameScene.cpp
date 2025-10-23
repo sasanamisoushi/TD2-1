@@ -254,13 +254,11 @@ GameScene::~GameScene() {
 
 void GameScene::Update() {
 
-	
-
+	fade_->Update();
 	switch (phase_) {
 	case GameScene::Phase::kFadeIn:
-		fade_->Update();
+		
 		if (fade_->isFinished()) {
-			fade_->Start(Fade::Status::FadeOut, 1.0f);
 			phase_ = Phase::kMain; // フェードイン完了 -> メインフェーズへ
 		}
 		break;
@@ -478,7 +476,6 @@ void GameScene::Update() {
 	} break;
 
 	case GameScene::Phase::kfadeOut: {
-
 		timer++;
 		if (timer > 120) {
 			isFinish = true;
@@ -512,8 +509,9 @@ void GameScene::Draw() {
 	}
 
 	// プレイヤーをフェード完了後に描画
-
-	player_->Draw();
+	if (phase_ == Phase::kMain) {
+		player_->Draw();
+	}
 
 	// 群れの描画
 	if (swimmyEvent_) {
