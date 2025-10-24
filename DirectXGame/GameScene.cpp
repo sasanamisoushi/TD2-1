@@ -47,10 +47,14 @@ void GameScene::Initialize(Score* score) {
 	bearModel_ = Model::CreateFromOBJ("bear", true);
 	bearLureModel_ = Model::CreateFromOBJ("bearLure", true);
 	weatherModel_ = Model::CreateFromOBJ("weather", true);
-	backgroundModel_ = Model::CreateFromOBJ("gameBackground");
+	
 
 	// 背景モデルの生成
-	backgroundModel_ = Model::CreateFromOBJ("gameBackground", true);
+	clearModel_ = Model::CreateFromOBJ("gameBackground", true);
+	rainModel_ = Model::CreateFromOBJ("gameBackground_rain", true);
+	meteoriteModel_ = Model::CreateFromOBJ("gameBackground_meteorite", true);
+	rainbowModel_ = Model::CreateFromOBJ("gameBackground_rainbow", true);
+	cloudModel_ = Model::CreateFromOBJ("gameBackground_storm", true);
 
 	score_ = score;
 
@@ -58,8 +62,7 @@ void GameScene::Initialize(Score* score) {
 	swimmyEvent_ = new SwimmyEvent();
 	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_);
 
-	
-	//クマイベントの初期化
+	// クマイベントの初期化
 	Vector3 bearLurePosition = {0, 7, 0}; // ルアーの描画位置
 	Vector3 bearPosition = {-12, 10, 0};  // 熊の描画位置
 
@@ -70,12 +73,11 @@ void GameScene::Initialize(Score* score) {
 
 	weatherEvent_ = new weatherEvent();
 	weatherEvent_->Initialize();
-	
 
 	// 背景オブジェクトのワールド座標設定
 	backgroundTransform_.Initialize();
-	backgroundTransform_.translation_ = {0.0f,5.0f, 10.0f}; // ← zを大きくしてt奥に
-	backgroundTransform_.scale_ = {5.0f, 3.0f, 10.0f};        // サイズ調整
+	backgroundTransform_.translation_ = {0.0f, 5.0f, 10.0f}; // ← zを大きくしてt奥に
+	backgroundTransform_.scale_ = {5.0f, 3.0f, 10.0f};       // サイズ調整
 
 	WorldTransformUpdate(backgroundTransform_);
 
@@ -250,6 +252,9 @@ GameScene::~GameScene() {
 	delete bearLureModel_;
 	delete weatherEvent_;
 	delete weatherModel_;
+
+	
+
 	for (auto& eventFish : events_) {
 
 		delete eventFish;
@@ -266,6 +271,9 @@ GameScene::~GameScene() {
 void GameScene::Update() {
 
 	fade_->Update();
+	float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
+	int caughtFishCount = 0;
+
 	switch (phase_) {
 	case GameScene::Phase::kFadeIn:
 
@@ -273,7 +281,7 @@ void GameScene::Update() {
 			phase_ = Phase::kMain; // フェードイン完了 -> メインフェーズへ
 		}
 		break;
-	case GameScene::Phase::kMain: {
+	case GameScene::Phase::kMain: 
 
 		player_->Update();
 		// 小さい魚
@@ -310,9 +318,8 @@ void GameScene::Update() {
 		if (weatherEvent_) {
 			weatherEvent_->Update();
 		}
-		
 
-		float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
+		
 
 		// --- すでにいる全ての魚に速度補正を再適用 ---
 		for (auto& fish : fishes_) {
@@ -332,7 +339,7 @@ void GameScene::Update() {
 		}
 
 		// 魚が取れた時
-		int caughtFishCount = 0;
+	
 		fishes_.remove_if([&caughtFishCount](Fish* fish) {
 			if (fish->IsLureCheck()) {
 				delete fish;
@@ -403,25 +410,12 @@ void GameScene::Update() {
 			SpawnFish();
 		}
 
-	if (Input::GetInstance()->TriggerKey(DIK_S)) {
-		isFinish = true;
-		score_->FileWrite();
-	}
-		CheckAllCollisions();
-		CheckBearCollisions();
-
-	// タイマー処理
-	if (isGame_) {
-		if (gameTimer_ > 0) {
-			gameTimer_--;
-		}
-		if (gameTimer_ <= 0) {
-			gameTimer_ = 0;
-			isGame_ = false;
+		if (Input::GetInstance()->TriggerKey(DIK_S)) {
 			isFinish = true;
 			score_->FileWrite();
 		}
 		CheckAllCollisions();
+		CheckBearCollisions();
 
 		// タイマー処理
 		if (isGame_) {
@@ -434,104 +428,141 @@ void GameScene::Update() {
 				isFinish = true;
 				score_->FileWrite();
 			}
-		}
+			CheckAllCollisions();
+
+			// タイマー処理
+			if (isGame_) {
+				if (gameTimer_ > 0) {
+					gameTimer_--;
+				}
+				if (gameTimer_ <= 0) {
+					gameTimer_ = 0;
+					isGame_ = false;
+					isFinish = true;
+					score_->FileWrite();
+				}
+			}
 
 #ifdef _DEBUG
 
-	if (Input::GetInstance()->TriggerKey(DIK_B)) {
-	  bearEvent_->isBearEvent_ = true;
-  }
-	
-		ImGui::Begin("Game Scene");
+			if (Input::GetInstance()->TriggerKey(DIK_B)) {
+				bearEvent_->isBearEvent_ = true;
+			}
 
-		int index = 0;
-		for (auto& fish : fishes_) {
-			const Vector3& pos = fish->GetWorldPosition();
+			ImGui::Begin("Game Scene");
 
-			ImGui::Text("Fish %d", index);
-			ImGui::SameLine();
-			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+			int index = 0;
+			for (auto& fish : fishes_) {
+				const Vector3& pos = fish->GetWorldPosition();
 
-			ImGui::Text("fishAABB min x,%f y,%f z,%f", fish->GetAABB().min.x, fish->GetAABB().min.y, fish->GetAABB().min.z);
-			ImGui::Text("fishAABB max x,%f y,%f z,%f", fish->GetAABB().max.x, fish->GetAABB().max.y, fish->GetAABB().max.z);
+				ImGui::Text("Fish %d", index);
+				ImGui::SameLine();
+				ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
 
-			ImGui::Text("playerPos %d", fish->fishHit_);
-			ImGui::Text("GetTimer %d", fish->fishGetTimer_);
-			index++;
-		}
+				ImGui::Text("fishAABB min x,%f y,%f z,%f", fish->GetAABB().min.x, fish->GetAABB().min.y, fish->GetAABB().min.z);
+				ImGui::Text("fishAABB max x,%f y,%f z,%f", fish->GetAABB().max.x, fish->GetAABB().max.y, fish->GetAABB().max.z);
 
-		for (auto& BigFish : BigFishes_) {
-			const Vector3& pos = BigFish->GetWorldPosition();
+				ImGui::Text("playerPos %d", fish->fishHit_);
+				ImGui::Text("GetTimer %d", fish->fishGetTimer_);
+				index++;
+			}
 
-			ImGui::Text("BigFish %d", index);
-			ImGui::SameLine();
-			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-			ImGui::Text("fishAABB min x,%f y,%f z,%f", BigFish->GetAABB().min.x, BigFish->GetAABB().min.y, BigFish->GetAABB().min.z);
-			ImGui::Text("fishAABB max x,%f y,%f z,%f", BigFish->GetAABB().max.x, BigFish->GetAABB().max.y, BigFish->GetAABB().max.z);
-			ImGui::Text("GetTimer %d", BigFish->fishGetTimer_);
-			index++;
-		}
+			for (auto& BigFish : BigFishes_) {
+				const Vector3& pos = BigFish->GetWorldPosition();
 
-		for (auto& Rubbishs : rubbishes_) {
-			const Vector3& pos = Rubbishs->GetWorldPosition();
+				ImGui::Text("BigFish %d", index);
+				ImGui::SameLine();
+				ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+				ImGui::Text("fishAABB min x,%f y,%f z,%f", BigFish->GetAABB().min.x, BigFish->GetAABB().min.y, BigFish->GetAABB().min.z);
+				ImGui::Text("fishAABB max x,%f y,%f z,%f", BigFish->GetAABB().max.x, BigFish->GetAABB().max.y, BigFish->GetAABB().max.z);
+				ImGui::Text("GetTimer %d", BigFish->fishGetTimer_);
+				index++;
+			}
 
-			ImGui::Text("Rubbish %d", index);
-			ImGui::SameLine();
-			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-			ImGui::Text("GetTimer %d", Rubbishs->fishGetTimer_);
-			index++;
-		}
+			for (auto& Rubbishs : rubbishes_) {
+				const Vector3& pos = Rubbishs->GetWorldPosition();
 
-		ImGui::Text("Spawned %d small fish and %d big fish \nand rubbish %d\n", smallCount, bigCount, rubbishCount);
+				ImGui::Text("Rubbish %d", index);
+				ImGui::SameLine();
+				ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+				ImGui::Text("GetTimer %d", Rubbishs->fishGetTimer_);
+				index++;
+			}
 
-		ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
-		ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
+			ImGui::Text("Spawned %d small fish and %d big fish \nand rubbish %d\n", smallCount, bigCount, rubbishCount);
 
-		ImGui::End();
-		ImGui::Begin("Event Fish ");
-		int eventIndex = 0;
-		for (auto& eventFish : events_) {
-			const Vector3& pos = eventFish->GetWorldPosition();
-			ImGui::Separator();
-			ImGui::Text("EventFish %d", eventIndex);
-			ImGui::SameLine();
-			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-			ImGui::Text("GetTimer: %d", eventFish->fishGetTimer_);
-			ImGui::Text("EventType: %d", static_cast<int>(eventFish->GetEventType())); // ← イベント種類確認用
-			eventIndex++;
-		}
-		ImGui::End();
+			ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
+			ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
 
-		ImGui::Begin("playerAABB ");
+			ImGui::End();
+			ImGui::Begin("Event Fish ");
+			int eventIndex = 0;
+			for (auto& eventFish : events_) {
+				const Vector3& pos = eventFish->GetWorldPosition();
+				ImGui::Separator();
+				ImGui::Text("EventFish %d", eventIndex);
+				ImGui::SameLine();
+				ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+				ImGui::Text("GetTimer: %d", eventFish->fishGetTimer_);
+				ImGui::Text("EventType: %d", static_cast<int>(eventFish->GetEventType())); // ← イベント種類確認用
+				eventIndex++;
+			}
+			ImGui::End();
 
-		ImGui::Text("playerAABB min x,%f y,%f z,%f", player_->GetAABB().min.x, player_->GetAABB().min.y, player_->GetAABB().min.z);
-		ImGui::Text("playerAABB max x,%f y,%f z,%f", player_->GetAABB().max.x, player_->GetAABB().max.y, player_->GetAABB().max.z);
-		ImGui::Text("playerPos %d", player_->playerHit_);
+			ImGui::Begin("playerAABB ");
 
-		ImGui::End();
+			ImGui::Text("playerAABB min x,%f y,%f z,%f", player_->GetAABB().min.x, player_->GetAABB().min.y, player_->GetAABB().min.z);
+			ImGui::Text("playerAABB max x,%f y,%f z,%f", player_->GetAABB().max.x, player_->GetAABB().max.y, player_->GetAABB().max.z);
+			ImGui::Text("playerPos %d", player_->playerHit_);
+
+			ImGui::End();
 #endif
-	} break;
+		}
+		break;
 
-	case GameScene::Phase::kfadeOut: {
+	case GameScene::Phase::kfadeOut: 
 		timer++;
 		if (timer > 120) {
 			isFinish = true;
 		}
-	} break;
-	default:
 		break;
+	
+	default:
+
+		break;
+	
+
 	}
 }
 
 void GameScene::Draw() {
-
-	
 
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
 	// 3Dモデル描画前処理
 	Model::PreDraw(dxCommon->GetCommandList());
 
+	switch (weatherEvent_->GetWeatherType()) {
+	case weatherEvent::WeatherType::Clear:
+		backgroundModel_ = clearModel_;
+		break;
+	case weatherEvent::WeatherType::Rain:
+		backgroundModel_ = rainModel_;
+		break;
+	case weatherEvent::WeatherType::Cloud:
+		backgroundModel_ = cloudModel_;
+		break;
+	case weatherEvent::WeatherType::Rainbow:
+		backgroundModel_ = rainbowModel_;
+		break;
+	case weatherEvent::WeatherType::Meteor:
+		backgroundModel_ = meteoriteModel_;
+		break;
+	default:
+		break;
+	}
+	
+	// 背景描画
 	backgroundModel_->Draw(backgroundTransform_, camera_);
 
 	weatherEvent_->Draw();
@@ -568,11 +599,6 @@ void GameScene::Draw() {
 	if (bearEvent_) {
 		bearEvent_->Draw();
 	}
-
-	
-
-		
-	
 
 	Model::PostDraw();
 
@@ -680,14 +706,12 @@ void GameScene::CheckAllCollisions() {
 	}
 }
 
-void GameScene::CheckBearCollisions() 
-{ 
-	AABB aabb1, aabb2; 
+void GameScene::CheckBearCollisions() {
+	AABB aabb1, aabb2;
 	// 熊の座標
 	aabb1 = bearEvent_->GetAABB();
 
-	for (Fish* fish : fishes_)
-	{
+	for (Fish* fish : fishes_) {
 		aabb2 = fish->GetAABB();
 
 		// 熊
@@ -706,8 +730,7 @@ void GameScene::CheckBearCollisions()
 	}
 
 	// 自キャラと大きい魚全ての当たり判定
-	for (BigFish* Bigfish : BigFishes_) 
-	{
+	for (BigFish* Bigfish : BigFishes_) {
 		aabb2 = Bigfish->GetAABB();
 		// 熊
 		// ルアーと魚が当たっているとき

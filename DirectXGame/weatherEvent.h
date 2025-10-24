@@ -52,7 +52,7 @@ private:
 
 	bool isActive_ = false;
 
-	//最初は雨
+	//最初は晴れ
 	WeatherType currentWeather_ = WeatherType::Clear;
 	float timer_ = 0.0f;
 
