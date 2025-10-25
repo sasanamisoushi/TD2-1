@@ -7,10 +7,10 @@
 class SwimmyEvent {
 public:
 	// 初期化
-	void Initialize(Model* fishModel, Model* leaderModel, Camera* camera);
+	void Initialize(Model* fishModel, Model* leaderModel, Camera* camera, Score* score);
 
 	// 更新処理
-	void Update();
+	void Update(Player* player);
 
 	// 描画処理
 	void Draw();
@@ -48,10 +48,12 @@ private:
 	bool isActive_ = false;
 
 	//群れの存在時間カウンタ
-	int groupTimer_ = 0;
+	float groupTimer_ = 0;
 
 	//群れが存在する最大時間
-	int groupLifetime_ = 600;
+	float groupLifetime_ = 60.0f;
 
 	std::function<void()> onEventEnd_;
+
+	Score* score_ = nullptr;
 };
