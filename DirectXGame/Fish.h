@@ -1,6 +1,7 @@
 #pragma once
 #include "KamataEngine.h"
 #include "math.h"
+#include "Score.h"
 
 using namespace KamataEngine;
 
@@ -89,6 +90,27 @@ public:
 
 	int fishHit_ = false;
 
+	// スイミーイベントの時だけの処理
+	bool isSwimmyFish_ = false;
+
+	
+
+	bool IsAlive() const { return isAlive_; }
+	
+	void SetIsAlive(bool alive) { isAlive_ = alive; }
+
+	void SetScore(Score* score) { score_ = score; }
+	Score* GetScore() const { return score_; }
+	int GetPoint() const { return point_; }
+
+
+	// 魚の見た目の向きを更新する関数
+	void SetMoveDirectionX(float dirX);
+
+	// 魚の回転を直接設定する関数
+	void SetRotationY(float rotationY);
+
+
 private:
 	// ワールド変換データ
 	KamataEngine::WorldTransform worldTransform_;
@@ -147,4 +169,7 @@ private:
 	 float baseSpeed_ = 0.05f;      // 通常の移動速度
 	float speedMultiplier_ = 0.01f; // 天気などによる速度補正
 
+	// 生きてる or 釣られた
+	 bool isAlive_ = true;
+	
 };

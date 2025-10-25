@@ -60,7 +60,7 @@ void GameScene::Initialize(Score* score) {
 
 	// イベントの初期化
 	swimmyEvent_ = new SwimmyEvent();
-	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_);
+	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_,score_);
 
 	// クマイベントの初期化
 	Vector3 bearLurePosition = {0, 7, 0}; // ルアーの描画位置
@@ -306,7 +306,7 @@ void GameScene::Update() {
 
 		// 群れの更新
 		if (swimmyEvent_) {
-			swimmyEvent_->Update();
+			swimmyEvent_->Update(player_);
 		}
 
 		// クマの更新
@@ -809,7 +809,7 @@ void GameScene::SpawnFish() {
 	float eventChance = 0.05f; // 5%の確率でイベント魚出現
 	if (r < eventChance && events_.empty()) {
 		auto* eventFish = new EventFish();
-		eventFish->Initialize(swimmyModel_, &camera_, nullptr, fishPos, moveRight);
+		eventFish->Initialize(swimmyModel_, &camera_, score_, fishPos, moveRight);
 
 		eventFish->SetOnTriggered([this](const Vector3& centerPos, EventFish::FishEventType type) {
 			switch (type) {

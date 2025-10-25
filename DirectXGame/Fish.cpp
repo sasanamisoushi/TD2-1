@@ -1,14 +1,13 @@
 #include "Fish.h"
-#include <cstdlib>
-#include <cassert>
-#include <numbers>
 #include "Player.h"
-#include "bearEvent.h"
 #include "Score.h"
-
+#include "bearEvent.h"
+#include <cassert>
+#include <cstdlib>
+#include <numbers>
 
 void Fish::Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight, int getTimer) {
-  
+
 	// NULLポインタチェック
 	assert(model);
 	// モデル
@@ -21,14 +20,12 @@ void Fish::Initialize(Model* model, Camera* camera, Score* score, const Vector3&
 
 	targetPos_ = targetPos;
 
-
 	moveRight_ = moveRight;
-  
+
 	score_ = score;
 
-	
 	Vector3 spawnPos;
-	//出現開始位置
+	// 出現開始位置
 	if (rand() % 2 == 0) {
 		spawnPos = {moveRight ? -15.0f : 15.0f, targetPos_.y, targetPos_.z};
 	} else {
@@ -43,14 +40,14 @@ void Fish::Initialize(Model* model, Camera* camera, Score* score, const Vector3&
 	// 出現完了後の最終サイズ
 	finalScale_ = {0.2f, 0.2f, 0.2f};
 
-	//画面の範囲
+	// 画面の範囲
 	const float screenLeft = -14.0f;
 	const float screenRight = 14.0f;
 
 	// 泳ぐ範囲ランダム
 	float swimRange = static_cast<float>(rand() % 5 + 4);
 
-	//出現ランダム
+	// 出現ランダム
 	float minPos = screenLeft + swimRange;
 	float maxPos = screenRight - swimRange;
 	float randomPos = minPos + static_cast<float>(rand()) / RAND_MAX * (maxPos - minPos);
@@ -61,23 +58,21 @@ void Fish::Initialize(Model* model, Camera* camera, Score* score, const Vector3&
 
 	worldTransform_.translation_.x = randomPos;
 
-	
 	// 泳ぐ上限
 	leftLimit_ = worldTransform_.translation_.x - swimRange;
 	rigdhtLimit_ = worldTransform_.translation_.x + swimRange;
 
-	//移動方向
+	// 移動方向
 	direction_ = moveRight ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(-1.0f, 0.0f, 0.0f);
 
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 
 	// 角度調整
-	if (moveRight)
-	{
-		//右
+	if (moveRight) {
+		// 右
 		worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	} else {
-		//左
+		// 左
 		worldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 	}
 
@@ -100,11 +95,18 @@ void Fish::Update() {
 		break;
 
 	case FishState::Normal:
-		// 移動
-		worldTransform_.translation_.x += direction_.x * speedMultiplier_;
 
+		// イベント中は移動も方向反転もしない
+		if (inEvent_) {
+			// SwimmyEvent 側が SetRotationY / SetMoveDirectionX を管理
+			worldTransform_.translation_.x += direction_.x * speedMultiplier_;
+			break;
+		}
+		// 移動
+			worldTransform_.translation_.x += direction_.x * speedMultiplier_;
+		
 		// 端で反転（ヒステリシスを持たせる）
-		if (!inEvent_) {
+		
 			if (worldTransform_.translation_.x > rigdhtLimit_ + 0.1f) {
 				direction_.x = -1.0f; // 左へ
 				velocity_.x = direction_.x * speedMultiplier_;
@@ -116,21 +118,21 @@ void Fish::Update() {
 				worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f; // 右向きに回転
 				worldTransform_.translation_.x = leftLimit_;
 			}
-		}
+		
+
 		break;
 	}
-	
+
 	// 行列更新
 	WorldTransformUpdate(worldTransform_);
 }
 
-void Fish::Draw() { 
+void Fish::Draw() {
 	// 3Dモデル描画前処理
-	model_->Draw(worldTransform_, * camera_);
+	model_->Draw(worldTransform_, *camera_);
 }
 
-KamataEngine::Vector3 Fish::GetWorldPosition() 
-{
+KamataEngine::Vector3 Fish::GetWorldPosition() {
 	// ワールド座標を入れる変数
 	KamataEngine::Vector3 worldPos;
 	// ワールド行列の平行移動成分取得
@@ -141,8 +143,7 @@ KamataEngine::Vector3 Fish::GetWorldPosition()
 	return worldPos;
 }
 
-AABB Fish::GetAABB() 
-{
+AABB Fish::GetAABB() {
 	KamataEngine::Vector3 worldPos = GetWorldPosition();
 
 	AABB aabb;
@@ -153,18 +154,26 @@ AABB Fish::GetAABB()
 	return aabb;
 }
 
-void Fish::OnCollision(Player* player) 
-{
+void Fish::OnCollision(Player* player) {
+	if (!isAlive_) {
+		return;
+	}
+
 	// ルアーと当たっているとき
 	(void)player;
 	// ゲットタイマーを減らす
 	fishGetTimer_--;
 	// ゲットタイマーが0になったらゲット
-	if (fishGetTimer_ < 0) 
-	{
+	if (fishGetTimer_ < 0) {
 		isLureCheck_ = true;
 		score_->AddScoreCombo(point_);
-		player->Reset();
+		if (isSwimmyFish_) {
+
+			isAlive_ = false;
+		} else {
+
+			player->Reset();
+		}
 	}
 }
 
@@ -176,30 +185,29 @@ void Fish::OnCollisionBear(bearEvent* bearEvent) {
 	bearEvent->Reset();
 }
 
-void Fish::OutCollision()
-{ 
+void Fish::OutCollision() {
 	// ルアーと当たっていないとき
 	// ゲットタイマーをリセット
-	fishGetTimer_ = resetTimer_; 
+	fishGetTimer_ = resetTimer_;
 }
 
-void Fish::OutCollisionBear()
-{
+void Fish::OutCollisionBear() {}
 
-}
+void Fish::SetTexture(const std::string& filePath) { textureHandle_ = TextureManager::Load(filePath); }
 
-void Fish::SetTexture(const std::string& filePath) { 
-	
-	textureHandle_ = TextureManager::Load(filePath);
+float Fish::GetMoveDirectionY() const { return moveRight_ ? 1.0f : -1.0f; }
 
-}
-
-float Fish::GetMoveDirectionY() const { 
-	return moveRight_ ? 1.0f : -1.0f; 
-}
-
-void Fish::SetWorldPosition(const Vector3& pos) {
-	worldTransform_.translation_ = pos; 
-}
+void Fish::SetWorldPosition(const Vector3& pos) { worldTransform_.translation_ = pos; }
 
 void Fish::SetSpeedMultiplier(float multiplier) { speedMultiplier_ = multiplier; }
+
+void Fish::SetMoveDirectionX(float dirX) {
+	direction_.x = dirX;
+
+}
+
+void Fish::SetRotationY(float rotationY) {
+
+	worldTransform_.rotation_.y = rotationY;
+
+}
