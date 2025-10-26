@@ -805,9 +805,25 @@ void GameScene::SpawnFish() {
 	// === 出現確率を決定 ===
 	float r = static_cast<float>(rand()) / RAND_MAX;
 
+	
+	float eventChance = 0.15f; // 15%の確率でイベント魚出現
+
+	bool otherEventActive = false;
+	// クマイベントがアクティブ
+	if (bearEvent_ && bearEvent_->isBearEvent_) {
+		otherEventActive = true;
+	}
+	// 群れイベントがアクティブ (swimmyEvent_ に IsEventActive() があると仮定)
+	if (swimmyEvent_ && swimmyEvent_->IsEventActive()) {
+		otherEventActive = true;
+	}
+	// 天候イベントがアクティブ (weatherEvent_ に IsEventActive() があると仮定)
+	if (weatherEvent_ && weatherEvent_->IsEventActive()) {
+		otherEventActive = true;
+	}
+
 	// --- イベント魚出現チェック（独立確率） ---
-	float eventChance = 0.05f; // 5%の確率でイベント魚出現
-	if (r < eventChance && events_.empty()) {
+	if (r < eventChance && events_.empty() && !otherEventActive) {
 		auto* eventFish = new EventFish();
 
 		Model* eventModel = nullptr;
@@ -835,6 +851,7 @@ void GameScene::SpawnFish() {
 		eventFish->SetOnTriggered([this](const Vector3& centerPos, EventFish::FishEventType type) {
 			switch (type) {
 			case EventFish::FishEventType::SwimmyGroup:
+				ClearAllFish();
 				swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
 				break;
 			case EventFish::FishEventType::BearHelp:
