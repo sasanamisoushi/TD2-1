@@ -24,6 +24,9 @@ public:
 	//群れが存在するか
 	bool HasFish() const { return !fishes_.empty(); }
 
+	// イベントがアクティブかどうかを返す関数を追加
+	bool IsEventActive() const { return isActive_; }
+
 	//イベント全体をリセット
 	void Reset();
 
@@ -58,4 +61,6 @@ private:
 	std::function<void()> onEventEnd_;
 
 	Score* score_ = nullptr;
+
+	
 };

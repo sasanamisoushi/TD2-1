@@ -38,7 +38,7 @@ void bearEvent::Initialize(
 	// タイマー
 	timer_ = 0.0f;
 	// 持続時間
-	duration_ = 120.0f;
+	duration_ = 50.0f;
 }
 
 void bearEvent::Update() 
