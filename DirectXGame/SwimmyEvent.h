@@ -30,6 +30,8 @@ public:
 	 // ★ イベント終了時に呼ばれるコールバック
 	void SetOnEventEnd(std::function<void()> callback) { onEventEnd_ = callback; }
 
+	~SwimmyEvent();
+
 private:
 
 	std::vector<Fish*> fishes_;

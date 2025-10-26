@@ -146,40 +146,40 @@ void SwimmyEvent::Update(Player* player) {
 		}
 
 
-		Vector3 fishPos = fish->GetWorldPosition();
-		Vector3 playerPos = player->GetWorldPosition(); // Playerに関数がある前提
+		//Vector3 fishPos = fish->GetWorldPosition();
+		//Vector3 playerPos = player->GetWorldPosition(); // Playerに関数がある前提
 
-		float dx = fishPos.x - playerPos.x;
-		float dy = fishPos.y - playerPos.y;
-		float dz = fishPos.z - playerPos.z;
-		float distanceSq = dx * dx + dy * dy + dz * dz;
+		//float dx = fishPos.x - playerPos.x;
+		//float dy = fishPos.y - playerPos.y;
+		//float dz = fishPos.z - playerPos.z;
+		//float distanceSq = dx * dx + dy * dy + dz * dz;
 
-		const float collisionRadius = 0.8f; // ぶつかったとみなす距離
-		if (distanceSq < collisionRadius * collisionRadius) {
-			// ★ Fish側の反応を呼ぶ
-			fish->OnCollision(player);
+		//const float collisionRadius = 0.8f; // ぶつかったとみなす距離
+		//if (distanceSq < collisionRadius * collisionRadius) {
+		//	// ★ Fish側の反応を呼ぶ
+		//	fish->OnCollision(player);
 
-			// ★ SwimmyEvent魚専用スコア処理
-			if (fish->isSwimmyFish_) {
+		//	// ★ SwimmyEvent魚専用スコア処理
+		//	if (fish->isSwimmyFish_) {
 
-				 // イベント魚は通常より高い得点
-				int eventBonus = 200;
+		//		 // イベント魚は通常より高い得点
+		//		int eventBonus = 200;
 
-				if(fish->GetScore()) {
-					// イベントボーナス込みで単発加算
-					fish->GetScore()->AddScore(fish->GetPoint() + eventBonus);
-				}
-				// イベント魚を消す
-				fish->SetIsAlive(false);
+		//		if(fish->GetScore()) {
+		//			// イベントボーナス込みで単発加算
+		//			fish->GetScore()->AddScore(fish->GetPoint() + eventBonus);
+		//		}
+		//		// イベント魚を消す
+		//		fish->SetIsAlive(false);
 
-				// 特殊演出やイベント終了をトリガー
-				if (fish == fishes_.front() && onEventEnd_) {
-					onEventEnd_();
-				}
-			}
-		}
+		//		// 特殊演出やイベント終了をトリガー
+		//		if (fish == fishes_.front() && onEventEnd_) {
+		//			onEventEnd_();
+		//		}
+		//	}
+		//}
 
-		
+		//
 	}
 
 	if (!fishes_.empty() && !fishes_.front()->IsAlive()) {
@@ -260,12 +260,15 @@ void SwimmyEvent::SpawnFishGroup(const Vector3& centerPos, int count, float spre
 	const float OUT_LIMIT_X = 17.0f;                       // 画面端X
 	float spawnX = moveRight ? -OUT_LIMIT_X : OUT_LIMIT_X; // 右向きなら左端から、左向きなら右端から
 	Vector3 spawnPos = centerPos;
+	spawnPos.z = 0.0f;
 	spawnPos.x = spawnX;
 
-	leaderFish->Initialize(leaderModel_, camera_,score_, centerPos, moveRight, 30);
+	leaderFish->Initialize(leaderModel_, camera_, score_, spawnPos, moveRight, 30);
 
 	//イベント魚として設定
 	leaderFish->SetEventType(FishEventType::swmmyFish);
+
+	leaderFish->isSwimmyFish_ = true;
 
 	leaderFish->SetInitialOffset({0, 0, 0});
 
@@ -282,7 +285,8 @@ void SwimmyEvent::SpawnFishGroup(const Vector3& centerPos, int count, float spre
 		float offsetZ = (float(rand()) / RAND_MAX - 0.5f) * 4.0f; // ±2の範囲
 
 		Vector3 offset = {offsetX, offsetY, offsetZ};
-		spawnPos = centerPos + offset;
+		spawnPos = {0.0f + offsetX, centerPos.y + offsetY, 0.0f + offsetZ};
+		spawnPos.x = spawnX;
 
 		Fish* fish = new Fish();
 		fish->Initialize(fishGroupModel_, camera_, score_, spawnPos, moveRight, 30);
@@ -322,4 +326,13 @@ void SwimmyEvent::Reset() {
 	#ifdef _DEBUG
 	OutputDebugStringA("[SwimmyEvent] Reset() called\n");
 #endif
+}
+
+SwimmyEvent::~SwimmyEvent() {
+// リストに残っている全ての Fish オブジェクトを削除
+    for (Fish* fish : fishes_) {
+        delete fish;
+    }
+    fishes_.clear();
+
 }

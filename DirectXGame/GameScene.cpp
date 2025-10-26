@@ -381,7 +381,7 @@ void GameScene::Update() {
 					// 通常の魚を消す
 					ClearAllFish();
 					// --- イベント群れを生成 ---
-					swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
+					swimmyEvent_->SpawnFishGroup(centerPos, 20, 3.0f);
 					break;
 				case EventFish::FishEventType::BearHelp:
 					bearEvent_->isBearEvent_ = true;
@@ -809,7 +809,28 @@ void GameScene::SpawnFish() {
 	float eventChance = 0.05f; // 5%の確率でイベント魚出現
 	if (r < eventChance && events_.empty()) {
 		auto* eventFish = new EventFish();
-		eventFish->Initialize(swimmyModel_, &camera_, score_, fishPos, moveRight);
+
+		Model* eventModel = nullptr;
+		EventFish::FishEventType eventType{};
+
+		int eventTypeRand = rand() % 3; // 3種類からランダム
+		switch (eventTypeRand) {
+		case 0:
+			eventModel = swimmyModel_;
+			eventType = EventFish::FishEventType::SwimmyGroup;
+			break;
+		case 1:
+			eventModel = bearModel_;
+			eventType = EventFish::FishEventType::BearHelp;
+			break;
+		case 2:
+			eventModel = weatherModel_;
+			eventType = EventFish::FishEventType::WeatherChange;
+			break;
+		}
+		eventFish->Initialize(eventModel, &camera_, score_, fishPos, moveRight);
+		// イベントの種類を設定
+		eventFish->SetEventType(eventType);
 
 		eventFish->SetOnTriggered([this](const Vector3& centerPos, EventFish::FishEventType type) {
 			switch (type) {
