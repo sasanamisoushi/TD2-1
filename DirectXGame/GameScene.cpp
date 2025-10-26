@@ -806,7 +806,7 @@ void GameScene::SpawnFish() {
 	float r = static_cast<float>(rand()) / RAND_MAX;
 
 	
-	float eventChance = 0.05f; // 5%の確率でイベント魚出現
+	float eventChance = 0.15f; // 15%の確率でイベント魚出現
 
 	bool otherEventActive = false;
 	// クマイベントがアクティブ
@@ -851,6 +851,7 @@ void GameScene::SpawnFish() {
 		eventFish->SetOnTriggered([this](const Vector3& centerPos, EventFish::FishEventType type) {
 			switch (type) {
 			case EventFish::FishEventType::SwimmyGroup:
+				ClearAllFish();
 				swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
 				break;
 			case EventFish::FishEventType::BearHelp:

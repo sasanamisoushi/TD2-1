@@ -22,10 +22,7 @@ void EventFish::OnCollision(Player* player) {
 		score_->AddScore(point_);
 	}
 
-	// イベント発生（群れを出すなど）
-	if (onTriggered_) {
-		onTriggered_(GetWorldPosition(), eventType_);
-	}
+	
 }
 
 AABB EventFish::GetAABB() {
