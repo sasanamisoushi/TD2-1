@@ -1,9 +1,17 @@
 #pragma once
 #include "KamataEngine.h"
 #include "Score.h"
+#include "Fade.h"
 
 class GameClearScene {
 public:
+
+	// フェード
+	enum class Phase { 
+		kFadeIn, 
+		kMain, 
+		kfadeOut 
+	};
 
 	~GameClearScene();
 
@@ -23,5 +31,13 @@ private:
 	// 終了フラグ
 	bool isFinish = false;
 
+	//スコア
 	Score* score_ = nullptr;
+
+	// フェード
+	Fade* fade_ = nullptr;
+	Phase phase_ = Phase::kFadeIn;
+
+	// フェード用
+	int timer;
 };
