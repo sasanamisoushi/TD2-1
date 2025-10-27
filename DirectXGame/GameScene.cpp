@@ -514,10 +514,10 @@ void GameScene::Update() {
 #endif
 		}
 		break;
-	}
+	
 
 	case GameScene::Phase::kfadeOut: 
-	{
+	
 		timer++;
 		if (timer > 120) 
 		{
