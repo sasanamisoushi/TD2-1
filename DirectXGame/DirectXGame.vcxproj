@@ -107,6 +107,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bearEvent.cpp" />
+    <ClCompile Include="BGM.cpp" />
     <ClCompile Include="BigFish.cpp" />
     <ClCompile Include="EventFish.cpp" />
     <ClCompile Include="Fade.cpp" />
@@ -199,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bearEvent.h" />
+    <ClInclude Include="BGM.h" />
     <ClInclude Include="BigFish.h" />
     <ClInclude Include="EventFish.h" />
     <ClInclude Include="Fade.h" />

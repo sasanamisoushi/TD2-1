@@ -2,6 +2,7 @@
 #include "Fish.h"
 #include "KamataEngine.h"
 #include "math.h"
+#include "BGM.h"
 
 class weatherEvent {
 public:
@@ -42,6 +43,8 @@ public:
 
 	bool WasRainJustEnded() const;
 
+	bool isActive_ = false;
+
 private:
 	// 天気変更
 	void ChangeWeather(WeatherType newWeather);
@@ -50,8 +53,6 @@ private:
 
 	// カメラ
 	Camera* camera_ = nullptr;
-
-	bool isActive_ = false;
 
 	//最初は晴れ
 	WeatherType currentWeather_ = WeatherType::Clear;
@@ -67,4 +68,16 @@ private:
 
 	bool wasRaining_ = false;
 	bool rainJustEnded_ = false;
+
+	BGM* bgm_ = nullptr;
+
+	uint32_t bgmBox_; // 四つのBGMを切り替えて流す箱
+
+	uint32_t rainBgm_; // 雨の時のBGM
+
+	uint32_t rainbowBgm_; // 虹の時
+
+	uint32_t cloudBgm_; // 雲の時
+
+	uint32_t meteorBgm_; // 隕石の時 
 };

@@ -143,7 +143,8 @@ AABB Player::GetAABB(){
 	return aabb;
 }
 
-void Player::Reset() {
+void Player::Reset() 
+{
 	KamataEngine::Vector3 acceleration = {};
 	worldTransform_.translation_ = resetPos_;
 	isKeyPush = false;

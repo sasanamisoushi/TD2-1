@@ -10,6 +10,8 @@ void GameClearScene::Initialize(Score* score)
 { 
 	//スコア
 	score_ = score; 
+	bgm_ = new BGM();
+	bgm_->Initialize();
 
 	// フェードとフェード管理の初期化
 	fade_ = new Fade();
@@ -19,13 +21,19 @@ void GameClearScene::Initialize(Score* score)
 	phase_ = Phase::kFadeIn;
 
 	timer = 0;
+
+	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/All the Fixings.mp3");
+
 }
 
-GameClearScene::~GameClearScene() {}
+GameClearScene::~GameClearScene()
+{
+	delete bgm_; 
+}
 
-
-void GameClearScene::Update() {
-
+void GameClearScene::Update() 
+{
+	bgm_->BGMPlay(gameClearBgmHandle_);
 	fade_->Update();
 	switch (phase_) {
 	case GameClearScene::Phase::kFadeIn:
@@ -36,6 +44,7 @@ void GameClearScene::Update() {
 	case GameClearScene::Phase::kMain:
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			isFinish = true;
+      bgm_->BGMStop();
 		}
 		break;
 	case GameClearScene::Phase::kfadeOut:

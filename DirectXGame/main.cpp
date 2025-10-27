@@ -20,7 +20,7 @@ enum class Scene {
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// エンジンの初期化
-	KamataEngine::Initialize(L"TD2");
+	KamataEngine::Initialize(L"2142_気まぐれフィッシング");
 
 	// 描画のためのDirectXCommmonインスタンスの取得
 	DirectXCommon* dxCommmon = DirectXCommon::GetInstance();

@@ -11,6 +11,7 @@
 #include "bearEvent.h"
 #include "weatherEvent.h"
 #include "Fade.h"
+#include "BGM.h"
 
 class GameScene 
 {
@@ -41,12 +42,10 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
-
 	int getTimer_;
 
 	void SpawnFish();
 
-	
 
 	void ClearAllFish();
 
@@ -71,6 +70,7 @@ private:
 	SwimmyEvent* swimmyEvent_=nullptr;
 	bearEvent* bearEvent_=nullptr;
 	weatherEvent* weatherEvent_=nullptr;
+	BGM* bgm_ = nullptr;
 
 	
 	// フェード
@@ -159,6 +159,7 @@ private:
 	//雲背景
 	Model* cloudModel_ = nullptr;
 
+
 	//魚の最大数
 	int totalFishMax;
 
@@ -167,5 +168,8 @@ private:
 
 
 	float weatherMultiplier;
+  
+  // プレイ中のBGM
+	uint32_t gamePlayBgmHandle_; 
 	
 };

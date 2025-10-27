@@ -1,6 +1,7 @@
 #pragma once
 #include "KamataEngine.h"
 #include "Fade.h"
+#include "BGM.h"
 
 class TitleScene {
 public:
@@ -36,7 +37,11 @@ private:
 	Fade* fade_ = nullptr;
 	Phase phase_ = Phase::kFadeIn;
 
+	BGM* bgm_ = nullptr;
+
 	//フェード用
 	int timer;
+
+	uint32_t titleBgmHandle_; // タイトルのBGM
 
 };
