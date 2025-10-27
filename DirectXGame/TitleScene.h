@@ -44,4 +44,8 @@ private:
 
 	uint32_t titleBgmHandle_; // タイトルのBGM
 
+	//タイトル画像
+	//KamataEngine::Sprite* titleSprite_ =nullptr;
+
+
 };
