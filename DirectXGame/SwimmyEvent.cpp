@@ -312,7 +312,7 @@ void SwimmyEvent::Reset() {
 	fishes_.clear();
 	isActive_ = false;
 	groupTimer_ = 0;
-
+	
 
 
 
