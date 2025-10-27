@@ -12,12 +12,16 @@ void TitleScene::Initialize() {
 
 	timer = 0;
 
+	bgm_ = new BGM();
+	bgm_->Initialize();
+
 }
 
 void TitleScene::Update() {
 	
 
 	fade_->Update();
+	bgm_->titleBGMPlay();
 	switch (phase_) {
 	case TitleScene::Phase::kFadeIn:
 		if (fade_->isFinished()) {
@@ -27,6 +31,7 @@ void TitleScene::Update() {
 	case TitleScene::Phase::kMain:
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			isFinish = true;
+			bgm_->titleBGMStop();
 		}
 
 		break;
@@ -68,4 +73,5 @@ void TitleScene::Draw() {
 	Sprite::PostDraw();
 }
 
-TitleScene::~TitleScene() {}
+TitleScene::~TitleScene() 
+{ delete bgm_; }

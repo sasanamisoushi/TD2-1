@@ -9,14 +9,23 @@ using namespace KamataEngine;
 void GameClearScene::Initialize(Score* score) 
 { 
 	score_ = score; 
+	bgm_ = new BGM();
+	bgm_->Initialize();
 }
 
-GameClearScene::~GameClearScene() {}
+GameClearScene::~GameClearScene()
+{
+	delete bgm_; 
+}
 
 
-void GameClearScene::Update() {
-	if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+void GameClearScene::Update() 
+{
+	bgm_->gameClearBGMPlay();
+	if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) 
+	{
 		isFinish = true;
+		bgm_->gameClearBGMStop();
 	}
 
 #ifdef _DEBUG

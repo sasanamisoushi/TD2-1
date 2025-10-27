@@ -71,6 +71,9 @@ void GameScene::Initialize(Score* score) {
 	weatherEvent_ = new weatherEvent();
 	weatherEvent_->Initialize();
 	
+	// BGMの初期化
+	bgm_ = new BGM();
+	bgm_->Initialize();
 
 	// 背景オブジェクトのワールド座標設定
 	backgroundTransform_.Initialize();
@@ -250,6 +253,7 @@ GameScene::~GameScene() {
 	delete bearLureModel_;
 	delete weatherEvent_;
 	delete weatherModel_;
+	delete bgm_;
 	for (auto& eventFish : events_) {
 
 		delete eventFish;
@@ -266,6 +270,7 @@ GameScene::~GameScene() {
 void GameScene::Update() {
 
 	fade_->Update();
+	bgm_->gamePlayBGMPlay();
 	switch (phase_) {
 	case GameScene::Phase::kFadeIn:
 
@@ -310,7 +315,6 @@ void GameScene::Update() {
 		if (weatherEvent_) {
 			weatherEvent_->Update();
 		}
-		
 
 		float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
 
@@ -403,119 +407,116 @@ void GameScene::Update() {
 			SpawnFish();
 		}
 
-	if (Input::GetInstance()->TriggerKey(DIK_S)) {
-		isFinish = true;
-		score_->FileWrite();
-	}
+		if (Input::GetInstance()->TriggerKey(DIK_S)) {
+			isFinish = true;
+			score_->FileWrite();
+			bgm_->gamePlayBGMStop();
+		}
 		CheckAllCollisions();
 		CheckBearCollisions();
 
-	// タイマー処理
-	if (isGame_) {
-		if (gameTimer_ > 0) {
-			gameTimer_--;
-		}
-		if (gameTimer_ <= 0) {
-			gameTimer_ = 0;
-			isGame_ = false;
-			isFinish = true;
-			score_->FileWrite();
-		}
-		CheckAllCollisions();
-
 		// タイマー処理
-		if (isGame_) {
-			if (gameTimer_ > 0) {
+		if (isGame_)
+		{
+			if (gameTimer_ > 0)
+			{
 				gameTimer_--;
 			}
-			if (gameTimer_ <= 0) {
+			if (gameTimer_ <= 0)
+			{
 				gameTimer_ = 0;
 				isGame_ = false;
 				isFinish = true;
 				score_->FileWrite();
+				bgm_->gamePlayBGMStop();
 			}
-		}
+			CheckAllCollisions();
 
 #ifdef _DEBUG
 
-	if (Input::GetInstance()->TriggerKey(DIK_B)) {
-	  bearEvent_->isBearEvent_ = true;
-  }
-	
-		ImGui::Begin("Game Scene");
+			if (Input::GetInstance()->TriggerKey(DIK_B)) {
+				bearEvent_->isBearEvent_ = true;
+			}
 
-		int index = 0;
-		for (auto& fish : fishes_) {
-			const Vector3& pos = fish->GetWorldPosition();
+			ImGui::Begin("Game Scene");
 
-			ImGui::Text("Fish %d", index);
-			ImGui::SameLine();
-			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+			int index = 0;
+			for (auto& fish : fishes_) {
+				const Vector3& pos = fish->GetWorldPosition();
 
-			ImGui::Text("fishAABB min x,%f y,%f z,%f", fish->GetAABB().min.x, fish->GetAABB().min.y, fish->GetAABB().min.z);
-			ImGui::Text("fishAABB max x,%f y,%f z,%f", fish->GetAABB().max.x, fish->GetAABB().max.y, fish->GetAABB().max.z);
+				ImGui::Text("Fish %d", index);
+				ImGui::SameLine();
+				ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
 
-			ImGui::Text("playerPos %d", fish->fishHit_);
-			ImGui::Text("GetTimer %d", fish->fishGetTimer_);
-			index++;
-		}
+				ImGui::Text("fishAABB min x,%f y,%f z,%f", fish->GetAABB().min.x, fish->GetAABB().min.y, fish->GetAABB().min.z);
+				ImGui::Text("fishAABB max x,%f y,%f z,%f", fish->GetAABB().max.x, fish->GetAABB().max.y, fish->GetAABB().max.z);
 
-		for (auto& BigFish : BigFishes_) {
-			const Vector3& pos = BigFish->GetWorldPosition();
+				ImGui::Text("playerPos %d", fish->fishHit_);
+				ImGui::Text("GetTimer %d", fish->fishGetTimer_);
+				index++;
+			}
 
-			ImGui::Text("BigFish %d", index);
-			ImGui::SameLine();
-			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-			ImGui::Text("fishAABB min x,%f y,%f z,%f", BigFish->GetAABB().min.x, BigFish->GetAABB().min.y, BigFish->GetAABB().min.z);
-			ImGui::Text("fishAABB max x,%f y,%f z,%f", BigFish->GetAABB().max.x, BigFish->GetAABB().max.y, BigFish->GetAABB().max.z);
-			ImGui::Text("GetTimer %d", BigFish->fishGetTimer_);
-			index++;
-		}
+			for (auto& BigFish : BigFishes_) {
+				const Vector3& pos = BigFish->GetWorldPosition();
 
-		for (auto& Rubbishs : rubbishes_) {
-			const Vector3& pos = Rubbishs->GetWorldPosition();
+				ImGui::Text("BigFish %d", index);
+				ImGui::SameLine();
+				ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+				ImGui::Text("fishAABB min x,%f y,%f z,%f", BigFish->GetAABB().min.x, BigFish->GetAABB().min.y, BigFish->GetAABB().min.z);
+				ImGui::Text("fishAABB max x,%f y,%f z,%f", BigFish->GetAABB().max.x, BigFish->GetAABB().max.y, BigFish->GetAABB().max.z);
+				ImGui::Text("GetTimer %d", BigFish->fishGetTimer_);
+				index++;
+			}
 
-			ImGui::Text("Rubbish %d", index);
-			ImGui::SameLine();
-			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-			ImGui::Text("GetTimer %d", Rubbishs->fishGetTimer_);
-			index++;
-		}
+			for (auto& Rubbishs : rubbishes_) {
+				const Vector3& pos = Rubbishs->GetWorldPosition();
 
-		ImGui::Text("Spawned %d small fish and %d big fish \nand rubbish %d\n", smallCount, bigCount, rubbishCount);
+				ImGui::Text("Rubbish %d", index);
+				ImGui::SameLine();
+				ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+				ImGui::Text("GetTimer %d", Rubbishs->fishGetTimer_);
+				index++;
+			}
 
-		ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
-		ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
+			ImGui::Text("Spawned %d small fish and %d big fish \nand rubbish %d\n", smallCount, bigCount, rubbishCount);
 
-		ImGui::End();
-		ImGui::Begin("Event Fish ");
-		int eventIndex = 0;
-		for (auto& eventFish : events_) {
-			const Vector3& pos = eventFish->GetWorldPosition();
-			ImGui::Separator();
-			ImGui::Text("EventFish %d", eventIndex);
-			ImGui::SameLine();
-			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-			ImGui::Text("GetTimer: %d", eventFish->fishGetTimer_);
-			ImGui::Text("EventType: %d", static_cast<int>(eventFish->GetEventType())); // ← イベント種類確認用
-			eventIndex++;
-		}
-		ImGui::End();
+			ImGui::Text("playerPos %f,%f,%f", player_->GetPlayerPos().x, player_->GetPlayerPos().y, player_->GetPlayerPos().z);
+			ImGui::Text("lurePos %f,%f,%f", player_->GetLurePos().x, player_->GetLurePos().y, player_->GetLurePos().z);
 
-		ImGui::Begin("playerAABB ");
+			ImGui::End();
+			ImGui::Begin("Event Fish ");
+			int eventIndex = 0;
+			for (auto& eventFish : events_) {
+				const Vector3& pos = eventFish->GetWorldPosition();
+				ImGui::Separator();
+				ImGui::Text("EventFish %d", eventIndex);
+				ImGui::SameLine();
+				ImGui::Text("Pos: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+				ImGui::Text("GetTimer: %d", eventFish->fishGetTimer_);
+				ImGui::Text("EventType: %d", static_cast<int>(eventFish->GetEventType())); // ← イベント種類確認用
+				eventIndex++;
+			}
+			ImGui::End();
 
-		ImGui::Text("playerAABB min x,%f y,%f z,%f", player_->GetAABB().min.x, player_->GetAABB().min.y, player_->GetAABB().min.z);
-		ImGui::Text("playerAABB max x,%f y,%f z,%f", player_->GetAABB().max.x, player_->GetAABB().max.y, player_->GetAABB().max.z);
-		ImGui::Text("playerPos %d", player_->playerHit_);
+			ImGui::Begin("playerAABB ");
 
-		ImGui::End();
+			ImGui::Text("playerAABB min x,%f y,%f z,%f", player_->GetAABB().min.x, player_->GetAABB().min.y, player_->GetAABB().min.z);
+			ImGui::Text("playerAABB max x,%f y,%f z,%f", player_->GetAABB().max.x, player_->GetAABB().max.y, player_->GetAABB().max.z);
+			ImGui::Text("playerPos %d", player_->playerHit_);
+
+			ImGui::End();
 #endif
-	} break;
+		}
+		break;
+	}
 
-	case GameScene::Phase::kfadeOut: {
+	case GameScene::Phase::kfadeOut: 
+	{
 		timer++;
-		if (timer > 120) {
+		if (timer > 120) 
+		{
 			isFinish = true;
+			
 		}
 	} break;
 	default:
@@ -568,10 +569,6 @@ void GameScene::Draw() {
 	if (bearEvent_) {
 		bearEvent_->Draw();
 	}
-
-	
-
-		
 	
 
 	Model::PostDraw();

@@ -1,6 +1,7 @@
 #pragma once
 #include "KamataEngine.h"
 #include "Score.h"
+#include "BGM.h"
 
 class GameClearScene {
 public:
@@ -24,4 +25,5 @@ private:
 	bool isFinish = false;
 
 	Score* score_ = nullptr;
+	BGM* bgm_ = nullptr;
 };
