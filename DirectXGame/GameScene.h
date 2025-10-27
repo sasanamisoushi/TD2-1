@@ -158,5 +158,7 @@ private:
 
 	//雲背景
 	Model* cloudModel_ = nullptr;
+
+	uint32_t gamePlayBgmHandle_; // プレイ中のBGM
 	
 };

@@ -15,13 +15,15 @@ void TitleScene::Initialize() {
 	bgm_ = new BGM();
 	bgm_->Initialize();
 
+	titleBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
+
 }
 
 void TitleScene::Update() {
 	
 
 	fade_->Update();
-	bgm_->titleBGMPlay();
+	bgm_->BGMPlay(titleBgmHandle_);
 	switch (phase_) {
 	case TitleScene::Phase::kFadeIn:
 		if (fade_->isFinished()) {
@@ -31,7 +33,7 @@ void TitleScene::Update() {
 	case TitleScene::Phase::kMain:
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			isFinish = true;
-			bgm_->titleBGMStop();
+			bgm_->BGMStop();
 		}
 
 		break;

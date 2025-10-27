@@ -8,6 +8,16 @@ void weatherEvent::Initialize() {
 	timer_ = 0.0f;
 	isActive_ = false;
 	duration_ = 10.0f;
+
+	bgm_ = new BGM();
+	bgm_->Initialize();
+	bgmBox_ = 0;
+
+	rainBgm_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
+	rainbowBgm_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
+	cloudBgm_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
+	meteorBgm_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
+
 }
 
 void weatherEvent::Update() {
@@ -17,6 +27,7 @@ void weatherEvent::Update() {
 		return;
 	}
 
+	bgm_->BGMPlay(bgmBox_);
 	// タイマーを継続時間分増やす
 	timer_ += 1.0f / 60.0f;
 
@@ -48,15 +59,19 @@ void weatherEvent::TriggerRandomWeather() {
 	switch (random) {
 	case 0:
 		ChangeWeather(WeatherType::Rain);
+		bgmBox_ = rainBgm_;
 		break;
 	case 1:
 		ChangeWeather(WeatherType::Cloud);
+		bgmBox_ = cloudBgm_;
 		break;
 	case 2:
 		ChangeWeather(WeatherType::Rainbow);
+		bgmBox_ = rainbowBgm_;
 		break;
 	case 3:
 		ChangeWeather(WeatherType::Meteor);
+		bgmBox_ = meteorBgm_;
 		break;
 	}
 }
@@ -109,6 +124,7 @@ void weatherEvent::ResetWeather() {
 	currentWeather_ = WeatherType::Clear;
 	timer_ = 0.0f;
 	isActive_ = false;
+	bgm_->BGMStop();
 }
 
 void weatherEvent::ChangeWeather(WeatherType newWeather) {

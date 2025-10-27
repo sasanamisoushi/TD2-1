@@ -204,6 +204,8 @@ void GameScene::Initialize(Score* score) {
 		attempts++;
 	}
 
+	gamePlayBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/All the Fixings.mp3");
+
 	// タイマー
 	// 数字の描画
 	numTexHandles_[0] = TextureManager::Load("num/0.png");
@@ -274,7 +276,7 @@ GameScene::~GameScene() {
 void GameScene::Update() {
 
 	fade_->Update();
-	bgm_->gamePlayBGMPlay();
+	bgm_->BGMPlay(gamePlayBgmHandle_);
 	float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
 	int caughtFishCount = 0;
 	switch (phase_) {
@@ -391,9 +393,15 @@ void GameScene::Update() {
 					break;
 				case EventFish::FishEventType::WeatherChange:
 
-					if (weatherEvent_) {
-
+					if (weatherEvent_) 
+					{
+						bgm_->BGMStop();
 						weatherEvent_->TriggerRandomWeather();
+					}
+
+					if (!weatherEvent_->isActive_) 
+					{
+						bgm_->BGMPlay(gamePlayBgmHandle_);
 					}
 
 					break;
@@ -416,7 +424,7 @@ void GameScene::Update() {
 		if (Input::GetInstance()->TriggerKey(DIK_S)) {
 			isFinish = true;
 			score_->FileWrite();
-			bgm_->gamePlayBGMStop();
+			bgm_->BGMStop();
 		}
 		CheckAllCollisions();
 		CheckBearCollisions();
@@ -434,7 +442,7 @@ void GameScene::Update() {
 				isGame_ = false;
 				isFinish = true;
 				score_->FileWrite();
-				bgm_->gamePlayBGMStop();
+				bgm_->BGMStop();
 			}
 			CheckAllCollisions();
 

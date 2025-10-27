@@ -21,6 +21,9 @@ void GameClearScene::Initialize(Score* score)
 	phase_ = Phase::kFadeIn;
 
 	timer = 0;
+
+	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/All the Fixings.mp3");
+
 }
 
 GameClearScene::~GameClearScene()
@@ -30,7 +33,7 @@ GameClearScene::~GameClearScene()
 
 void GameClearScene::Update() 
 {
-	bgm_->gameClearBGMPlay();
+	bgm_->BGMPlay(gameClearBgmHandle_);
 	fade_->Update();
 	switch (phase_) {
 	case GameClearScene::Phase::kFadeIn:
@@ -41,7 +44,7 @@ void GameClearScene::Update()
 	case GameClearScene::Phase::kMain:
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			isFinish = true;
-      bgm_->gameClearBGMStop();
+      bgm_->BGMStop();
 		}
 		break;
 	case GameClearScene::Phase::kfadeOut:
