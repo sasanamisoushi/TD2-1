@@ -321,11 +321,6 @@ void SwimmyEvent::Reset() {
 		onEventEnd_();
 	}
 
-	
-
-	#ifdef _DEBUG
-	OutputDebugStringA("[SwimmyEvent] Reset() called\n");
-#endif
 }
 
 SwimmyEvent::~SwimmyEvent() {
