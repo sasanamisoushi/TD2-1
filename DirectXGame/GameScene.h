@@ -12,6 +12,7 @@
 #include "weatherEvent.h"
 #include "Fade.h"
 #include "BGM.h"
+#include "BossFish.h"
 
 class GameScene 
 {
@@ -38,6 +39,8 @@ public:
 	void CheckAllCollisions();
 
 	void CheckBearCollisions();
+
+	void CheckBossCollisions();
 
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
@@ -71,6 +74,7 @@ private:
 	bearEvent* bearEvent_=nullptr;
 	weatherEvent* weatherEvent_=nullptr;
 	BGM* bgm_ = nullptr;
+	BossFish* bossFish_ = nullptr;
 
 	
 	// フェード
@@ -113,6 +117,9 @@ private:
 
 	//天気
 	Model* weatherModel_ = nullptr;
+
+	// 魚モデル
+	Model* bossFishModel_ = nullptr;
 
 	// 現在数をカウント
 	int smallCount = 0;

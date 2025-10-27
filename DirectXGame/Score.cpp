@@ -58,6 +58,8 @@ void Score::Initialize()
 
 	FileOpen();
 
+	isScoreBossClear = false;
+
 }
 
 void Score::AddScore(int score)
@@ -248,5 +250,13 @@ void Score::FileWrite() {
 		}
 
 		fclose(fp);
+	}
+}
+
+void Score::scoreBossClear()
+{
+	if (score_ >= 200000)
+	{
+		isScoreBossClear = true;
 	}
 }

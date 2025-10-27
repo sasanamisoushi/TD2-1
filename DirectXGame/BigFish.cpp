@@ -5,8 +5,6 @@
 #include "Player.h"
 #include "Score.h"
 
-
-
 void BigFish::Initialize(Model* model, Camera* camera, Score* score, const Vector3& targetPos, bool moveRight) {
 	
 
@@ -24,7 +22,8 @@ void BigFish::Initialize(Model* model, Camera* camera, Score* score, const Vecto
 	WorldTransformUpdate(GetWorldTransform());
 }
 
-void BigFish::Update() {
+void BigFish::Update() 
+{
 
 	switch (State_) {
 	case BigFishState::Appear:
