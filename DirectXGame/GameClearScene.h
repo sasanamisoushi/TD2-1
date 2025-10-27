@@ -1,6 +1,7 @@
 #pragma once
 #include "KamataEngine.h"
 #include "Score.h"
+#include "BGM.h"
 #include "Fade.h"
 
 class GameClearScene {
@@ -33,6 +34,7 @@ private:
 
 	//スコア
 	Score* score_ = nullptr;
+	BGM* bgm_ = nullptr;
 
 	// フェード
 	Fade* fade_ = nullptr;

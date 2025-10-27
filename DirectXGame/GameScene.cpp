@@ -73,6 +73,10 @@ void GameScene::Initialize(Score* score) {
 
 	weatherEvent_ = new weatherEvent();
 	weatherEvent_->Initialize();
+	
+	// BGMの初期化
+	bgm_ = new BGM();
+	bgm_->Initialize();
 
 	// 背景オブジェクトのワールド座標設定
 	backgroundTransform_.Initialize();
@@ -252,8 +256,7 @@ GameScene::~GameScene() {
 	delete bearLureModel_;
 	delete weatherEvent_;
 	delete weatherModel_;
-
-	
+	delete bgm_;
 
 	for (auto& eventFish : events_) {
 
@@ -271,9 +274,9 @@ GameScene::~GameScene() {
 void GameScene::Update() {
 
 	fade_->Update();
+	bgm_->gamePlayBGMPlay();
 	float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
 	int caughtFishCount = 0;
-
 	switch (phase_) {
 	case GameScene::Phase::kFadeIn:
 
@@ -413,38 +416,30 @@ void GameScene::Update() {
 		if (Input::GetInstance()->TriggerKey(DIK_S)) {
 			isFinish = true;
 			score_->FileWrite();
+			bgm_->gamePlayBGMStop();
 		}
 		CheckAllCollisions();
 		CheckBearCollisions();
 
 		// タイマー処理
-		if (isGame_) {
-			if (gameTimer_ > 0) {
+		if (isGame_)
+		{
+			if (gameTimer_ > 0)
+			{
 				gameTimer_--;
 			}
-			if (gameTimer_ <= 0) {
+			if (gameTimer_ <= 0)
+			{
 				gameTimer_ = 0;
 				isGame_ = false;
 				isFinish = true;
 				score_->FileWrite();
+				bgm_->gamePlayBGMStop();
 			}
 			CheckAllCollisions();
 
-			// タイマー処理
-			if (isGame_) {
-				if (gameTimer_ > 0) {
-					gameTimer_--;
-				}
-				if (gameTimer_ <= 0) {
-					gameTimer_ = 0;
-					isGame_ = false;
-					isFinish = true;
-					score_->FileWrite();
-				}
-			}
-
 #ifdef _DEBUG
-
+      
 			if (Input::GetInstance()->TriggerKey(DIK_B)) {
 				bearEvent_->isBearEvent_ = true;
 			}
@@ -519,11 +514,15 @@ void GameScene::Update() {
 #endif
 		}
 		break;
+	}
 
 	case GameScene::Phase::kfadeOut: 
+	{
 		timer++;
-		if (timer > 120) {
+		if (timer > 120) 
+		{
 			isFinish = true;
+			
 		}
 		break;
 	

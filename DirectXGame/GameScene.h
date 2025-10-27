@@ -11,6 +11,7 @@
 #include "bearEvent.h"
 #include "weatherEvent.h"
 #include "Fade.h"
+#include "BGM.h"
 
 class GameScene 
 {
@@ -41,12 +42,10 @@ public:
 	//デスフラグのgetter
 	bool IsFinished() const { return isFinish; }
 
-
 	int getTimer_;
 
 	void SpawnFish();
 
-	
 
 	void ClearAllFish();
 
@@ -71,6 +70,7 @@ private:
 	SwimmyEvent* swimmyEvent_=nullptr;
 	bearEvent* bearEvent_=nullptr;
 	weatherEvent* weatherEvent_=nullptr;
+	BGM* bgm_ = nullptr;
 
 	
 	// フェード

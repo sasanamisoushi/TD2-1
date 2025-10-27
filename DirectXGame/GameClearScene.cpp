@@ -10,6 +10,8 @@ void GameClearScene::Initialize(Score* score)
 { 
 	//スコア
 	score_ = score; 
+	bgm_ = new BGM();
+	bgm_->Initialize();
 
 	// フェードとフェード管理の初期化
 	fade_ = new Fade();
@@ -21,11 +23,14 @@ void GameClearScene::Initialize(Score* score)
 	timer = 0;
 }
 
-GameClearScene::~GameClearScene() {}
+GameClearScene::~GameClearScene()
+{
+	delete bgm_; 
+}
 
-
-void GameClearScene::Update() {
-
+void GameClearScene::Update() 
+{
+	bgm_->gameClearBGMPlay();
 	fade_->Update();
 	switch (phase_) {
 	case GameClearScene::Phase::kFadeIn:
@@ -36,6 +41,7 @@ void GameClearScene::Update() {
 	case GameClearScene::Phase::kMain:
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			isFinish = true;
+      bgm_->gameClearBGMStop();
 		}
 		break;
 	case GameClearScene::Phase::kfadeOut:
