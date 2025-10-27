@@ -42,4 +42,6 @@ private:
 
 	// フェード用
 	int timer;
+
+	uint32_t gameClearBgmHandle_; // クリアしたときのBGM
 };
