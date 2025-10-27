@@ -159,6 +159,17 @@ private:
 	//雲背景
 	Model* cloudModel_ = nullptr;
 
-	uint32_t gamePlayBgmHandle_; // プレイ中のBGM
+
+	//魚の最大数
+	int totalFishMax;
+
+	// 通常最大数× 天気補正
+	int adjustedMaxFish;
+
+
+	float weatherMultiplier;
+  
+  // プレイ中のBGM
+	uint32_t gamePlayBgmHandle_; 
 	
 };

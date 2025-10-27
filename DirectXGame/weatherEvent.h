@@ -21,7 +21,7 @@ public:
 	void Initialize();
 
 	// 更新処理
-	void Update();
+	void Update(int fishCount, int bigFishCount, int rubbishCount);
 
 	// 描画処理
 	void Draw();
@@ -39,6 +39,9 @@ public:
 	float GetFishSpeedMultiplier() const;
 	float GetBigFishSpawnRate() const;
 	float GetRubbishSpawnRate() const;
+	float GetFishMaxCountMultiplier() const;
+
+	bool WasRainJustEnded() const;
 
 	bool isActive_ = false;
 
@@ -58,6 +61,14 @@ private:
 	//天気の持続時間
 	float duration_ = 60.0f;
 
+	// 最大数追跡用
+	int maxFishCount_ = 0;
+	int maxBigFishCount_ = 0;
+	int maxRubbishCount_ = 0;
+
+	bool wasRaining_ = false;
+	bool rainJustEnded_ = false;
+
 	BGM* bgm_ = nullptr;
 
 	uint32_t bgmBox_; // 四つのBGMを切り替えて流す箱
@@ -69,5 +80,4 @@ private:
 	uint32_t cloudBgm_; // 雲の時
 
 	uint32_t meteorBgm_; // 隕石の時 
-
 };
