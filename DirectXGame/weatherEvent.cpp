@@ -8,9 +8,14 @@ void weatherEvent::Initialize() {
 	timer_ = 0.0f;
 	isActive_ = false;
 	duration_ = 10.0f;
+
+	// 最大数の初期化
+	maxFishCount_ = 0;
+	maxBigFishCount_ = 0;
+	maxRubbishCount_ = 0;
 }
 
-void weatherEvent::Update() {
+void weatherEvent::Update(int fishCount, int bigFishCount, int rubbishCount) {
 
 	// 天気イベントが発動していないなら何もしない
 	if (!isActive_) {
@@ -20,16 +25,35 @@ void weatherEvent::Update() {
 	// タイマーを継続時間分増やす
 	timer_ += 1.0f / 60.0f;
 
+	// --- 最大数更新 ---
+	if (fishCount > maxFishCount_) {
+		maxFishCount_ = fishCount;
+	}
+	if (bigFishCount > maxBigFishCount_) {
+		maxBigFishCount_ = bigFishCount;
+	}
+	if (rubbishCount > maxRubbishCount_) {
+		maxRubbishCount_ = rubbishCount;
+	}
+
 	// 一定時間経過したら天気をリセット
 	if (timer_ >= duration_) {
 
 		ResetWeather();
 	}
 
+	bool wasRainBefore = wasRaining_;
+	wasRaining_ = (currentWeather_ == WeatherType::Rain);
+	rainJustEnded_ = (wasRainBefore && !wasRaining_);
+
 #ifdef _DEBUG
 	ImGui::Begin("Weather Debug");
 	ImGui::Text("Weather: %d", static_cast<int>(currentWeather_));
 	ImGui::Text("Timer: %.2f", timer_);
+	ImGui::Separator();
+	ImGui::Text("Fish Count: %d (Max: %d)", fishCount, maxFishCount_);
+	ImGui::Text("BigFish Count: %d (Max: %d)", bigFishCount, maxBigFishCount_);
+	ImGui::Text("Rubbish Count: %d (Max: %d)", rubbishCount, maxRubbishCount_);
 	ImGui::End();
 #endif
 }
@@ -68,10 +92,8 @@ float weatherEvent::GetFishSpeedMultiplier() const {
 	}
 
 	switch (currentWeather_) {
-	case WeatherType::Rain:
-		return 0.05f; // 雨で速い
 	case WeatherType::Cloud:
-		return 0.01f; // 雲で遅い
+		return 0.03f; // 雲で早い
 	default:
 		return 0.01f;
 	}
@@ -105,7 +127,31 @@ float weatherEvent::GetRubbishSpawnRate() const {
 	}
 }
 
+float weatherEvent::GetFishMaxCountMultiplier() const {
+	if (!isActive_) {
+		return 1.0f; // 通常時（倍率1倍）
+	}
+
+	switch (currentWeather_) {
+	case WeatherType::Rain:
+		return 1.5f; // 雨で魚が多く出る
+	default:
+		return 1.0f;
+	}
+}
+
+bool weatherEvent::WasRainJustEnded() const {
+	
+	return rainJustEnded_; 
+}
+
 void weatherEvent::ResetWeather() {
+	maxFishCount_ = 0;
+	maxBigFishCount_ = 0;
+	maxRubbishCount_ = 0;
+
+	rainJustEnded_ = (currentWeather_ == WeatherType::Rain);
+
 	currentWeather_ = WeatherType::Clear;
 	timer_ = 0.0f;
 	isActive_ = false;

@@ -89,7 +89,7 @@ void GameScene::Initialize(Score* score) {
 	});
 
 	// 制限数
-	const int totalFishMax = 15; // 全体の最大数
+	totalFishMax = 15; // 全体の最大数
 	const int bigFishMax = 5;    // 大きい魚の最大数
 	const int EventFisMax = 1;   // イベントの魚の最大数
 	bigCount = 0;
@@ -316,7 +316,16 @@ void GameScene::Update() {
 
 		// 天気の更新
 		if (weatherEvent_) {
-			weatherEvent_->Update();
+			weatherEvent_->Update(smallCount, bigCount, rubbishCount);
+
+			// === 雨が終わったら魚を減らす ===
+			if (weatherEvent_->WasRainJustEnded()) {
+				const size_t normalMax = totalFishMax; // 通常の最大数
+				while (fishes_.size() > normalMax) {
+					delete fishes_.back();
+					fishes_.pop_back();
+				}
+			}
 		}
 
 		
@@ -405,6 +414,20 @@ void GameScene::Update() {
 			return false;
 		});
 
+		// --- 天気ごとの最大魚数制御 ---
+		weatherMultiplier = 1.0f;
+		if (weatherEvent_) {
+			weatherMultiplier = weatherEvent_->GetFishMaxCountMultiplier();
+		}
+
+		// 通常最大数× 天気補正
+		adjustedMaxFish = static_cast<int>(totalFishMax * weatherMultiplier);
+
+		// 晴れなどイベントが終わっているときは自動で元に戻る（1.0倍に戻る）
+		if (fishes_.size() + BigFishes_.size() + rubbishes_.size() + events_.size() < adjustedMaxFish) {
+			SpawnFish();
+		}
+
 		// 捕まえた数だけ再生成
 		for (int i = 0; i < caughtFishCount; i++) {
 			SpawnFish();
@@ -430,23 +453,16 @@ void GameScene::Update() {
 			}
 			CheckAllCollisions();
 
-			// タイマー処理
-			if (isGame_) {
-				if (gameTimer_ > 0) {
-					gameTimer_--;
-				}
-				if (gameTimer_ <= 0) {
-					gameTimer_ = 0;
-					isGame_ = false;
-					isFinish = true;
-					score_->FileWrite();
-				}
-			}
+			
 
 #ifdef _DEBUG
 
 			if (Input::GetInstance()->TriggerKey(DIK_B)) {
 				bearEvent_->isBearEvent_ = true;
+			}
+
+			if (Input::GetInstance()->TriggerKey(DIK_A)) {
+				weatherEvent_->TriggerRandomWeather();
 			}
 
 			ImGui::Begin("Game Scene");
@@ -527,11 +543,7 @@ void GameScene::Update() {
 		}
 		break;
 	
-	default:
-
-		break;
 	
-
 	}
 }
 
@@ -793,7 +805,16 @@ void GameScene::SpawnFish() {
 	// === 天候補正を取得 ===
 	float bigFishChance = weatherEvent_->GetBigFishSpawnRate();      // 虹で上がる
 	float rubbishChance = weatherEvent_->GetRubbishSpawnRate();      // 隕石で上がる
-	float speedMultiplier = weatherEvent_->GetFishSpeedMultiplier(); // 雨・雲で変化
+	float speedMultiplier = weatherEvent_->GetFishSpeedMultiplier(); // 雲で速度変化
+	float MaxCountMultiplier = weatherEvent_->GetFishMaxCountMultiplier(); //雨で発生率の変更
+
+	// --- 出現しない可能性を加える ---
+	// 通常1.0倍 → 雨なら例: 1.5倍 など
+	float spawnChance = 0.5f * MaxCountMultiplier; // 通常50%で生成、雨なら75%など
+	float rSpawn = static_cast<float>(rand()) / RAND_MAX;
+	if (rSpawn > spawnChance) {
+		return; // 今回は生成スキップ（晴れならスカしやすい）
+	}
 
 	// === 正規化（合計が1を超えないように）===
 	float total = bigFishChance + rubbishChance;
@@ -862,6 +883,8 @@ void GameScene::SpawnFish() {
 					weatherEvent_->TriggerRandomWeather();
 				}
 				break;
+			default:
+				break;
 			}
 		});
 
@@ -869,21 +892,28 @@ void GameScene::SpawnFish() {
 		return; // イベント魚を出したら他は生成しない
 	}
 
+	int baseMaxFish = 10;
+	adjustedMaxFish = static_cast<int>(baseMaxFish * weatherEvent_->GetFishMaxCountMultiplier());
+
+	if (fishes_.size() >= adjustedMaxFish) {
+		return; // 上限なら生成しない
+	}
+
 	// === 通常の魚生成（天候補正を反映） ===
 	if (r < rubbishChance) {
-		// 🗑️ ゴミを生成
+		// ゴミを生成
 		auto* rub = new Rubbish();
 		rub->Initialize(rubbishModel_, &camera_, score_, fishPos, moveRight);
 		rub->SetSpeedMultiplier(speedMultiplier);
 		rubbishes_.push_back(rub);
 	} else if (r < rubbishChance + bigFishChance) {
-		// 🐋 大魚を生成
+		// 大魚を生成
 		auto* big = new BigFish();
 		big->Initialize(bigFishModel_, &camera_, score_, fishPos, moveRight);
 		big->SetSpeedMultiplier(speedMultiplier);
 		BigFishes_.push_back(big);
 	} else {
-		// 🐠 小魚を生成
+		// 小魚を生成
 		auto* fish = new Fish();
 		fish->Initialize(fishModel_, &camera_, score_, fishPos, moveRight, getTimer_);
 		fish->SetSpeedMultiplier(speedMultiplier);
