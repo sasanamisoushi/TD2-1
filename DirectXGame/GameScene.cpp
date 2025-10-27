@@ -856,6 +856,7 @@ void GameScene::SpawnFish() {
 	// 群れイベントがアクティブ (swimmyEvent_ に IsEventActive() があると仮定)
 	if (swimmyEvent_ && swimmyEvent_->IsEventActive()) {
 		otherEventActive = true;
+		return;
 	}
 	// 天候イベントがアクティブ (weatherEvent_ に IsEventActive() があると仮定)
 	if (weatherEvent_ && weatherEvent_->IsEventActive()) {
@@ -910,6 +911,8 @@ void GameScene::SpawnFish() {
 		events_.push_back(eventFish);
 		return; // イベント魚を出したら他は生成しない
 	}
+
+	
 
 	int baseMaxFish = 10;
 	adjustedMaxFish = static_cast<int>(baseMaxFish * weatherEvent_->GetFishMaxCountMultiplier());
