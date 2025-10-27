@@ -25,7 +25,7 @@ void GameScene::Initialize(Score* score) {
 
 	getTimer_ = 90;
 
-	Vector3 playerPosition = {-11, 10, 0};
+	Vector3 playerPosition = {-11, 9, 0};
 	Vector3 lurePosition = {5, 7, 0};
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
 
@@ -67,7 +67,7 @@ void GameScene::Initialize(Score* score) {
 
 	// クマイベントの初期化
 	Vector3 bearLurePosition = {0, 7, 0}; // ルアーの描画位置
-	Vector3 bearPosition = {-11, 10, 0};  // 熊の描画位置
+	Vector3 bearPosition = {-11, 9, 0};  // 熊の描画位置
 
 	bearEvent_ = new bearEvent();
 	bearEvent_->Initialize(bearLureModel_, bearPModel_, &camera_, bearLurePosition, bearPosition);
@@ -119,12 +119,21 @@ void GameScene::Initialize(Score* score) {
 		Vector3 fishPos;
 		bool setPos = false;
 
+		float x = 0.0f;
+		if (rand() % 2 == 0) {
+			// 左側エリア
+			x = static_cast<float>(rand() % 100 - 140) / 10.0f; // -14.0 ～ -4.0
+		} else {
+			// 右側エリア
+			x = static_cast<float>(rand() % 100 + 40) / 10.0f; // +4.0 ～ +14.0
+		}
+
 		// 複数の魚を出す
 
 		for (int confirmation = 0; confirmation < 50 && !setPos; confirmation++) {
 
 			// ランダムな位置に生成
-			fishPos = {static_cast<float>(rand() % 280 - 140) / 10.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
+			fishPos = {x, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
 
 			setPos = true;
 
@@ -846,7 +855,16 @@ void GameScene::SpawnFish() {
 
 	// === 位置を決定 ===
 	for (int confirmation = 0; confirmation < 50 && !setPos; confirmation++) {
-		fishPos = {static_cast<float>(rand() % 280 - 140) / 10.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, 0.0f};
+
+		float x = 0.0f;
+		if (rand() % 2 == 0) {
+			// 左側エリア
+			x = static_cast<float>(rand() % 100 - 140) / 10.0f; // -14.0 ～ -4.0
+		} else {
+			// 右側エリア
+			x = static_cast<float>(rand() % 100 + 40) / 10.0f; // +4.0 ～ +14.0
+		}
+		fishPos = {x, static_cast<float>(rand() % 60) / 10.0f - 2.0f, 0.0f};
 		setPos = true;
 
 		// 小さい魚と距離確認
