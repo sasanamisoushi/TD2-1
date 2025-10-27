@@ -154,7 +154,8 @@ AABB Fish::GetAABB() {
 	return aabb;
 }
 
-void Fish::OnCollision(Player* player) {
+void Fish::OnCollision(Player* player) 
+{
 	if (!isAlive_) {
 		return;
 	}

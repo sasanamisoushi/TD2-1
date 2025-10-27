@@ -33,6 +33,10 @@ public:
 
 	void FileWrite();
 
+	void scoreBossClear();
+
+	int isScoreBossClear = false;
+
 private:
 
 	int score_;

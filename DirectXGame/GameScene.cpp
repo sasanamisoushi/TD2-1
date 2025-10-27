@@ -26,7 +26,7 @@ void GameScene::Initialize(Score* score) {
 	getTimer_ = 90;
 
 	Vector3 playerPosition = {-11, 10, 0};
-	Vector3 lurePosition = {0, 7, 0};
+	Vector3 lurePosition = {5, 7, 0};
 	player_->Initialize(model_, playerModel_, &camera_, lurePosition, playerPosition);
 
 	// フェードの初期化
@@ -47,7 +47,7 @@ void GameScene::Initialize(Score* score) {
 	bearModel_ = Model::CreateFromOBJ("bear", true);
 	bearLureModel_ = Model::CreateFromOBJ("bearLure", true);
 	weatherModel_ = Model::CreateFromOBJ("weather", true);
-	
+	bossFishModel_ = Model::CreateFromOBJ("fish");
 
 	// 背景モデルの生成
 	clearModel_ = Model::CreateFromOBJ("gameBackground", true);
@@ -73,6 +73,10 @@ void GameScene::Initialize(Score* score) {
 
 	weatherEvent_ = new weatherEvent();
 	weatherEvent_->Initialize();
+
+	bossFish_ = new BossFish();
+	Vector3 bossPosition = {0, float(rand() % 7 - 2), 0};
+	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition, 10);
 	
 	// BGMの初期化
 	bgm_ = new BGM();
@@ -333,7 +337,10 @@ void GameScene::Update() {
 			}
 		}
 
-		
+		if (bossFish_)
+		{
+			bossFish_->Update();
+		}
 
 		// --- すでにいる全ての魚に速度補正を再適用 ---
 		for (auto& fish : fishes_) {
@@ -451,6 +458,7 @@ void GameScene::Update() {
 		}
 		CheckAllCollisions();
 		CheckBearCollisions();
+		CheckBossCollisions();
 
 		// タイマー処理
 		if (isGame_)
@@ -459,21 +467,42 @@ void GameScene::Update() {
 			{
 				gameTimer_--;
 			}
-			if (gameTimer_ <= 0)
+			if (gameTimer_ <= 0) 
 			{
-				gameTimer_ = 0;
-				isGame_ = false;
-				isFinish = true;
-				score_->FileWrite();
-				bgm_->BGMStop();
+				if (!bossFish_->isBossEvent_)
+				{
+					if (!score_->isScoreBossClear) {
+						gameTimer_ = 0;
+						isGame_ = false;
+						isFinish = true;
+						score_->FileWrite();
+						bgm_->BGMStop();
+					} else {
+						bossFish_->isBossEvent_ = true;
+						bossFish_->isBossSpoon_ = true;
+						gameTimer_ = 100;
+						bgm_->BGMStop();
+					}
+				} else {
+
+					gameTimer_ = 0;
+					isGame_ = false;
+					isFinish = true;
+					score_->FileWrite();
+					bgm_->BGMStop();
+				}
 			}
+			
 			CheckAllCollisions();
 
 
 #ifdef _DEBUG
       
-			if (Input::GetInstance()->TriggerKey(DIK_B)) {
-				bearEvent_->isBearEvent_ = true;
+			if (Input::GetInstance()->TriggerKey(DIK_B))
+			{
+				ClearAllFish();
+				bossFish_->isBossEvent_ = true;
+				bossFish_->isBossSpoon_ = true;
 			}
 
 			if (Input::GetInstance()->TriggerKey(DIK_A)) {
@@ -631,6 +660,8 @@ void GameScene::Draw() {
 		bearEvent_->Draw();
 	}
 
+	bossFish_->Draw();
+
 	Model::PostDraw();
 
 	// 2d描画
@@ -776,6 +807,26 @@ void GameScene::CheckBearCollisions() {
 				Bigfish->OutCollisionBear();
 			}
 		}
+	}
+}
+
+void GameScene::CheckBossCollisions() 
+{
+	// 判定対象1と2の座標
+
+	AABB aabb1, aabb2;
+
+	// 自キャラの座標
+	aabb1 = player_->GetAABB();
+
+	aabb2 = bossFish_->GetAABB();
+	// 自キャラと魚全ての当たり判定
+
+	// プレイヤー
+	// ルアーと魚が当たっているとき
+	if (IsCollision(aabb1, aabb2)) {
+		player_->OnCollision(bossFish_);
+		bossFish_->OnCollision(player_);
 	}
 }
 

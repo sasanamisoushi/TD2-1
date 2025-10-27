@@ -102,7 +102,8 @@ void Player::InputMove() {
 	velocity_.y += acceleration.y;
 }
 
-void Player::WorldTransformUpdate() {
+void Player::WorldTransformUpdate()
+{
 	worldTransform_.translation_.x += velocity_.x;
 	worldTransform_.translation_.y += velocity_.y;
 	worldTransform_.translation_.z += velocity_.z;
@@ -165,3 +166,6 @@ void Player::OnCollision(const BigFish* Bigfish) {
 void Player::OnCollision(const Rubbish* Rubbish) { 
 	(void)Rubbish; 
 }
+
+void Player::OnCollision(const BossFish* bossFish)
+{ (void)bossFish; }
