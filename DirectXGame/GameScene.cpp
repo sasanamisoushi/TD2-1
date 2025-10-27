@@ -47,19 +47,22 @@ void GameScene::Initialize(Score* score) {
 	bearModel_ = Model::CreateFromOBJ("bear", true);
 	bearLureModel_ = Model::CreateFromOBJ("bearLure", true);
 	weatherModel_ = Model::CreateFromOBJ("weather", true);
-	backgroundModel_ = Model::CreateFromOBJ("gameBackground");
+	
 
 	// 背景モデルの生成
-	backgroundModel_ = Model::CreateFromOBJ("gameBackground", true);
+	clearModel_ = Model::CreateFromOBJ("gameBackground", true);
+	rainModel_ = Model::CreateFromOBJ("gameBackground_rain", true);
+	meteoriteModel_ = Model::CreateFromOBJ("gameBackground_meteorite", true);
+	rainbowModel_ = Model::CreateFromOBJ("gameBackground_rainbow", true);
+	cloudModel_ = Model::CreateFromOBJ("gameBackground_storm", true);
 
 	score_ = score;
 
 	// イベントの初期化
 	swimmyEvent_ = new SwimmyEvent();
-	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_);
+	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_,score_);
 
-	
-	//クマイベントの初期化
+	// クマイベントの初期化
 	Vector3 bearLurePosition = {0, 7, 0}; // ルアーの描画位置
 	Vector3 bearPosition = {-12, 10, 0};  // 熊の描画位置
 
@@ -77,8 +80,8 @@ void GameScene::Initialize(Score* score) {
 
 	// 背景オブジェクトのワールド座標設定
 	backgroundTransform_.Initialize();
-	backgroundTransform_.translation_ = {0.0f,5.0f, 10.0f}; // ← zを大きくしてt奥に
-	backgroundTransform_.scale_ = {5.0f, 3.0f, 10.0f};        // サイズ調整
+	backgroundTransform_.translation_ = {0.0f, 5.0f, 10.0f}; // ← zを大きくしてt奥に
+	backgroundTransform_.scale_ = {5.0f, 3.0f, 10.0f};       // サイズ調整
 
 	WorldTransformUpdate(backgroundTransform_);
 
@@ -254,6 +257,7 @@ GameScene::~GameScene() {
 	delete weatherEvent_;
 	delete weatherModel_;
 	delete bgm_;
+
 	for (auto& eventFish : events_) {
 
 		delete eventFish;
@@ -271,6 +275,8 @@ void GameScene::Update() {
 
 	fade_->Update();
 	bgm_->gamePlayBGMPlay();
+	float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
+	int caughtFishCount = 0;
 	switch (phase_) {
 	case GameScene::Phase::kFadeIn:
 
@@ -278,7 +284,7 @@ void GameScene::Update() {
 			phase_ = Phase::kMain; // フェードイン完了 -> メインフェーズへ
 		}
 		break;
-	case GameScene::Phase::kMain: {
+	case GameScene::Phase::kMain: 
 
 		player_->Update();
 		// 小さい魚
@@ -303,7 +309,7 @@ void GameScene::Update() {
 
 		// 群れの更新
 		if (swimmyEvent_) {
-			swimmyEvent_->Update();
+			swimmyEvent_->Update(player_);
 		}
 
 		// クマの更新
@@ -316,7 +322,7 @@ void GameScene::Update() {
 			weatherEvent_->Update();
 		}
 
-		float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
+		
 
 		// --- すでにいる全ての魚に速度補正を再適用 ---
 		for (auto& fish : fishes_) {
@@ -336,7 +342,7 @@ void GameScene::Update() {
 		}
 
 		// 魚が取れた時
-		int caughtFishCount = 0;
+	
 		fishes_.remove_if([&caughtFishCount](Fish* fish) {
 			if (fish->IsLureCheck()) {
 				delete fish;
@@ -378,7 +384,7 @@ void GameScene::Update() {
 					// 通常の魚を消す
 					ClearAllFish();
 					// --- イベント群れを生成 ---
-					swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
+					swimmyEvent_->SpawnFishGroup(centerPos, 20, 3.0f);
 					break;
 				case EventFish::FishEventType::BearHelp:
 					bearEvent_->isBearEvent_ = true;
@@ -433,7 +439,7 @@ void GameScene::Update() {
 			CheckAllCollisions();
 
 #ifdef _DEBUG
-
+      
 			if (Input::GetInstance()->TriggerKey(DIK_B)) {
 				bearEvent_->isBearEvent_ = true;
 			}
@@ -518,21 +524,44 @@ void GameScene::Update() {
 			isFinish = true;
 			
 		}
-	} break;
-	default:
 		break;
+	
+	default:
+
+		break;
+	
+
 	}
 }
 
 void GameScene::Draw() {
-
-	
 
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
 	// 3Dモデル描画前処理
 	Model::PreDraw(dxCommon->GetCommandList());
 
+	switch (weatherEvent_->GetWeatherType()) {
+	case weatherEvent::WeatherType::Clear:
+		backgroundModel_ = clearModel_;
+		break;
+	case weatherEvent::WeatherType::Rain:
+		backgroundModel_ = rainModel_;
+		break;
+	case weatherEvent::WeatherType::Cloud:
+		backgroundModel_ = cloudModel_;
+		break;
+	case weatherEvent::WeatherType::Rainbow:
+		backgroundModel_ = rainbowModel_;
+		break;
+	case weatherEvent::WeatherType::Meteor:
+		backgroundModel_ = meteoriteModel_;
+		break;
+	default:
+		break;
+	}
+	
+	// 背景描画
 	backgroundModel_->Draw(backgroundTransform_, camera_);
 
 	weatherEvent_->Draw();
@@ -569,7 +598,6 @@ void GameScene::Draw() {
 	if (bearEvent_) {
 		bearEvent_->Draw();
 	}
-	
 
 	Model::PostDraw();
 
@@ -677,14 +705,12 @@ void GameScene::CheckAllCollisions() {
 	}
 }
 
-void GameScene::CheckBearCollisions() 
-{ 
-	AABB aabb1, aabb2; 
+void GameScene::CheckBearCollisions() {
+	AABB aabb1, aabb2;
 	// 熊の座標
 	aabb1 = bearEvent_->GetAABB();
 
-	for (Fish* fish : fishes_)
-	{
+	for (Fish* fish : fishes_) {
 		aabb2 = fish->GetAABB();
 
 		// 熊
@@ -703,8 +729,7 @@ void GameScene::CheckBearCollisions()
 	}
 
 	// 自キャラと大きい魚全ての当たり判定
-	for (BigFish* Bigfish : BigFishes_) 
-	{
+	for (BigFish* Bigfish : BigFishes_) {
 		aabb2 = Bigfish->GetAABB();
 		// 熊
 		// ルアーと魚が当たっているとき
@@ -779,15 +804,53 @@ void GameScene::SpawnFish() {
 	// === 出現確率を決定 ===
 	float r = static_cast<float>(rand()) / RAND_MAX;
 
+	
+	float eventChance = 0.15f; // 15%の確率でイベント魚出現
+
+	bool otherEventActive = false;
+	// クマイベントがアクティブ
+	if (bearEvent_ && bearEvent_->isBearEvent_) {
+		otherEventActive = true;
+	}
+	// 群れイベントがアクティブ (swimmyEvent_ に IsEventActive() があると仮定)
+	if (swimmyEvent_ && swimmyEvent_->IsEventActive()) {
+		otherEventActive = true;
+	}
+	// 天候イベントがアクティブ (weatherEvent_ に IsEventActive() があると仮定)
+	if (weatherEvent_ && weatherEvent_->IsEventActive()) {
+		otherEventActive = true;
+	}
+
 	// --- イベント魚出現チェック（独立確率） ---
-	float eventChance = 0.05f; // 5%の確率でイベント魚出現
-	if (r < eventChance && events_.empty()) {
+	if (r < eventChance && events_.empty() && !otherEventActive) {
 		auto* eventFish = new EventFish();
-		eventFish->Initialize(swimmyModel_, &camera_, nullptr, fishPos, moveRight);
+
+		Model* eventModel = nullptr;
+		EventFish::FishEventType eventType{};
+
+		int eventTypeRand = rand() % 3; // 3種類からランダム
+		switch (eventTypeRand) {
+		case 0:
+			eventModel = swimmyModel_;
+			eventType = EventFish::FishEventType::SwimmyGroup;
+			break;
+		case 1:
+			eventModel = bearModel_;
+			eventType = EventFish::FishEventType::BearHelp;
+			break;
+		case 2:
+			eventModel = weatherModel_;
+			eventType = EventFish::FishEventType::WeatherChange;
+			break;
+		}
+		eventFish->Initialize(eventModel, &camera_, score_, fishPos, moveRight);
+		// イベントの種類を設定
+		eventFish->SetEventType(eventType);
 
 		eventFish->SetOnTriggered([this](const Vector3& centerPos, EventFish::FishEventType type) {
 			switch (type) {
 			case EventFish::FishEventType::SwimmyGroup:
+				ClearAllFish();
 				swimmyEvent_->SpawnFishGroup(centerPos, 8, 3.0f);
 				break;
 			case EventFish::FishEventType::BearHelp:

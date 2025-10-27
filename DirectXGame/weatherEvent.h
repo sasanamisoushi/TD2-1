@@ -32,7 +32,7 @@ public:
 	WeatherType GetWeatherType() const { return currentWeather_; }
 
 	//天気がアクティブかどうか
-	bool IsActive() const { return isActive_; }
+	bool IsEventActive() const { return isActive_; }
 
 	//魚出現・挙動補正用
 	float GetFishSpeedMultiplier() const;
@@ -52,7 +52,7 @@ private:
 
 	bool isActive_ = false;
 
-	//最初は雨
+	//最初は晴れ
 	WeatherType currentWeather_ = WeatherType::Clear;
 	float timer_ = 0.0f;
 

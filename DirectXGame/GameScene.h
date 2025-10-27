@@ -136,9 +136,27 @@ private:
 	//フェード用のタイマー
 	float timer;
 
-
+	//========================================
+	// 背景
+	//========================================
+	
 	//背景モデル
 	Model* backgroundModel_ = nullptr;
 	WorldTransform backgroundTransform_;
+
+	//初期背景
+	Model* clearModel_ = nullptr;
+
+	//雨背景
+	Model* rainModel_ = nullptr;
+
+	//隕石背景
+	Model* meteoriteModel_ = nullptr;
+
+	//虹背景
+	Model* rainbowModel_ = nullptr;
+
+	//雲背景
+	Model* cloudModel_ = nullptr;
 	
 };

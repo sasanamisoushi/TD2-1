@@ -8,9 +8,19 @@ using namespace KamataEngine;
 
 void GameClearScene::Initialize(Score* score) 
 { 
+	//スコア
 	score_ = score; 
 	bgm_ = new BGM();
 	bgm_->Initialize();
+
+	// フェードとフェード管理の初期化
+	fade_ = new Fade();
+	fade_->Initialize();
+	fade_->Start(Fade::Status::FadeIn, 1.0f);
+
+	phase_ = Phase::kFadeIn;
+
+	timer = 0;
 }
 
 GameClearScene::~GameClearScene()
@@ -18,16 +28,36 @@ GameClearScene::~GameClearScene()
 	delete bgm_; 
 }
 
-
 void GameClearScene::Update() 
 {
 	bgm_->gameClearBGMPlay();
-	if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) 
-	{
-		isFinish = true;
-		bgm_->gameClearBGMStop();
-	}
+	fade_->Update();
+	switch (phase_) {
+	case GameClearScene::Phase::kFadeIn:
+		if (fade_->isFinished()) {
+			phase_ = Phase::kMain; // フェードイン完了 -> メインフェーズへ
+		}
+		break;
+	case GameClearScene::Phase::kMain:
+		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+			isFinish = true;
+      bgm_->gameClearBGMStop();
+		}
+		break;
+	case GameClearScene::Phase::kfadeOut:
+		if (fade_->isFinished()) {
+			// 2秒後にシーン転移
+			timer++;
+			if (timer > 120) {
+				isFinish = true;
+			}
+		}
 
+		break;
+	default:
+		break;
+	}
+	
 #ifdef _DEBUG
 	ImGui::Begin("Game Clear Scene");
 	ImGui::End();
@@ -41,6 +71,8 @@ void GameClearScene::Draw()
 	Model::PreDraw(dxCommon->GetCommandList());
 
 	Model::PostDraw();
+	// フェード
+	fade_->Draw(dxCommon->GetCommandList());
 
 	// 2d描画
 	Sprite::PreDraw(dxCommon->GetCommandList());
