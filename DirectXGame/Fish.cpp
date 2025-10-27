@@ -26,11 +26,9 @@ void Fish::Initialize(Model* model, Camera* camera, Score* score, const Vector3&
 
 	Vector3 spawnPos;
 	// 出現開始位置
-	if (rand() % 2 == 0) {
-		spawnPos = {moveRight ? -15.0f : 15.0f, targetPos_.y, targetPos_.z};
-	} else {
-		spawnPos = {0.0f, targetPos_.y, targetPos_.z + 20.0f}; // 奥から
-	}
+	
+	spawnPos = {0.0f, targetPos_.y, targetPos_.z + 20.0f}; // 奥から
+	
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();

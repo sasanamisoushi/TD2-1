@@ -166,6 +166,8 @@ private:
 	//雲背景
 	Model* cloudModel_ = nullptr;
 
+	//クマ
+	Model* bearPModel_ = nullptr;
 
 	//魚の最大数
 	int totalFishMax;

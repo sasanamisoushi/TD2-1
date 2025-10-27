@@ -44,7 +44,7 @@ void GameScene::Initialize(Score* score) {
 	bigFishModel_ = Model::CreateFromOBJ("fish");
 	rubbishModel_ = Model::CreateFromOBJ("trash", true);
 	swimmyModel_ = Model::CreateFromOBJ("suimii", true);
-	bearModel_ = Model::CreateFromOBJ("bear", true);
+	bearModel_ = Model::CreateFromOBJ("bearFish", true);
 	bearLureModel_ = Model::CreateFromOBJ("bearLure", true);
 	weatherModel_ = Model::CreateFromOBJ("weather", true);
 	bossFishModel_ = Model::CreateFromOBJ("fish");
@@ -56,6 +56,9 @@ void GameScene::Initialize(Score* score) {
 	rainbowModel_ = Model::CreateFromOBJ("gameBackground_rainbow", true);
 	cloudModel_ = Model::CreateFromOBJ("gameBackground_storm", true);
 
+	//クマイベントのモデル
+	bearPModel_ = Model::CreateFromOBJ("Bear", true);
+
 	score_ = score;
 
 	// イベントの初期化
@@ -64,10 +67,10 @@ void GameScene::Initialize(Score* score) {
 
 	// クマイベントの初期化
 	Vector3 bearLurePosition = {0, 7, 0}; // ルアーの描画位置
-	Vector3 bearPosition = {-12, 10, 0};  // 熊の描画位置
+	Vector3 bearPosition = {-11, 10, 0};  // 熊の描画位置
 
 	bearEvent_ = new bearEvent();
-	bearEvent_->Initialize(bearLureModel_, bearModel_, &camera_, bearLurePosition, bearPosition);
+	bearEvent_->Initialize(bearLureModel_, bearPModel_, &camera_, bearLurePosition, bearPosition);
 
 	// 天気イベントの初期化
 
@@ -121,7 +124,7 @@ void GameScene::Initialize(Score* score) {
 		for (int confirmation = 0; confirmation < 50 && !setPos; confirmation++) {
 
 			// ランダムな位置に生成
-			fishPos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
+			fishPos = {static_cast<float>(rand() % 280 - 140) / 10.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, static_cast<float>((rand() % 40 - 20) / 10.0f)};
 
 			setPos = true;
 
@@ -263,6 +266,8 @@ GameScene::~GameScene() {
 	delete weatherEvent_;
 	delete weatherModel_;
 	delete bgm_;
+
+	delete bearPModel_;
 
 	for (auto& eventFish : events_) {
 
@@ -507,6 +512,10 @@ void GameScene::Update() {
 
 			if (Input::GetInstance()->TriggerKey(DIK_A)) {
 				weatherEvent_->TriggerRandomWeather();
+			}
+
+			if (Input::GetInstance()->TriggerKey(DIK_D)) {
+				bearEvent_->isBearEvent_ = true;
 			}
 
 			ImGui::Begin("Game Scene");
@@ -837,7 +846,7 @@ void GameScene::SpawnFish() {
 
 	// === 位置を決定 ===
 	for (int confirmation = 0; confirmation < 50 && !setPos; confirmation++) {
-		fishPos = {0.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, 0.0f};
+		fishPos = {static_cast<float>(rand() % 280 - 140) / 10.0f, static_cast<float>(rand() % 60) / 10.0f - 2.0f, 0.0f};
 		setPos = true;
 
 		// 小さい魚と距離確認

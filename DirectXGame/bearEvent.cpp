@@ -18,7 +18,7 @@ void bearEvent::Initialize(
 	bearModel_ = bearModel;
 	bearWorldTransform_.Initialize();
 	bearWorldTransform_.translation_ = bearPosition;
-	bearWorldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	bearWorldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 
 	camera_ = camera;
 
