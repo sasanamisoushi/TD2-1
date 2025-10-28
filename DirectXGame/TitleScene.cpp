@@ -85,4 +85,8 @@ void TitleScene::Draw() {
 }
 
 TitleScene::~TitleScene() 
-{ delete bgm_; }
+{ 
+delete bgm_; 
+delete fade_;
+
+}

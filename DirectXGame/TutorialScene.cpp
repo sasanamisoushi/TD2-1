@@ -4,13 +4,12 @@
 
 using namespace KamataEngine;
 
-TutorialScene::~TutorialScene() 
-{
-	for (int i = 0; i < 2; i++)
-	{
-		delete tutorialSprites[i];
-		tutorialSprites[i] = nullptr;
+TutorialScene::~TutorialScene() {
+	for (auto sprite : tutorialSprites) {
+		delete sprite;
 	}
+	tutorialSprites.clear();
+	tutorialScoreGround_.clear();
 }
 
 void TutorialScene::Initialize() {
@@ -20,23 +19,19 @@ void TutorialScene::Initialize() {
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
 
 	phase_ = Phase::kFadeIn;
-	
 	timer = 0;
 
-	
+	tutorialScoreGround_.push_back(TextureManager::Load("./Resources/Tutorial/explanation.png"));
+	tutorialScoreGround_.push_back(TextureManager::Load("./Resources/Tutorial/Scorecard.png"));
 
-	tutorialScoreGround_[0] = TextureManager::Load("./Resources/tutorial/explanation.png");
-	tutorialScoreGround_[1] = TextureManager::Load("./Resources/tutorial/Scorecard.pmg");
-
-	for (int i = 0; i < 2; i++)
-	{
-		tutorialSprites[i] = Sprite::Create(tutorialScoreGround_[i], {0.0f, 0.0f});
+	for (auto handle : tutorialScoreGround_) {
+		Sprite* sprite = Sprite::Create(handle, {0.0f, 0.0f});
+		tutorialSprites.push_back(sprite);
 	}
 	page = 0;
 }
 
-void TutorialScene::Update() 
-{
+void TutorialScene::Update() {
 	fade_->Update();
 	switch (phase_) {
 	case TutorialScene::Phase::kFadeIn:
@@ -45,14 +40,10 @@ void TutorialScene::Update()
 		}
 		break;
 	case TutorialScene::Phase::kMain:
-		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE))
-		{
-			if (page == 0)
-			{
+		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+			if (page == 0) {
 				page = 1;
-			}
-			else if (page == 1)
-			{
+			} else if (page == 1) {
 				isFinish = true;
 			}
 		}
@@ -72,19 +63,13 @@ void TutorialScene::Update()
 	}
 }
 
-void TutorialScene::Draw() 
-{
+void TutorialScene::Draw() {
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	// 2d描画
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
-	if (page == 0) 
-	{
-		tutorialSprites[0]->Draw();
-	}
-	if (page == 1) 
-	{
-		tutorialSprites[1]->Draw();
+	if (page < tutorialSprites.size()) {
+		tutorialSprites[page]->Draw();
 	}
 
 	Sprite::PostDraw();
