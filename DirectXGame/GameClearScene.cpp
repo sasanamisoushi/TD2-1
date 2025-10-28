@@ -22,7 +22,7 @@ void GameClearScene::Initialize(Score* score)
 
 	timer = 0;
 
-	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/All the Fixings.mp3");
+	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/Sunny Day.mp3");
 
 }
 

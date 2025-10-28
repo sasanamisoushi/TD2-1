@@ -6,8 +6,10 @@
 #include <cstdlib>
 #include <numbers>
 
-void BossFish::Initialize(Model* model, Camera* camera, Score* score, KamataEngine::Vector3& position, int getTimer) 
-{
+BossFish::~BossFish() 
+{ delete bgm_; }
+
+void BossFish::Initialize(Model* model, Camera* camera, Score* score, KamataEngine::Vector3& position, int getTimer) {
 
 	// スポーンの範囲を５～-２にする
 
@@ -33,7 +35,10 @@ void BossFish::Initialize(Model* model, Camera* camera, Score* score, KamataEngi
 	isBossEvent_ = false;
 	isBossSpoon_ = false;
 
-	bossBgm_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
+	bgm_ = new BGM();
+	bgm_->Initialize();
+
+	bossBgm_ = Audio::GetInstance()->LoadWave("./BGM/Run.mp3");
 }
 
 void BossFish::Update() 
