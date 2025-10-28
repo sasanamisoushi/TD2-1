@@ -52,6 +52,8 @@ public:
 
 	void ClearAllFish();
 
+	void ClearEventFish();
+
 	Model* GetFishModel() { return fishModel_; }
 	Model* GetSwimmyModel() { return swimmyModel_; }
 

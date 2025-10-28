@@ -492,6 +492,8 @@ void GameScene::Update() {
 						score_->FileWrite();
 						bgm_->BGMStop();
 					} else {
+						ClearAllFish();
+						ClearEventFish();
 						bossFish_->isBossEvent_ = true;
 						bossFish_->isBossSpoon_ = true;
 						gameTimer_ = 100;
@@ -515,6 +517,7 @@ void GameScene::Update() {
 			if (Input::GetInstance()->TriggerKey(DIK_B))
 			{
 				ClearAllFish();
+				ClearEventFish();
 				bossFish_->isBossEvent_ = true;
 				bossFish_->isBossSpoon_ = true;
 				bgm_->BGMStop();
@@ -850,6 +853,10 @@ void GameScene::CheckBossCollisions()
 }
 
 void GameScene::SpawnFish() {
+	if (bossFish_->isBossEvent_) {
+		return;
+	}
+
 	bool moveRight = (rand() % 2 == 0);
 	Vector3 fishPos;
 	bool setPos = false;
@@ -1043,6 +1050,13 @@ void GameScene::ClearAllFish() {
 	}
 	rubbishes_.clear();
 	rubbishCount = 0;
+}
+
+void GameScene::ClearEventFish() {
+	for (auto& eventFish : events_) {
+		delete eventFish;
+	}
+	events_.clear();
 }
 
 Vector3 GameScene::GetRandomPos() {
