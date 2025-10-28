@@ -44,8 +44,12 @@ private:
 
 	uint32_t titleBgmHandle_; // タイトルのBGM
 
+	// テクスチャハンドル
+	uint32_t titleBackground_ = 0u;
+
 	//タイトル画像
-	//KamataEngine::Sprite* titleSprite_ =nullptr;
+	KamataEngine::Sprite* titleSprite_ =nullptr;
+	
 
 
 };

@@ -23,8 +23,8 @@ void TutorialScene::Initialize() {
 
 	timer = 0;
 
-	tutorialScoreGround_[0] = TextureManager::Load("./Resources/scoreBackground/scoreBackground.png");
-	tutorialScoreGround_[1] = TextureManager::Load("./Resources/scoreBackground/scoreBackground.png");
+	tutorialScoreGround_[0] = TextureManager::Load("./Resources/tutorial﻿/explanation.png");
+	tutorialScoreGround_[1] = TextureManager::Load("./Resources/tutorial﻿/Scorecard.png");
 
 	for (int i = 0; i < 2; i++)
 	{
