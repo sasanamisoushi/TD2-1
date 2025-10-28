@@ -46,9 +46,9 @@ private:
 	int timer;
 
 	// テクスチャハンドル
-	std::array<uint32_t, 2> tutorialScoreGround_ = {}; // 配列 数字
+	std::vector<uint32_t> tutorialScoreGround_; 
 
-	std::array<KamataEngine::Sprite*, 2> tutorialSprites= {};
+	std::vector<KamataEngine::Sprite*> tutorialSprites;
 
 	int page;
 
