@@ -17,7 +17,7 @@ void TitleScene::Initialize() {
 
 	titleBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
 
-	titleBackground_ = TextureManager::Load("Resources/titleText/");
+	titleBackground_ = TextureManager::Load("./Resources/titleText/title1.png");
 
 	// スプライト作成
 	titleSprite_ = Sprite::Create(titleBackground_, {0.0f, 0.0f});
