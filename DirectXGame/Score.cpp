@@ -50,7 +50,8 @@ void Score::Initialize()
 	{
 		for (int j = 0; j < 10; j++)
 		{
-			rankingSprites[i][j] = Sprite::Create(tex_[0], {float(970 + (30 * j)), float(60 + (40 * i))}, collar, {0.0f, 0.0f}, false, false);
+			rankingSprites[i][j] = Sprite::Create(tex_[0], {float(480 + (30 * j)), float(350 + (40 * i))}, collar, {0.0f, 0.0f}, false, false);
+			
 		}
 	}
 
@@ -158,6 +159,7 @@ void Score::RankingDraw()
 	{
 		for (int j = 0; j < ketaNum; j++)
 		{
+			
 			rankingSprites[i][j]->SetTextureHandle(tex_[keta[i][j]]);
 			rankingSprites[i][j]->Draw();
 		}

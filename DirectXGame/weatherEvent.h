@@ -2,7 +2,6 @@
 #include "Fish.h"
 #include "KamataEngine.h"
 #include "math.h"
-#include "BGM.h"
 
 class weatherEvent {
 public:
@@ -69,15 +68,4 @@ private:
 	bool wasRaining_ = false;
 	bool rainJustEnded_ = false;
 
-	BGM* bgm_ = nullptr;
-
-	uint32_t bgmBox_; // 四つのBGMを切り替えて流す箱
-
-	uint32_t rainBgm_; // 雨の時のBGM
-
-	uint32_t rainbowBgm_; // 虹の時
-
-	uint32_t cloudBgm_; // 雲の時
-
-	uint32_t meteorBgm_; // 隕石の時 
 };

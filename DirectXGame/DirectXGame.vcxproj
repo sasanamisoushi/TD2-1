@@ -122,6 +122,7 @@
     <ClCompile Include="Rubbish.cpp" />
     <ClCompile Include="SwimmyEvent.cpp" />
     <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="TutorialScene.cpp" />
     <ClCompile Include="weatherEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +216,7 @@
     <ClInclude Include="Rubbish.h" />
     <ClInclude Include="SwimmyEvent.h" />
     <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="TutorialScene.h" />
     <ClInclude Include="weatherEvent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

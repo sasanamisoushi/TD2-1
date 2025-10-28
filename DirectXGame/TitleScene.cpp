@@ -35,7 +35,6 @@ void TitleScene::Update() {
 	case TitleScene::Phase::kMain:
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			isFinish = true;
-			bgm_->BGMStop();
 		}
 
 		break;
