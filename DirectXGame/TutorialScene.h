@@ -1,24 +1,28 @@
 #pragma once
-#include "KamataEngine.h"
-#include "Score.h"
-#include "BGM.h"
 #include "Fade.h"
+#include "KamataEngine.h"
+#include <array>
 
-class GameClearScene
+namespace KamataEngine {
+class Sprite;
+}
+
+class TutorialScene
 {
 public:
 
 	// フェード
-	enum class Phase { 
+	enum class Phase
+	{ 
 		kFadeIn, 
 		kMain, 
 		kfadeOut 
 	};
 
-	~GameClearScene();
+	~TutorialScene();
 
 	// 初期化
-	void Initialize(Score* score);
+	void Initialize();
 
 	// 更新
 	void Update();
@@ -30,24 +34,22 @@ public:
 	bool IsFinished() const { return isFinish; }
 
 private:
+
 	// 終了フラグ
 	bool isFinish = false;
 
-	//スコア
-	Score* score_ = nullptr;
-	BGM* bgm_ = nullptr;
-
-	// フェード
+		// フェード
 	Fade* fade_ = nullptr;
 	Phase phase_ = Phase::kFadeIn;
 
 	// フェード用
 	int timer;
 
-	uint32_t gameClearBgmHandle_; // クリアしたときのBGM
-
 	// テクスチャハンドル
-	uint32_t scoreBackground_ = 0u;
+	std::array<uint32_t, 2> tutorialScoreGround_ = {}; // 配列 数字
 
-	KamataEngine::Sprite* ClearSprite_ = nullptr;
+	std::array<KamataEngine::Sprite*, 2> tutorialSprites= {};
+
+	int page;
+
 };

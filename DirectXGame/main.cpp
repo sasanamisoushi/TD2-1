@@ -4,7 +4,8 @@
 #include "GameClearScene.h"
 #include "Score.h"
 #include <Windows.h>
-
+#include "TutorialScene.h"
+#include "BGM.h"
 
 using namespace KamataEngine;
 
@@ -12,6 +13,7 @@ using namespace KamataEngine;
 enum class Scene {
 	kUnknown = 0,
 	kTitle,
+	kTutorial,
 	kGame,
 	kGameClear,
 };
@@ -32,7 +34,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	GameScene* gameScene = nullptr;
 	TitleScene* titleScene = nullptr;
 	GameClearScene* gameClearScene = nullptr;
-	
+	TutorialScene* tutorialScene = nullptr;
+	BGM* bgm_ = nullptr;
 
 	// 現在と次のシーンの状態変数
 	Scene currentSceneEnum = Scene::kTitle;
@@ -45,6 +48,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Score* score;
 	score = new Score();
 	score->Initialize();
+
+	bgm_ = new BGM();
+	bgm_->Initialize();
 
 	// メインループ
 	while (true) {
@@ -63,6 +69,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			case Scene::kTitle:
 				delete titleScene;
 				titleScene = nullptr;
+				break;
+			case Scene::kTutorial:
+				delete tutorialScene;
+				tutorialScene = nullptr;
 				break;
 			case Scene::kGame:
 				delete gameScene;
@@ -85,6 +95,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				titleScene = new TitleScene();
 				titleScene->Initialize();
 				break;
+			case Scene::kTutorial:
+				tutorialScene = new TutorialScene();
+				tutorialScene->Initialize();
+				break;
 			case Scene::kGame:
 				gameScene = new GameScene();
 				gameScene->Initialize(score);
@@ -103,10 +117,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 					titleScene->Update();
 				    score->ResetScore();
 					if (titleScene->IsFinished()) {
-						nextSceneEnum = Scene::kGame;
+						nextSceneEnum = Scene::kTutorial;
 					}
 				}
 				break;
+		    case Scene::kTutorial:
+			    if (tutorialScene != nullptr) {
+				    tutorialScene->Update();
+				    if (tutorialScene->IsFinished()) {
+					    nextSceneEnum = Scene::kGame;
+					    bgm_->BGMStop();
+				    }
+			    }
+			    break;
 			case Scene::kGame:
 				if (gameScene != nullptr) {
 					gameScene->Update();
@@ -136,6 +159,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 					titleScene->Draw();
 				}
 				break;
+		    case Scene::kTutorial:
+			    if (tutorialScene != nullptr) {
+				    tutorialScene->Draw();
+			    }
+			    break;
 			case Scene::kGame:
 				if (gameScene != nullptr) {
 					gameScene->Draw();
