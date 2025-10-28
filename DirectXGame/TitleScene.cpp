@@ -17,7 +17,10 @@ void TitleScene::Initialize() {
 
 	titleBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
 
-	//titleSprite_ = TextureManager::Load("Resources/titleText/")
+	titleBackground_ = TextureManager::Load("Resources/titleText/");
+
+	// スプライト作成
+	titleSprite_ = Sprite::Create(titleBackground_, {0.0f, 0.0f});
 
 }
 
@@ -68,6 +71,11 @@ void TitleScene::Draw() {
 
 	// スプライト描画前処理
 	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	if (titleSprite_) {
+
+		titleSprite_->Draw();
+	}
 
 	//フェード
 	fade_->Draw(dxCommon->GetCommandList());
