@@ -23,7 +23,10 @@ void GameClearScene::Initialize(Score* score)
 	timer = 0;
 
 	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/Sunny Day.mp3");
+	scoreBackground_ = TextureManager::Load("./Resources/scoreBackground/scoreBackground.png");
 
+	//スプライト作成
+	ClearSprite_ = Sprite::Create(scoreBackground_, {0.0f, 0.0f});
 }
 
 GameClearScene::~GameClearScene()
@@ -79,6 +82,11 @@ void GameClearScene::Draw()
 
 	// 2d描画
 	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	if (ClearSprite_) {
+		
+		ClearSprite_->Draw();
+	}
 
 	score_->Draw();
 	score_->RankingDraw();

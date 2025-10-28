@@ -133,7 +133,7 @@ private:
 	// タイマー
 	uint32_t numTexHandles_[10];
 	Sprite* numSprite_[3];
-	int gameTimer_ = 18000;
+	int gameTimer_ = 12000;
 	bool isGame_ = true; // ゲーム中か
 
 	static GameScene* instance_;
@@ -166,6 +166,8 @@ private:
 	//雲背景
 	Model* cloudModel_ = nullptr;
 
+	//クマ
+	Model* bearPModel_ = nullptr;
 
 	//魚の最大数
 	int totalFishMax;

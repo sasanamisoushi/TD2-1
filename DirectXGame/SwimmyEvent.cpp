@@ -312,7 +312,7 @@ void SwimmyEvent::Reset() {
 	fishes_.clear();
 	isActive_ = false;
 	groupTimer_ = 0;
-
+	
 
 
 
@@ -321,11 +321,6 @@ void SwimmyEvent::Reset() {
 		onEventEnd_();
 	}
 
-	
-
-	#ifdef _DEBUG
-	OutputDebugStringA("[SwimmyEvent] Reset() called\n");
-#endif
 }
 
 SwimmyEvent::~SwimmyEvent() {

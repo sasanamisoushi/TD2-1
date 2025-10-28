@@ -18,7 +18,7 @@ void bearEvent::Initialize(
 	bearModel_ = bearModel;
 	bearWorldTransform_.Initialize();
 	bearWorldTransform_.translation_ = bearPosition;
-	bearWorldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	bearWorldTransform_.rotation_.y = std::numbers::pi_v<float> * 3.0f / 2.0f;
 
 	camera_ = camera;
 
@@ -38,7 +38,7 @@ void bearEvent::Initialize(
 	// タイマー
 	timer_ = 0.0f;
 	// 持続時間
-	duration_ = 50.0f;
+	duration_ = 30.0f;
 }
 
 void bearEvent::Update() 
@@ -54,6 +54,9 @@ void bearEvent::Update()
 	if (timer_ >= duration_)
 	{
 		isBearEvent_ = false;
+		timer_ = 0.0f;
+		Reset();
+		return;
 	}
 
 	// 処理

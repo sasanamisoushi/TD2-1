@@ -44,4 +44,9 @@ private:
 	int timer;
 
 	uint32_t gameClearBgmHandle_; // クリアしたときのBGM
+
+	// テクスチャハンドル
+	uint32_t scoreBackground_ = 0u;
+
+	KamataEngine::Sprite* ClearSprite_ = nullptr;
 };
