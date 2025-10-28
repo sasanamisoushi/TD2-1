@@ -14,6 +14,8 @@ class BossFish
 {
 public:
 
+	~BossFish();
+
 	// 初期化（座標と速度方向を指定）
 
 	void Initialize(Model* model, Camera* camera, Score* score, KamataEngine::Vector3& position, int getTimer);

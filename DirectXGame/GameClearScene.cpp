@@ -22,12 +22,11 @@ void GameClearScene::Initialize(Score* score)
 
 	timer = 0;
 
-	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/All the Fixings.mp3");
+	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/Sunny Day.mp3");
 	scoreBackground_ = TextureManager::Load("./Resources/scoreBackground/scoreBackground.png");
 
 	//スプライト作成
 	ClearSprite_ = Sprite::Create(scoreBackground_, {0.0f, 0.0f});
-
 }
 
 GameClearScene::~GameClearScene()

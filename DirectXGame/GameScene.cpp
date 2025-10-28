@@ -517,6 +517,7 @@ void GameScene::Update() {
 				ClearAllFish();
 				bossFish_->isBossEvent_ = true;
 				bossFish_->isBossSpoon_ = true;
+				bgm_->BGMStop();
 			}
 
 			if (Input::GetInstance()->TriggerKey(DIK_A)) {
