@@ -20,11 +20,13 @@ void TutorialScene::Initialize() {
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
 
 	phase_ = Phase::kFadeIn;
-
+	
 	timer = 0;
 
-	tutorialScoreGround_[0] = TextureManager::Load("./Resources/tutorial﻿/explanation.png");
-	tutorialScoreGround_[1] = TextureManager::Load("./Resources/tutorial﻿/Scorecard.png");
+	
+
+	tutorialScoreGround_[0] = TextureManager::Load("./Resources/tutorial/explanation.png");
+	tutorialScoreGround_[1] = TextureManager::Load("./Resources/tutorial/Scorecard.pmg");
 
 	for (int i = 0; i < 2; i++)
 	{
