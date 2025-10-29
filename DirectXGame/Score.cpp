@@ -63,7 +63,6 @@ void Score::Initialize()
 	isScoreBossClear = false;
 
 	combo_ = 0;
-
 	
 	comboNumSprites_[0] = Sprite::Create(tex_[1], {970, 50}, collar, {0.0f, 0.0f}, false, false);
 	comboNumSprites_[1] = Sprite::Create(tex_[2], {970, 50}, collar, {0.0f, 0.0f}, false, false);
@@ -74,7 +73,7 @@ void Score::Initialize()
 
 	comboGH = TextureManager::Load("num/combo.png");
 
-	comboSprites_ = Sprite::Create(comboGH, {1000, 40}, collar, {0.0f, 0.0f}, false, false);
+	comboSprites_ = Sprite::Create(comboGH, {1140, 60}, collar, {0.0f, 0.0f}, false, false);
 	
 
 
@@ -150,12 +149,14 @@ void Score::Draw()
 		sprites_[i]->SetTextureHandle(tex_[keta[i]]);
 		sprites_[i]->Draw();
 	}
-	
-	if (combo_ > 0)
+	if (isComboDraw_)
 	{
-		comboNumSprites_[combo_]->Draw();
-		comboSprites_->Draw();
+		if (combo_ > 0) {
+			comboNumSprites_[combo_ - 1]->Draw();
+			comboSprites_->Draw();
+		}
 	}
+	
 }
 
 void Score::RankingDraw()
@@ -300,10 +301,10 @@ void Score::SetScoreDisplayMode(DisplayMode mode) {
 
 
 	if (mode == DisplayMode::Normal) {
-		scale = 30.0f;
-		baseX = 950.0f;
-		baseY = 20.0f;
-		spacing = 20.0f ;
+		scale = 50.0f;
+		baseX = 920.0f;
+		baseY = 10.0f;
+		spacing = 35.0f ;
 	} else if (mode == DisplayMode::Result) {
 		scale = 70.0f;
 		baseX = 600.0f; // 画面中央寄りに

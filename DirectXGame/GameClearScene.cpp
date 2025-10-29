@@ -9,7 +9,7 @@ using namespace KamataEngine;
 void GameClearScene::Initialize(Score* score) 
 { 
 	//スコア
-	score_ = score; 
+	score_ = score;
 	score_->SetScoreDisplayMode(Score::DisplayMode::Result);
 
 	//BGM

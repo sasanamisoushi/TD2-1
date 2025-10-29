@@ -93,7 +93,7 @@ public:
 	// スイミーイベントの時だけの処理
 	bool isSwimmyFish_ = false;
 
-	
+	bool isSmallFish_ = false;
 
 	bool IsAlive() const { return isAlive_; }
 	

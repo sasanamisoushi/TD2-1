@@ -163,10 +163,15 @@ void Fish::OnCollision(Player* player)
 	// ゲットタイマーを減らす
 	fishGetTimer_--;
 	// ゲットタイマーが0になったらゲット
-	if (fishGetTimer_ < 0) {
+	if (fishGetTimer_ < 0 && !isLureCheck_)
+	{
 		isLureCheck_ = true;
-		score_->AddScoreCombo(point_);
-		if (isSwimmyFish_) {
+		if (isSmallFish_) 
+		{
+			score_->AddScoreCombo(point_);
+		}
+		
+ 		if (isSwimmyFish_) {
 
 			isAlive_ = false;
 		} else {
