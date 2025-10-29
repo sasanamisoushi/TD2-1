@@ -44,6 +44,8 @@ public:
 
 	void SetScoreDisplayMode(DisplayMode mode);
 
+	bool isComboDraw_ = false;
+
 private:
 
 	int score_;

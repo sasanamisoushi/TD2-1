@@ -502,8 +502,9 @@ void GameScene::Update() {
 						gameTimer_ = 120000;
 						bgm_->BGMStop();
 					}
-				} else {
-
+				} 
+				else
+				{
 					gameTimer_ = 0;
 					isGame_ = false;
 					isFinish = true;
@@ -511,7 +512,17 @@ void GameScene::Update() {
 					bgm_->BGMStop();
 				}
 			}
-			
+			if (bossFish_->isBossEvent_) 
+			{
+				if (!bossFish_->isBossSpoon_)
+				{
+					gameTimer_ = 0;
+					isGame_ = false;
+					isFinish = true;
+					score_->FileWrite();
+					bgm_->BGMStop();
+				}
+			}
 			CheckAllCollisions();
 
 
@@ -739,6 +750,7 @@ void GameScene::CheckAllCollisions() {
 			player_->playerHit_ = true;
 			fish->fishHit_ = true;
 			fish->OnCollision(player_);
+			fish->isSmallFish_ = true;
 		}
 		// ルアーと魚が当たってないとき
 		else {

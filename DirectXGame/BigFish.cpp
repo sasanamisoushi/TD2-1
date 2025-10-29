@@ -75,6 +75,7 @@ void BigFish::OnCollision(Player* player)
 
 	if (fishGetTimer_ < 0 && !isLureCheck_) {
 		isLureCheck_ = true;
+
 		score_->AddScore(point_);
 
 		// ★ 重複実行を防ぐため即座に無効化！
