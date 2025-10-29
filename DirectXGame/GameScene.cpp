@@ -87,7 +87,6 @@ void GameScene::Initialize(Score* score) {
 	// BGMの初期化
 	bgm_ = new BGM();
 	bgm_->Initialize();
-
 	// 背景オブジェクトのワールド座標設定
 	backgroundTransform_.Initialize();
 	backgroundTransform_.translation_ = {0.0f, 5.0f, 10.0f}; // ← zを大きくしてt奥に
@@ -223,8 +222,6 @@ void GameScene::Initialize(Score* score) {
 		attempts++;
 	}
 
-	gamePlayBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/All the Fixings.mp3");
-
 	// タイマー
 	// 数字の描画
 	numTexHandles_[0] = TextureManager::Load("num/0.png");
@@ -281,7 +278,6 @@ GameScene::~GameScene() {
 	delete bearLureModel_;
 	delete weatherEvent_;
 	delete weatherModel_;
-	delete bgm_;
 
 	delete bearPModel_;
 
@@ -301,7 +297,6 @@ GameScene::~GameScene() {
 void GameScene::Update() {
 
 	fade_->Update();
-	bgm_->BGMPlay(gamePlayBgmHandle_);
 	float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
 	int caughtFishCount = 0;
 	switch (phase_) {
@@ -469,7 +464,6 @@ void GameScene::Update() {
 		if (Input::GetInstance()->TriggerKey(DIK_S)) {
 			isFinish = true;
 			score_->FileWrite();
-			bgm_->BGMStop();
 		}
 		CheckAllCollisions();
 		CheckBearCollisions();
@@ -488,7 +482,6 @@ void GameScene::Update() {
 						isGame_ = false;
 						isFinish = true;
 						score_->FileWrite();
-						bgm_->BGMStop();
 					} else {
 						ClearAllFish();
 						ClearEventFish();
@@ -498,15 +491,13 @@ void GameScene::Update() {
 						swimmyEvent_->Reset();
 						weatherEvent_->isActive_=false;
 						
-						gameTimer_ = 60000;
-						bgm_->BGMStop();
+						gameTimer_ = 6000;
 					}
 				} else {
 					gameTimer_ = 0;
 					isGame_ = false;
 					isFinish = true;
 					score_->FileWrite();
-					bgm_->BGMStop();
 				}
 			}
 			if (bossFish_->isBossEvent_) {
@@ -515,7 +506,6 @@ void GameScene::Update() {
 					isGame_ = false;
 					isFinish = true;
 					score_->FileWrite();
-					bgm_->BGMStop();
 				}
 			}
 			CheckAllCollisions();
@@ -527,7 +517,6 @@ void GameScene::Update() {
 				ClearEventFish();
 				bossFish_->isBossEvent_ = true;
 				bossFish_->isBossSpoon_ = true;
-				bgm_->BGMStop();
 			}
 
 			if (Input::GetInstance()->TriggerKey(DIK_A)) {

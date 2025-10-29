@@ -75,7 +75,6 @@ private:
 	SwimmyEvent* swimmyEvent_=nullptr;
 	bearEvent* bearEvent_=nullptr;
 	weatherEvent* weatherEvent_=nullptr;
-	BGM* bgm_ = nullptr;
 	BossFish* bossFish_ = nullptr;
 
 	
@@ -135,8 +134,8 @@ private:
 	// タイマー
 	uint32_t numTexHandles_[10];
 	Sprite* numSprite_[3];
-	int gameTimer_ = 12000;
-	//int gameTimer_ = 120;
+	//int gameTimer_ = 12000;
+	int gameTimer_ = 120;
 	bool isGame_ = true; // ゲーム中か
 
 	static GameScene* instance_;
@@ -180,8 +179,5 @@ private:
 
 
 	float weatherMultiplier;
-  
-  // プレイ中のBGM
-	uint32_t gamePlayBgmHandle_; 
 	
 };

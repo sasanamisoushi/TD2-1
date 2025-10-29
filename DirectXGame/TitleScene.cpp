@@ -11,11 +11,7 @@ void TitleScene::Initialize() {
 	phase_ = Phase::kFadeIn;
 
 	timer = 0;
-
-	bgm_ = new BGM();
-	bgm_->Initialize();
-
-	titleBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
+	
 
 	titleBackground_ = TextureManager::Load("./Resources/titleText/title1.png");
 
@@ -28,7 +24,6 @@ void TitleScene::Update() {
 	
 
 	fade_->Update();
-	bgm_->BGMPlay(titleBgmHandle_);
 	switch (phase_) {
 	case TitleScene::Phase::kFadeIn:
 		if (fade_->isFinished()) {
@@ -86,7 +81,6 @@ void TitleScene::Draw() {
 
 TitleScene::~TitleScene() 
 { 
-delete bgm_; 
-delete fade_;
+	delete fade_;
 
 }
