@@ -33,6 +33,10 @@ public:
 	 // ★ イベント終了時に呼ばれるコールバック
 	void SetOnEventEnd(std::function<void()> callback) { onEventEnd_ = callback; }
 
+	
+	// イベントが発生中かどうか
+	bool isActive_ = false;
+
 	~SwimmyEvent();
 
 private:
@@ -49,8 +53,7 @@ private:
 	
 	//---------群れの状態制御---------
 	
-	//イベントが発生中かどうか
-	bool isActive_ = false;
+	
 
 	//群れの存在時間カウンタ
 	float groupTimer_ = 0;

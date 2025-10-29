@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "math.h"
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <numbers>
@@ -56,20 +57,20 @@ void GameScene::Initialize(Score* score) {
 	rainbowModel_ = Model::CreateFromOBJ("gameBackground_rainbow", true);
 	cloudModel_ = Model::CreateFromOBJ("gameBackground_storm", true);
 
-	//クマイベントのモデル
+	// クマイベントのモデル
 	bearPModel_ = Model::CreateFromOBJ("Bear", true);
 
-	//スコア
+	// スコア
 	score_ = score;
 	score_->SetScoreDisplayMode(Score::DisplayMode::Normal);
 
 	// イベントの初期化
 	swimmyEvent_ = new SwimmyEvent();
-	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_,score_);
+	swimmyEvent_->Initialize(fishModel_, swimmyModel_, &camera_, score_);
 
 	// クマイベントの初期化
 	Vector3 bearLurePosition = {0, 7, 0}; // ルアーの描画位置
-	Vector3 bearPosition = {-11, 9, 0};  // 熊の描画位置
+	Vector3 bearPosition = {-11, 9, 0};   // 熊の描画位置
 
 	bearEvent_ = new bearEvent();
 	bearEvent_->Initialize(bearLureModel_, bearPModel_, &camera_, bearLurePosition, bearPosition);
@@ -81,8 +82,11 @@ void GameScene::Initialize(Score* score) {
 
 	bossFish_ = new BossFish();
 	Vector3 bossPosition = {0, float(rand() % 7 - 2), 0};
-	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition,10);
-
+	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition, 60);
+	
+	// BGMの初期化
+	bgm_ = new BGM();
+	bgm_->Initialize();
 	// 背景オブジェクトのワールド座標設定
 	backgroundTransform_.Initialize();
 	backgroundTransform_.translation_ = {0.0f, 5.0f, 10.0f}; // ← zを大きくしてt奥に
@@ -98,9 +102,9 @@ void GameScene::Initialize(Score* score) {
 	});
 
 	// 制限数
-	totalFishMax = 15; // 全体の最大数
-	const int bigFishMax = 5;    // 大きい魚の最大数
-	const int EventFisMax = 1;   // イベントの魚の最大数
+	totalFishMax = 15;         // 全体の最大数
+	const int bigFishMax = 5;  // 大きい魚の最大数
+	const int EventFisMax = 1; // イベントの魚の最大数
 	bigCount = 0;
 	smallCount = 0;
 	rubbishCount = 0;
@@ -111,8 +115,8 @@ void GameScene::Initialize(Score* score) {
 
 		bool moveRight = (rand() % 2 == 0);
 		bool isBigFish = (rand() % 100 < 40);
-		bool isRubbish = (rand() % 100 < 20);
-		bool isEvent = (rand() % 100 < 10);
+		bool isRubbish = (rand() % 100 < 30);
+		bool isEvent = (rand() % 100 < 20);
 
 		Vector3 fishPos;
 		bool setPos = false;
@@ -233,8 +237,12 @@ void GameScene::Initialize(Score* score) {
 
 	// 数字の初期化
 	numSprite_[0] = Sprite::Create(numTexHandles_[0], {30, 30});
-	numSprite_[1] = Sprite::Create(numTexHandles_[0], {50, 30});
-	numSprite_[2] = Sprite::Create(numTexHandles_[0], {70, 30});
+	numSprite_[1] = Sprite::Create(numTexHandles_[0], {55, 30});
+	numSprite_[2] = Sprite::Create(numTexHandles_[0], {85, 30});
+
+	for (int i = 0; i < 3; i++) {
+		numSprite_[i]->SetSize({50, 50});
+	}
 }
 
 GameScene::~GameScene() {
@@ -298,7 +306,7 @@ void GameScene::Update() {
 			phase_ = Phase::kMain; // フェードイン完了 -> メインフェーズへ
 		}
 		break;
-	case GameScene::Phase::kMain: 
+	case GameScene::Phase::kMain:
 
 		player_->Update();
 		// 小さい魚
@@ -345,8 +353,7 @@ void GameScene::Update() {
 			}
 		}
 		// ぬしの処理
-		if (bossFish_)
-		{
+		if (bossFish_) {
 			bossFish_->Update();
 		}
 
@@ -368,7 +375,7 @@ void GameScene::Update() {
 		}
 
 		// 魚が取れた時
-	
+
 		fishes_.remove_if([&caughtFishCount](Fish* fish) {
 			if (fish->IsLureCheck()) {
 				delete fish;
@@ -417,6 +424,7 @@ void GameScene::Update() {
 					break;
 				case EventFish::FishEventType::WeatherChange:
 
+
 					if (weatherEvent_) 
 					{
 						weatherEvent_->TriggerRandomWeather();
@@ -462,16 +470,12 @@ void GameScene::Update() {
 		CheckBossCollisions();
 
 		// タイマー処理
-		if (isGame_)
-		{
-			if (gameTimer_ > 0)
-			{
+		if (isGame_) {
+			if (gameTimer_ > 0) {
 				gameTimer_--;
 			}
-			if (gameTimer_ <= 0) 
-			{
-				if (!bossFish_->isBossEvent_)
-				{
+			if (gameTimer_ <= 0) {
+				if (!bossFish_->isBossEvent_) {
 					score_->scoreBossClear();
 					if (!score_->isScoreBossClear) {
 						gameTimer_ = 0;
@@ -483,22 +487,21 @@ void GameScene::Update() {
 						ClearEventFish();
 						bossFish_->isBossEvent_ = true;
 						bossFish_->isBossSpoon_ = true;
-						bearEvent_->isBearEvent_ = false;
+
+						swimmyEvent_->Reset();
+						weatherEvent_->isActive_=false;
+						
 						gameTimer_ = 6000;
 					}
-				} 
-				else
-				{
+				} else {
 					gameTimer_ = 0;
 					isGame_ = false;
 					isFinish = true;
 					score_->FileWrite();
 				}
 			}
-			if (bossFish_->isBossEvent_) 
-			{
-				if (!bossFish_->isBossSpoon_)
-				{
+			if (bossFish_->isBossEvent_) {
+				if (!bossFish_->isBossSpoon_) {
 					gameTimer_ = 0;
 					isGame_ = false;
 					isFinish = true;
@@ -507,11 +510,9 @@ void GameScene::Update() {
 			}
 			CheckAllCollisions();
 
-
 #ifdef _DEBUG
-      
-			if (Input::GetInstance()->TriggerKey(DIK_B))
-			{
+
+			if (Input::GetInstance()->TriggerKey(DIK_B)) {
 				ClearAllFish();
 				ClearEventFish();
 				bossFish_->isBossEvent_ = true;
@@ -526,8 +527,17 @@ void GameScene::Update() {
 				bearEvent_->isBearEvent_ = true;
 			}
 
-			if (Input::GetInstance()->TriggerKey(DIK_1))
-			{
+			if (Input::GetInstance()->TriggerKey(DIK_W)) {
+				ClearAllFish();
+				ClearEventFish();
+				// 現在のカメラ中心または適当な位置に発生させる
+				KamataEngine::Vector3 spawnPos = {0.0f, 0.0f, 0.0f}; // 画面中央付近
+
+				// 魚群を生成（数や広がりは任意で調整）
+				swimmyEvent_->SpawnFishGroup(spawnPos, 15, 3.0f);
+			}
+
+			if (Input::GetInstance()->TriggerKey(DIK_1)) {
 				score_->AddScoreCombo(point_);
 			}
 
@@ -601,19 +611,14 @@ void GameScene::Update() {
 #endif
 		}
 		break;
-	
 
-	case GameScene::Phase::kfadeOut: 
-	
+	case GameScene::Phase::kfadeOut:
+
 		timer++;
-		if (timer > 120) 
-		{
+		if (timer > 120) {
 			isFinish = true;
-			
 		}
 		break;
-	
-	
 	}
 }
 
@@ -624,7 +629,12 @@ void GameScene::Draw() {
 	// 3Dモデル描画前処理
 	Model::PreDraw(dxCommon->GetCommandList());
 
-	switch (weatherEvent_->GetWeatherType()) {
+	weatherEvent::WeatherType type = weatherEvent_->GetWeatherType();
+	if (!weatherEvent_->isActive_) {
+		type = weatherEvent::WeatherType::Clear;
+	}
+
+	switch (type) {
 	case weatherEvent::WeatherType::Clear:
 		backgroundModel_ = clearModel_;
 		break;
@@ -643,7 +653,7 @@ void GameScene::Draw() {
 	default:
 		break;
 	}
-	
+
 	// 背景描画
 	backgroundModel_->Draw(backgroundTransform_, camera_);
 
@@ -833,8 +843,7 @@ void GameScene::CheckBearCollisions() {
 	}
 }
 
-void GameScene::CheckBossCollisions() 
-{
+void GameScene::CheckBossCollisions() {
 	// 判定対象1と2の座標
 
 	AABB aabb1, aabb2;
@@ -909,10 +918,14 @@ void GameScene::SpawnFish() {
 	}
 
 	// === 天候補正を取得 ===
-	float bigFishChance = weatherEvent_->GetBigFishSpawnRate();      // 虹で上がる
-	float rubbishChance = weatherEvent_->GetRubbishSpawnRate();      // 隕石で上がる
-	float speedMultiplier = weatherEvent_->GetFishSpeedMultiplier(); // 雲で速度変化
-	float MaxCountMultiplier = weatherEvent_->GetFishMaxCountMultiplier(); //雨で発生率の変更
+	float speedMultiplier = weatherEvent_->GetFishSpeedMultiplier();       // 雲で速度変化
+	float MaxCountMultiplier = weatherEvent_->GetFishMaxCountMultiplier(); // 雨で発生率の変更
+
+	// === 出現確率設定 ===
+	// 天候イベント補正
+	float bigFishChance = std::clamp(weatherEvent_->GetBigFishSpawnRate(), 0.05f, 0.25f);
+	float rubbishChance = std::clamp(weatherEvent_->GetRubbishSpawnRate(), 0.05f, 0.20f);
+	float eventChance = 0.20f;
 
 	// --- 出現しない可能性を加える ---
 	// 通常1.0倍 → 雨なら例: 1.5倍 など
@@ -931,9 +944,6 @@ void GameScene::SpawnFish() {
 
 	// === 出現確率を決定 ===
 	float r = static_cast<float>(rand()) / RAND_MAX;
-
-	
-	float eventChance = 0.15f; // 15%の確率でイベント魚出現
 
 	bool otherEventActive = false;
 	// クマイベントがアクティブ
@@ -998,8 +1008,6 @@ void GameScene::SpawnFish() {
 		events_.push_back(eventFish);
 		return; // イベント魚を出したら他は生成しない
 	}
-
-	
 
 	int baseMaxFish = 10;
 	adjustedMaxFish = static_cast<int>(baseMaxFish * weatherEvent_->GetFishMaxCountMultiplier());

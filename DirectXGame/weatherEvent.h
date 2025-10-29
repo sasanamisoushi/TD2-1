@@ -34,6 +34,8 @@ public:
 	//天気がアクティブかどうか
 	bool IsEventActive() const { return isActive_; }
 
+	  
+
 	//魚出現・挙動補正用
 	float GetFishSpeedMultiplier() const;
 	float GetBigFishSpawnRate() const;

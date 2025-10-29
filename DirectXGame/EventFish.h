@@ -31,7 +31,7 @@ private:
 
 	//スコア
 	Score* score_;
-	const int point_ = 300;
+	const int point_ = 1000;
 
 	bool hasTriggered_ = false;
 
