@@ -52,7 +52,7 @@ private:
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
-	
+	 bool isAlive_ = true;
 
 	 // 出現アニメ用
 	Vector3 targetPos_{};

@@ -15,11 +15,21 @@ void EventFish::Update() {
 }
 
 void EventFish::OnCollision(Player* player) {
-	Fish::OnCollision(player);
+	if (!isAlive_)
+		return; // すでに死んでたら無視
 
-	if (isLureCheck_) {
-		// BigFishはスコア加算
+	// ゲット判定
+	fishGetTimer_--;
+
+	if (fishGetTimer_ < 0 && !isLureCheck_) {
+		isLureCheck_ = true;
 		score_->AddScore(point_);
+
+		// ★ 重複実行を防ぐため即座に無効化！
+		isAlive_ = false;
+
+		// プレイヤーをリセット
+		player->Reset();
 	}
 
 	
