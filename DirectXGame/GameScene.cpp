@@ -458,10 +458,7 @@ void GameScene::Update() {
 			SpawnFish();
 		}
 
-		if (Input::GetInstance()->TriggerKey(DIK_S)) {
-			isFinish = true;
-			score_->FileWrite();
-		}
+		
 		CheckAllCollisions();
 		CheckBearCollisions();
 		CheckBossCollisions();
@@ -508,6 +505,11 @@ void GameScene::Update() {
 			CheckAllCollisions();
 
 #ifdef _DEBUG
+
+			if (Input::GetInstance()->TriggerKey(DIK_S)) {
+				isFinish = true;
+				score_->FileWrite();
+			}
 
 			if (Input::GetInstance()->TriggerKey(DIK_B)) {
 				ClearAllFish();
