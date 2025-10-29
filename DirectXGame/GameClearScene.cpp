@@ -10,6 +10,7 @@ void GameClearScene::Initialize(Score* score)
 { 
 	//スコア
 	score_ = score;
+	score_->isComboDraw_ = false;
 	score_->SetScoreDisplayMode(Score::DisplayMode::Result);
 
 	//BGM
