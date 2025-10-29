@@ -39,5 +39,8 @@ private:
 
 	std::function<void(const Vector3&, FishEventType)> onTriggered_;
 
+	// 生きてる or 釣られた
+	bool isAlive_ = true;
+
 	float triggerTimer_;
 };

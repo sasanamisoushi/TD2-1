@@ -67,12 +67,22 @@ AABB BigFish::GetAABB() {
 
 void BigFish::OnCollision(Player* player)
 {
-	// Fishの共通当たり処理（タイマー処理など）
-	Fish::OnCollision(player);
+	if (!isAlive_)
+		return; // すでに死んでたら無視
 
-	if (!isLureCheck_) {
-		// BigFishはスコア加算
+	// ゲット判定
+	fishGetTimer_--;
+
+	if (fishGetTimer_ < 0 && !isLureCheck_) {
+		isLureCheck_ = true;
+
 		score_->AddScore(point_);
+
+		// ★ 重複実行を防ぐため即座に無効化！
+		isAlive_ = false;
+
+		// プレイヤーをリセット
+		player->Reset();
 	}
 	
 }
