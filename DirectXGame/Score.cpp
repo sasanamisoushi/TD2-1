@@ -64,18 +64,24 @@ void Score::Initialize()
 
 	combo_ = 0;
 	
-	comboNumSprites_[0] = Sprite::Create(tex_[1], {970, 50}, collar, {0.0f, 0.0f}, false, false);
-	comboNumSprites_[1] = Sprite::Create(tex_[2], {970, 50}, collar, {0.0f, 0.0f}, false, false);
-	comboNumSprites_[2] = Sprite::Create(tex_[3], {970, 50}, collar, {0.0f, 0.0f}, false, false);
-	comboNumSprites_[3] = Sprite::Create(tex_[4], {970, 50}, collar, {0.0f, 0.0f}, false, false);
-	comboNumSprites_[4] = Sprite::Create(tex_[5], {970, 50}, collar, {0.0f, 0.0f}, false, false);
+	/*comboNumSprites_[0] = Sprite::Create(tex_[1], {1100, 60}, collar, {0.0f, 0.0f}, false, false);
+	comboNumSprites_[1] = Sprite::Create(tex_[2], {1100, 60}, collar, {0.0f, 0.0f}, false, false);
+	comboNumSprites_[2] = Sprite::Create(tex_[3], {1100, 60}, collar, {0.0f, 0.0f}, false, false);
+	comboNumSprites_[3] = Sprite::Create(tex_[4], {1100, 60}, collar, {0.0f, 0.0f}, false, false);
+	comboNumSprites_[4] = Sprite::Create(tex_[5], {1100, 60}, collar, {0.0f, 0.0f}, false, false);*/
+
+	for (int i = 0; i < 5; i++) 
+	{
+		comboNumSprites_[i] = Sprite::Create(tex_[i+1], {1100, 60}, collar, {0.0f, 0.0f}, false, false);
+		comboNumSprites_[i]->SetSize({50, 50});
+	}
 	
 
 	comboGH = TextureManager::Load("num/combo.png");
 
 	comboSprites_ = Sprite::Create(comboGH, {1140, 60}, collar, {0.0f, 0.0f}, false, false);
 	
-
+	isComboDraw_ = false;
 
 }
 
@@ -83,6 +89,7 @@ void Score::AddScore(int score)
 {
 	score_ += score; 
 	combo_ = 0;
+	isComboDraw_ = false;
 }
 
 void Score::AddScoreBear(int score) 
@@ -92,11 +99,26 @@ void Score::AddScoreBear(int score)
 
 void Score::AddScoreCombo(int score) 
 { 
-	if (combo_ < 6) 
-	{
- 		combo_ += 1;
+	if (combo_ < 5) 
+	{	
+		if (combo_ == 5)
+		{
+			combo_ = 5;
+		}
+		else 
+		{
+			combo_ += 1;
+		}
+	}
+	
+
+	if (!isComboDraw_) {
+		isComboDraw_ = true;
 	}
 	score_ += score + (40 * (combo_));
+
+	
+	
 }
 
 void Score::SubtractScore(int score)
@@ -156,7 +178,6 @@ void Score::Draw()
 			comboSprites_->Draw();
 		}
 	}
-	
 }
 
 void Score::RankingDraw()

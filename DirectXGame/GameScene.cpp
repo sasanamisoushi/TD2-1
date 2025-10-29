@@ -81,7 +81,7 @@ void GameScene::Initialize(Score* score) {
 
 	bossFish_ = new BossFish();
 	Vector3 bossPosition = {0, float(rand() % 7 - 2), 0};
-	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition, 10);
+	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition, 90);
 	
 	// BGMの初期化
 	bgm_ = new BGM();
@@ -427,13 +427,7 @@ void GameScene::Update() {
 
 					if (weatherEvent_) 
 					{
-						bgm_->BGMStop();
 						weatherEvent_->TriggerRandomWeather();
-					}
-
-					if (!weatherEvent_->isActive_) 
-					{
-						bgm_->BGMPlay(gamePlayBgmHandle_);
 					}
 
 					break;
@@ -499,7 +493,8 @@ void GameScene::Update() {
 						ClearEventFish();
 						bossFish_->isBossEvent_ = true;
 						bossFish_->isBossSpoon_ = true;
-						gameTimer_ = 120000;
+						bearEvent_->isBearEvent_ = false;
+						gameTimer_ = 6000;
 						bgm_->BGMStop();
 					}
 				} 

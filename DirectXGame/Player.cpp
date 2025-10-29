@@ -82,8 +82,11 @@ void Player::InputMove() {
 			acceleration.y += kLureMoveSpeedY;
 		}
 
-		if (worldTransform_.translation_.y > 8.0f) {
+		if (worldTransform_.translation_.y > 8.0f)
+		{
 			Reset();
+			velocity_.y = 0;
+			acceleration.y = 0;
 		}
 		if (worldTransform_.translation_.y < -2.0f) {
 			// ルアーが下端に行ったときに
@@ -153,7 +156,7 @@ void Player::Reset()
 	isLeft = false;
 	velocity_.y = 0;
 	acceleration.y = 0;
-	coolTime = 20;
+	coolTime = 30;
 }
 
 void Player::OnCollision(const Fish* fish) 
