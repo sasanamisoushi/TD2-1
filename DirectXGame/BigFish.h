@@ -60,5 +60,5 @@ private:
 	float appearTimer_ = 0.0f;
 	float appearDuration_ = 60.0f;
 
-	const int point_ = 200;
+	const int point_ = 600;
 };

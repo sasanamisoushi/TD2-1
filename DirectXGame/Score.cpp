@@ -305,6 +305,8 @@ void Score::scoreBossClear()
 	if (score_ >= 10)
 	{
 		isScoreBossClear = true;
+	} else {
+		isScoreBossClear = false;
 	}
 }
 
