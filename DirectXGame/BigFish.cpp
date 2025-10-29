@@ -70,7 +70,7 @@ void BigFish::OnCollision(Player* player)
 	// Fishの共通当たり処理（タイマー処理など）
 	Fish::OnCollision(player);
 
-	if (isLureCheck_) {
+	if (!isLureCheck_) {
 		// BigFishはスコア加算
 		score_->AddScore(point_);
 	}
