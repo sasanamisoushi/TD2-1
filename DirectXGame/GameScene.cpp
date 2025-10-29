@@ -82,7 +82,7 @@ void GameScene::Initialize(Score* score) {
 
 	bossFish_ = new BossFish();
 	Vector3 bossPosition = {0, float(rand() % 7 - 2), 0};
-	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition, 90);
+	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition, 60);
 	
 	// BGMの初期化
 	bgm_ = new BGM();
@@ -240,8 +240,12 @@ void GameScene::Initialize(Score* score) {
 
 	// 数字の初期化
 	numSprite_[0] = Sprite::Create(numTexHandles_[0], {30, 30});
-	numSprite_[1] = Sprite::Create(numTexHandles_[0], {50, 30});
-	numSprite_[2] = Sprite::Create(numTexHandles_[0], {70, 30});
+	numSprite_[1] = Sprite::Create(numTexHandles_[0], {55, 30});
+	numSprite_[2] = Sprite::Create(numTexHandles_[0], {85, 30});
+
+	for (int i = 0; i < 3; i++) {
+		numSprite_[i]->SetSize({50, 50});
+	}
 }
 
 GameScene::~GameScene() {
@@ -494,9 +498,7 @@ void GameScene::Update() {
 						swimmyEvent_->Reset();
 						weatherEvent_->isActive_=false;
 						
-					
-
-						gameTimer_ = 120000;
+						gameTimer_ = 60000;
 						bgm_->BGMStop();
 					}
 				} else {
