@@ -352,7 +352,7 @@ void GameScene::Update() {
 				}
 			}
 		}
-
+		// ぬしの処理
 		if (bossFish_)
 		{
 			bossFish_->Update();
@@ -487,6 +487,7 @@ void GameScene::Update() {
 			{
 				if (!bossFish_->isBossEvent_)
 				{
+					score_->scoreBossClear();
 					if (!score_->isScoreBossClear) {
 						gameTimer_ = 0;
 						isGame_ = false;
@@ -498,7 +499,7 @@ void GameScene::Update() {
 						ClearEventFish();
 						bossFish_->isBossEvent_ = true;
 						bossFish_->isBossSpoon_ = true;
-						gameTimer_ = 100;
+						gameTimer_ = 120000;
 						bgm_->BGMStop();
 					}
 				} else {
@@ -531,6 +532,11 @@ void GameScene::Update() {
 
 			if (Input::GetInstance()->TriggerKey(DIK_D)) {
 				bearEvent_->isBearEvent_ = true;
+			}
+
+			if (Input::GetInstance()->TriggerKey(DIK_1))
+			{
+				score_->AddScoreCombo(point_);
 			}
 
 			ImGui::Begin("Game Scene");
