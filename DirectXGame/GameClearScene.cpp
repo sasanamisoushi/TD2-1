@@ -10,6 +10,9 @@ void GameClearScene::Initialize(Score* score)
 { 
 	//スコア
 	score_ = score; 
+	score_->SetScoreDisplayMode(Score::DisplayMode::Result);
+
+	//BGM
 	bgm_ = new BGM();
 	bgm_->Initialize();
 

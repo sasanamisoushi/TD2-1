@@ -31,16 +31,7 @@ void Score::Initialize()
 		tex_[i] = TextureManager::Load(path);
 	}
 
-	sprites_[0] = Sprite::Create(tex_[0], {970, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[1] = Sprite::Create(tex_[0], {1000, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[2] = Sprite::Create(tex_[0], {1030, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[3] = Sprite::Create(tex_[0], {1060, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[4] = Sprite::Create(tex_[0], {1090, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[5] = Sprite::Create(tex_[0], {1120, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[6] = Sprite::Create(tex_[0], {1150, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[7] = Sprite::Create(tex_[0], {1180, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[8] = Sprite::Create(tex_[0], {1210, 10}, collar, {0.0f, 0.0f}, false, false);
-	sprites_[9] = Sprite::Create(tex_[0], {1240, 10}, collar, {0.0f, 0.0f}, false, false);
+	SetScoreDisplayMode(DisplayMode::Normal);
 
 	// ===== ランキング表示位置と大きさを変更 =====
 	// ※ここを自由に調整してランキング部分を見やすくできます
@@ -54,6 +45,8 @@ void Score::Initialize()
 			// spacingをrankScale分だけ広げることで見た目を「拡大」
 			Vector2 pos = {rankBasePos.x + j * (rankDigitSpacing * rankScale), rankBasePos.y + i * (rankLineSpacing)};
 			rankingSprites[i][j] = Sprite::Create(tex_[0], pos, collar, {0.0f, 0.0f}, false, false);
+
+			rankingSprites[i][j]->SetSize({40, 40});
 		}
 	}
 
@@ -263,4 +256,49 @@ void Score::scoreBossClear()
 	{
 		isScoreBossClear = true;
 	}
+}
+
+void Score::SetScoreDisplayMode(DisplayMode mode) {
+	displayMode_ = mode;
+
+	// 共通の色
+	Vector4 color = {1, 1, 1, 1};
+
+	// 各モードごとの設定
+	float scale = 1.0f; // スプライトの拡大率
+	float baseX = 0.0f;
+	float baseY = 0.0f;
+	float spacing = 10.0f; //行間隔
+
+
+	if (mode == DisplayMode::Normal) {
+		scale = 30.0f;
+		baseX = 950.0f;
+		baseY = 20.0f;
+		spacing = 20.0f ;
+	} else if (mode == DisplayMode::Result) {
+		scale = 70.0f;
+		baseX = 600.0f; // 画面中央寄りに
+		baseY = 150.0f;
+		spacing = 45.0f ;
+	}
+
+
+
+	// 一旦既存スプライト削除（再作成するため）
+	for (int i = 0; i < 10; i++) {
+		delete sprites_[i];
+		sprites_[i] = nullptr;
+	}
+
+	// 新しいスプライトを再生成
+	for (int i = 0; i < 10; i++) {
+		Vector2 pos = {baseX + spacing * i, baseY};
+		sprites_[i] = Sprite::Create(tex_[0], pos, color, {0.0f, 0.0f}, false, false);
+
+		// スプライトのサイズ変更
+		sprites_[i]->SetSize({scale, scale});
+	}
+
+
 }
