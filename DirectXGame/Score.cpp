@@ -18,6 +18,12 @@ Score::~Score()
 			delete rankingSprites[i][j];
 		}
 	}
+
+	for (int i = 0; i < 5; i++) 
+	{
+		delete comboNumSprites_[i];
+		comboNumSprites_[i] = nullptr;
+	}
 }
 
 void Score::Initialize()
@@ -63,6 +69,22 @@ void Score::Initialize()
 
 	isScoreBossClear = false;
 
+	combo_ = 0;
+
+	
+	comboNumSprites_[0] = Sprite::Create(tex_[1], {970, 50}, collar, {0.0f, 0.0f}, false, false);
+	comboNumSprites_[1] = Sprite::Create(tex_[2], {970, 50}, collar, {0.0f, 0.0f}, false, false);
+	comboNumSprites_[2] = Sprite::Create(tex_[3], {970, 50}, collar, {0.0f, 0.0f}, false, false);
+	comboNumSprites_[3] = Sprite::Create(tex_[4], {970, 50}, collar, {0.0f, 0.0f}, false, false);
+	comboNumSprites_[4] = Sprite::Create(tex_[5], {970, 50}, collar, {0.0f, 0.0f}, false, false);
+	
+
+	comboGH = TextureManager::Load("num/combo.png");
+
+	comboSprites_ = Sprite::Create(comboGH, {1000, 40}, collar, {0.0f, 0.0f}, false, false);
+	
+
+
 }
 
 void Score::AddScore(int score)
@@ -80,9 +102,9 @@ void Score::AddScoreCombo(int score)
 { 
 	if (combo_ < 6) 
 	{
-		combo_ += 1;
+ 		combo_ += 1;
 	}
-	score_ += score + (40 * (combo_ - 1));
+	score_ += score + (40 * (combo_));
 }
 
 void Score::SubtractScore(int score)
@@ -134,6 +156,12 @@ void Score::Draw()
 	{
 		sprites_[i]->SetTextureHandle(tex_[keta[i]]);
 		sprites_[i]->Draw();
+	}
+	
+	if (combo_ > 0)
+	{
+		comboNumSprites_[combo_]->Draw();
+		comboSprites_->Draw();
 	}
 }
 
@@ -259,7 +287,7 @@ void Score::FileWrite() {
 
 void Score::scoreBossClear()
 {
-	if (score_ >= 200000)
+	if (score_ >= 10)
 	{
 		isScoreBossClear = true;
 	}

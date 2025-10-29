@@ -82,7 +82,7 @@ void Player::InputMove() {
 			acceleration.y += kLureMoveSpeedY;
 		}
 
-		if (worldTransform_.translation_.y > 9.5f) {
+		if (worldTransform_.translation_.y > 8.0f) {
 			Reset();
 		}
 		if (worldTransform_.translation_.y < -2.0f) {

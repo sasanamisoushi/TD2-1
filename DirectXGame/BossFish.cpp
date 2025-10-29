@@ -121,7 +121,8 @@ void BossFish::RandomPosY()
 
 void BossFish::OnCollision(Player* player)
 {
-	if (!isBossSpoon_) {
+	if (!isBossSpoon_)
+	{
 		return;
 	}
 

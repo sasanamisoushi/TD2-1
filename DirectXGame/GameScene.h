@@ -140,7 +140,7 @@ private:
 
 	static GameScene* instance_;
 
-
+	const int point_ = 100000;
 
 	//フェード用のタイマー
 	float timer;
