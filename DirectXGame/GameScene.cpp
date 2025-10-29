@@ -84,9 +84,6 @@ void GameScene::Initialize(Score* score) {
 	Vector3 bossPosition = {0, float(rand() % 7 - 2), 0};
 	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition, 60);
 	
-	// BGMの初期化
-	bgm_ = new BGM();
-	bgm_->Initialize();
 	// 背景オブジェクトのワールド座標設定
 	backgroundTransform_.Initialize();
 	backgroundTransform_.translation_ = {0.0f, 5.0f, 10.0f}; // ← zを大きくしてt奥に
