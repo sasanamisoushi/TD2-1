@@ -24,16 +24,12 @@ void Score::Initialize()
 {
 	
 	Vector4 collar = {1, 1, 1, 1};
-	tex_[0] = TextureManager::Load("num/0.png");
-	tex_[1] = TextureManager::Load("num/1.png");
-	tex_[2] = TextureManager::Load("num/2.png");
-	tex_[3] = TextureManager::Load("num/3.png");
-	tex_[4] = TextureManager::Load("num/4.png");
-	tex_[5] = TextureManager::Load("num/5.png");
-	tex_[6] = TextureManager::Load("num/6.png");
-	tex_[7] = TextureManager::Load("num/7.png");
-	tex_[8] = TextureManager::Load("num/8.png");
-	tex_[9] = TextureManager::Load("num/9.png");
+	// ===== 数字画像を読み込み =====
+	for (int i = 0; i < 10; i++) {
+		char path[64];
+		sprintf_s(path, "num/%d.png", i);
+		tex_[i] = TextureManager::Load(path);
+	}
 
 	sprites_[0] = Sprite::Create(tex_[0], {970, 10}, collar, {0.0f, 0.0f}, false, false);
 	sprites_[1] = Sprite::Create(tex_[0], {1000, 10}, collar, {0.0f, 0.0f}, false, false);
@@ -46,12 +42,18 @@ void Score::Initialize()
 	sprites_[8] = Sprite::Create(tex_[0], {1210, 10}, collar, {0.0f, 0.0f}, false, false);
 	sprites_[9] = Sprite::Create(tex_[0], {1240, 10}, collar, {0.0f, 0.0f}, false, false);
 
-	for (int i = 0; i < 3; i++) 
-	{
-		for (int j = 0; j < 10; j++)
-		{
-			rankingSprites[i][j] = Sprite::Create(tex_[0], {float(480 + (30 * j)), float(350 + (40 * i))}, collar, {0.0f, 0.0f}, false, false);
-			
+	// ===== ランキング表示位置と大きさを変更 =====
+	// ※ここを自由に調整してランキング部分を見やすくできます
+	const Vector2 rankBasePos = {430.0f, 360.0f}; // 左上位置（下げたいならYを大きく）
+	const float rankDigitSpacing = 20.0f;         // 桁間隔（数字の横幅方向）
+	const float rankLineSpacing = 135.0f;          // 行間（数字列の縦方向）
+	const float rankScale = 2.0f;                 // 疑似スケール（spacingで調整）
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 10; j++) {
+			// spacingをrankScale分だけ広げることで見た目を「拡大」
+			Vector2 pos = {rankBasePos.x + j * (rankDigitSpacing * rankScale), rankBasePos.y + i * (rankLineSpacing)};
+			rankingSprites[i][j] = Sprite::Create(tex_[0], pos, collar, {0.0f, 0.0f}, false, false);
 		}
 	}
 
