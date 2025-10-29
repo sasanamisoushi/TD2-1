@@ -59,7 +59,9 @@ void GameScene::Initialize(Score* score) {
 	//クマイベントのモデル
 	bearPModel_ = Model::CreateFromOBJ("Bear", true);
 
+	//スコア
 	score_ = score;
+	score_->SetScoreDisplayMode(Score::DisplayMode::Normal);
 
 	// イベントの初期化
 	swimmyEvent_ = new SwimmyEvent();
