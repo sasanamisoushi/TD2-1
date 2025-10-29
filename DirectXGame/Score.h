@@ -9,6 +9,11 @@ class Score
 {
 public:
 
+	 enum class DisplayMode { 
+		 Normal,
+		 Result
+	 };
+
 	~Score();
 
 	void Initialize();
@@ -37,6 +42,8 @@ public:
 
 	int isScoreBossClear = false;
 
+	void SetScoreDisplayMode(DisplayMode mode);
+
 private:
 
 	int score_;
@@ -48,4 +55,6 @@ private:
 	std::array<KamataEngine::Sprite*, 10> sprites_ = {}; // 配列 描画
 	std::array<std::array<KamataEngine::Sprite*, 10>,3> rankingSprites = {}; // 配列 描画 １位
 	std::array<int, 10> tex_ = {}; // 配列 数字
+
+	DisplayMode displayMode_ = DisplayMode::Normal;
 };
