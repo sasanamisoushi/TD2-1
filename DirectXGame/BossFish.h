@@ -2,7 +2,6 @@
 #include "KamataEngine.h"
 #include "math.h"
 #include "Score.h"
-#include "BGM.h"
 
 using namespace KamataEngine;
 
@@ -47,9 +46,9 @@ public:
 	bool IsLureCheck() const { return isLureCheck_; }
 
 	// イベント発生フラグ
-	int isBossEvent_;
+	bool isBossEvent_ = false;
 	// スポーン
-	int isBossSpoon_;
+	bool isBossSpoon_ = false;
 
 private:
 
@@ -66,10 +65,6 @@ private:
 	uint32_t textureHandle_ = 0u;
 
 	Score* score_;
-
-	BGM* bgm_ = nullptr;
-
-	uint32_t bossBgm_;
 
 	// 向き
 	Vector3 direction_;

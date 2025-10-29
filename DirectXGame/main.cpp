@@ -52,6 +52,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	bgm_ = new BGM();
 	bgm_->Initialize();
 
+	int isBoss = false;
+
+	uint32_t gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/Sunny Day.mp3");
+	uint32_t gamePlayBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/All the Fixings.mp3");
+	uint32_t titleBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/In the Sweet By and By.mp3");
+	uint32_t bossBgm_ = Audio::GetInstance()->LoadWave("./BGM/Run.mp3");
+
 	// メインループ
 	while (true) {
 		// エンジンの更新
@@ -94,6 +101,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			case Scene::kTitle:
 				titleScene = new TitleScene();
 				titleScene->Initialize();
+				isBoss = false;
 				break;
 			case Scene::kTutorial:
 				tutorialScene = new TutorialScene();
@@ -115,14 +123,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			case Scene::kTitle:
 				if (titleScene != nullptr) {
 					titleScene->Update();
+				    bgm_->BGMPlay(titleBgmHandle_);
 				    score->ResetScore();
+				    score->isScoreBossClear = false;
 					if (titleScene->IsFinished()) {
 						nextSceneEnum = Scene::kTutorial;
 					}
 				}
 				break;
 		    case Scene::kTutorial:
-			    if (tutorialScene != nullptr) {
+			    if (tutorialScene != nullptr)
+				{
+
 				    tutorialScene->Update();
 				    if (tutorialScene->IsFinished()) {
 					    nextSceneEnum = Scene::kGame;
@@ -131,18 +143,36 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			    }
 			    break;
 			case Scene::kGame:
-				if (gameScene != nullptr) {
+				if (gameScene != nullptr)
+				{
+				    if (!score->isScoreBossClear)
+					{
+					    bgm_->BGMPlay(gamePlayBgmHandle_);
+				    }
+					else
+					{
+					    if (!isBoss) 
+						{
+						    bgm_->BGMStop();
+						    isBoss = true;
+					    }
+					    bgm_->BGMPlay(bossBgm_);
+				    }
 					gameScene->Update();
 					if (gameScene->IsFinished()) {
 						nextSceneEnum = Scene::kGameClear;
+					    bgm_->BGMStop();
 					}
 				}
 				break;
 			case Scene::kGameClear:
-				if (gameClearScene != nullptr) {
+				if (gameClearScene != nullptr) 
+				{
+				    bgm_->BGMPlay(gameClearBgmHandle_);
 					gameClearScene->Update();
 					if (gameClearScene->IsFinished()) {
 						nextSceneEnum = Scene::kTitle;
+					    bgm_->BGMStop();
 					}
 				}
 				break;

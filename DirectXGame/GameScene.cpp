@@ -81,11 +81,7 @@ void GameScene::Initialize(Score* score) {
 
 	bossFish_ = new BossFish();
 	Vector3 bossPosition = {0, float(rand() % 7 - 2), 0};
-	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition, 90);
-	
-	// BGMの初期化
-	bgm_ = new BGM();
-	bgm_->Initialize();
+	bossFish_->Initialize(bossFishModel_, &camera_, score_, bossPosition,10);
 
 	// 背景オブジェクトのワールド座標設定
 	backgroundTransform_.Initialize();
@@ -222,8 +218,6 @@ void GameScene::Initialize(Score* score) {
 		attempts++;
 	}
 
-	gamePlayBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/All the Fixings.mp3");
-
 	// タイマー
 	// 数字の描画
 	numTexHandles_[0] = TextureManager::Load("num/0.png");
@@ -276,7 +270,6 @@ GameScene::~GameScene() {
 	delete bearLureModel_;
 	delete weatherEvent_;
 	delete weatherModel_;
-	delete bgm_;
 
 	delete bearPModel_;
 
@@ -296,7 +289,6 @@ GameScene::~GameScene() {
 void GameScene::Update() {
 
 	fade_->Update();
-	bgm_->BGMPlay(gamePlayBgmHandle_);
 	float currentSpeedMultiplier = weatherEvent_->GetFishSpeedMultiplier();
 	int caughtFishCount = 0;
 	switch (phase_) {
@@ -464,7 +456,6 @@ void GameScene::Update() {
 		if (Input::GetInstance()->TriggerKey(DIK_S)) {
 			isFinish = true;
 			score_->FileWrite();
-			bgm_->BGMStop();
 		}
 		CheckAllCollisions();
 		CheckBearCollisions();
@@ -487,7 +478,6 @@ void GameScene::Update() {
 						isGame_ = false;
 						isFinish = true;
 						score_->FileWrite();
-						bgm_->BGMStop();
 					} else {
 						ClearAllFish();
 						ClearEventFish();
@@ -495,7 +485,6 @@ void GameScene::Update() {
 						bossFish_->isBossSpoon_ = true;
 						bearEvent_->isBearEvent_ = false;
 						gameTimer_ = 6000;
-						bgm_->BGMStop();
 					}
 				} 
 				else
@@ -504,7 +493,6 @@ void GameScene::Update() {
 					isGame_ = false;
 					isFinish = true;
 					score_->FileWrite();
-					bgm_->BGMStop();
 				}
 			}
 			if (bossFish_->isBossEvent_) 
@@ -515,7 +503,6 @@ void GameScene::Update() {
 					isGame_ = false;
 					isFinish = true;
 					score_->FileWrite();
-					bgm_->BGMStop();
 				}
 			}
 			CheckAllCollisions();
@@ -529,7 +516,6 @@ void GameScene::Update() {
 				ClearEventFish();
 				bossFish_->isBossEvent_ = true;
 				bossFish_->isBossSpoon_ = true;
-				bgm_->BGMStop();
 			}
 
 			if (Input::GetInstance()->TriggerKey(DIK_A)) {

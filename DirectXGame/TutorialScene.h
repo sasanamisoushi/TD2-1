@@ -2,7 +2,6 @@
 #include "Fade.h"
 #include "KamataEngine.h"
 #include <array>
-
 namespace KamataEngine {
 class Sprite;
 }
@@ -41,7 +40,7 @@ private:
 		// フェード
 	Fade* fade_ = nullptr;
 	Phase phase_ = Phase::kFadeIn;
-
+	
 	// フェード用
 	int timer;
 

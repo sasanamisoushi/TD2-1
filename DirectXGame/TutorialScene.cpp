@@ -43,8 +43,10 @@ void TutorialScene::Update() {
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			if (page == 0) {
 				page = 1;
-			} else if (page == 1) {
+			} else if (page == 1) 
+			{
 				isFinish = true;
+				
 			}
 		}
 		break;

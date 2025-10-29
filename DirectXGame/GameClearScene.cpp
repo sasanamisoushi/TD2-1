@@ -13,10 +13,6 @@ void GameClearScene::Initialize(Score* score)
 	score_->isComboDraw_ = false;
 	score_->SetScoreDisplayMode(Score::DisplayMode::Result);
 
-	//BGM
-	bgm_ = new BGM();
-	bgm_->Initialize();
-
 	// フェードとフェード管理の初期化
 	fade_ = new Fade();
 	fade_->Initialize();
@@ -26,7 +22,7 @@ void GameClearScene::Initialize(Score* score)
 
 	timer = 0;
 
-	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/Sunny Day.mp3");
+	
 	scoreBackground_ = TextureManager::Load("./Resources/scoreBackground/scoreBackground.png");
 
 	//スプライト作成
@@ -35,12 +31,11 @@ void GameClearScene::Initialize(Score* score)
 
 GameClearScene::~GameClearScene()
 {
-	delete bgm_; 
+
 }
 
 void GameClearScene::Update() 
 {
-	bgm_->BGMPlay(gameClearBgmHandle_);
 	fade_->Update();
 	switch (phase_) {
 	case GameClearScene::Phase::kFadeIn:
@@ -51,7 +46,6 @@ void GameClearScene::Update()
 	case GameClearScene::Phase::kMain:
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			isFinish = true;
-      bgm_->BGMStop();
 		}
 		break;
 	case GameClearScene::Phase::kfadeOut:

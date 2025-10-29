@@ -6,8 +6,7 @@
 #include <cstdlib>
 #include <numbers>
 
-BossFish::~BossFish() 
-{ delete bgm_; }
+BossFish::~BossFish() {}
 
 void BossFish::Initialize(Model* model, Camera* camera, Score* score, KamataEngine::Vector3& position, int getTimer) {
 
@@ -32,13 +31,6 @@ void BossFish::Initialize(Model* model, Camera* camera, Score* score, KamataEngi
 	worldTransform_.scale_ = {0.8f, 0.6f, 0.8f}; // 最初は小さめ
 	isLeft_ = false;	
 
-	isBossEvent_ = false;
-	isBossSpoon_ = false;
-
-	bgm_ = new BGM();
-	bgm_->Initialize();
-
-	bossBgm_ = Audio::GetInstance()->LoadWave("./BGM/Run.mp3");
 }
 
 void BossFish::Update() 
@@ -47,7 +39,6 @@ void BossFish::Update()
 	{
 		return;
 	}
-	bgm_->BGMPlay(bossBgm_);
 	KamataEngine::Vector3 acceleration = {};
 	if (!isLeft_) {
 		acceleration.x += kLureMoveSpeedX;
@@ -135,6 +126,5 @@ void BossFish::OnCollision(Player* player)
 		isLureCheck_ = true;
 		score_->AddScoreCombo(point_);
 		isBossSpoon_ = false;
-		bgm_->BGMStop();
 	}
 }
