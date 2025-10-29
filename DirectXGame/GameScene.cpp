@@ -484,7 +484,7 @@ void GameScene::Update() {
 						ClearEventFish();
 						bossFish_->isBossEvent_ = true;
 						bossFish_->isBossSpoon_ = true;
-
+						bearEvent_->isBearEvent_ = false;
 						swimmyEvent_->Reset();
 						weatherEvent_->isActive_=false;
 						

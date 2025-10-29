@@ -302,7 +302,7 @@ void Score::FileWrite() {
 
 void Score::scoreBossClear()
 {
-	if (score_ >= 10)
+	if (score_ >= 15000)
 	{
 		isScoreBossClear = true;
 	} else {
